@@ -1,32 +1,7 @@
 <?php
 session_start();
 include 'dbconfig.php';
-if (isset($_SESSION['user_email'])) {
-    $usertype = $_SESSION['usertype'];
-    $email = $_SESSION['user_email'];
-    $userid = $_SESSION['userid'];
-
-    if ($usertype == 'admin') {
-        $sql = "SELECT us.userid,us.userapproved, us.username, us.field, us.lab,pd.pid, pd.productname,pd.datetime, pd.productlink, pd.productprice, pd.quantity, pd.urgency,pd.addedcart,pd.orderstatus,
-             pd.addedcartdate,pd.addedby,pd.handedover
-             FROM user AS us JOIN product AS pd ON us.userid = pd.userid";
-    } else {
-        $sql = "SELECT us.userid,us.username, us.field, us.lab, pd.productname,pd.datetime, pd.productlink, pd.productprice, pd.quantity, pd.urgency,pd.addedcart,pd.orderstatus,pd.handedover
-     FROM user AS us JOIN product AS pd ON us.userid = pd.userid WHERE us.email = :email";
-    }
-
-    $stmt = $conn->prepare($sql);
-
-    if ($usertype == 'user') {
-        $stmt->bindParam(':email', $email);
-    }
-
-    $stmt->execute();
-
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -36,6 +11,9 @@ if (isset($_SESSION['user_email'])) {
     <title>Attendance Management System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tabulator-tables@4.10.0/dist/css/tabulator.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/tabulator-tables@5.5.2/dist/css/tabulator.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
     <link rel="stylesheet" href="css/index.css">
 </head>
 
@@ -62,8 +40,11 @@ if (isset($_SESSION['user_email'])) {
 
     <div id="tab1" class="container tab-content active-tab">
         <div class="row">
+            <!---- code for registering the leave from the user start here --->
             <div class="col-md-6 offset-md-3">
-                <h2 class="mb-4">Date Input Form</h2>
+                <!--<h2 class="mb-4">Date Input Form</h2>-->
+                <h2 class="mb-4">CL: <?php echo "2"; ?></h2>
+                <h2 class="mb-4">RH: <?php echo "2"; ?> </h2>
                 <?php
                 if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $startDate = $_POST['start_date'];
@@ -92,87 +73,21 @@ if (isset($_SESSION['user_email'])) {
                         <label for="reason">Reason:</label>
                         <input type="text" class="form-control" id="reason" name="reason" required>
                     </div>
+                    <br>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>
         </div>
     </div>
 
+    <!------ code for dispalying the all the data to the user based on user type ------->
     <div id="tab2" class="container tab-content">
         <div class="row">
-            <div class="col-md-6 offset-md-3">
+            <div class="col-md-12 ">
                 <h2 class="mb-4">Displaying all the leave</h2>
-                <?php
-                echo '<table style="color: white; border-collapse: collapse; width: 100%; border: 1px solid white;">
-                    <tr>
-                        <th style="border: 1px solid white;">User Name</th>
-                        <th style="border: 1px solid white;">Approved/Disapproved User</th>
-                        <th style="border: 1px solid white;">Product Name</th>
-                        <th style="border: 1px solid white;">Order Date</th>
-                        <th style="border: 1px solid white;">Product Url</th>
-                        <th style="border: 1px solid white;">Product Urgency</th>
-                        <th style="border: 1px solid white;">Product Quantity</th>
-                        <th style="border: 1px solid white;">Added to Cart</th>
-                        <th style="border: 1px solid white;">Added to Cart Date</th>
-                        <th style="border: 1px solid white;">Added By</th>
-                        <th style="border: 1px solid white;">Handed Over</th>
-                    </tr>';
-
-                if ($results) {
-                    foreach ($results as $result) {
-                        echo '<tr>';
-                        echo '<td style="border: 1px solid white;">' . htmlspecialchars("hello") . '</td>';
-                        echo '<td style="border: 1px solid white;">';
-                        if ($result['userapproved'] == 'no') {
-                            echo '<button type="button" onclick="sendApprovalStatus(\'yes\', \'' . $result['userid'] . '\')" class="btn btn-danger approved_button1">Approved User</button>';
-                        } else {
-                            echo '<button type="button" onclick="sendApprovalStatus(\'no\', \'' . $result['userid'] . '\')" class="btn btn-success approved_button2">Disapproved User</button>';
-                        }
-                        echo '</td>';
-
-                        echo '<td style="border: 1px solid white;">' . htmlspecialchars($result['productname']) . '</td>';
-                        echo '<td style="border: 1px solid white;">' . htmlspecialchars($result['datetime']) . '</td>';
-                        echo '<td style="border: 1px solid white;"><a href="' . htmlspecialchars($result['productlink']) . '">' . htmlspecialchars($result['productlink']) . '</a></td>';
-                        echo '<td style="border: 1px solid white;">' . htmlspecialchars($result['urgency']) . '</td>';
-                        echo '<td style="border: 1px solid white;">' . htmlspecialchars($result['quantity']) . '</td>';
-
-                        /* code for displaying the added to cart data  */
-                        echo '<td style="border: 1px solid white;">';
-                        if ($usertype == 'admin' || $usertype == 'purchaseteam') {
-                            if ($result['addedcart'] == 'no') {
-                                echo '<button type="button" class="btn btn-primary cart-button  button_data" pid="' . htmlspecialchars($result["pid"]) . '" username="' . htmlspecialchars($usertype) . '" onclick="handleButtonClick(this)">Add To Cart</button>';
-                            } else {
-                                echo htmlspecialchars($result['addedcart']);
-                            }
-                        } else {
-                            echo htmlspecialchars($result['addedcart']);
-                        }
-                        echo '</td>';
-                        echo '<td style="border: 1px solid white;">' . htmlspecialchars($result['addedcartdate']) . '</td>';
-                        echo '<td style="border: 1px solid white;">' . htmlspecialchars($result['addedby']) . '</td>';
-                        // echo '<td style="border: 1px solid white;">' . htmlspecialchars($result['orderstatus']) . '</td>';
-                        echo '<td style="border: 1px solid white;">';
-
-                        /* code for dispalying the handedover data  */
-                        if (($usertype == 'admin' || $usertype == 'purchaseteam')) {
-
-                            if ($result['handedover'] == '') {
-                                echo '<input type="text" style="width:120px;margin:10px;" class="handed_over" data-userid="' . htmlspecialchars($result['userid']) . '" placeholder="Handed Over" onkeypress="handleEnterKey(event)">';
-                            } else {
-                                echo htmlspecialchars($result['handedover']);
-                            }
-                        } else {
-                            echo htmlspecialchars($result['handedover']);
-                        }
-                        echo '</td>';
-                        echo '</tr>';
-                    }
-                } else {
-                    echo '<tr><td colspan="3">No results found.</td></tr>';
-                }
-
-                echo '</table>';
-                ?>
+                <div id="tabulator-table"></div>
+                <!--<div class="pagination-btn" onclick="table.previousPage()">Previous</div>-->
+                <!--<div class="pagination-btn" onclick="table.nextPage()">Next</div>-->
             </div>
         </div>
     </div>
@@ -185,6 +100,404 @@ if (isset($_SESSION['user_email'])) {
             });
             var selectedTab = document.getElementById(tabId);
             selectedTab.classList.add('active-tab');
+        }
+    </script>
+    <script>
+        var tabId;
+
+        function showTab(tabId) {
+            var tabs = document.querySelectorAll('.tab-content');
+            // console.log(tabId);
+            tabs.forEach(function(tab) {
+                tab.classList.remove('active-tab');
+            });
+            var selectedTab = document.getElementById(tabId);
+            selectedTab.classList.add('active-tab');
+        }
+
+
+        if (typeof Tabulator !== 'undefined') {
+            var results = <?php echo json_encode($results); ?>;
+            var columns = [{
+                    title: "User Name",
+                    field: "userfullname",
+                    headerFilter: true
+                    // visible: <?php echo ($usertype == 'user') ? 'true' : 'true'; ?>,
+                },
+                {
+                    title: "Contact No",
+                    field: "phoneNo",
+                    headerFilter: true
+                },
+                {
+                    title: "Reason",
+                    field: "quantity",
+                    headerFilter: true
+                },
+                {
+                    title: "Start Date",
+                    field: "productprice",
+                    headerFilter: true
+                },
+                {
+                    title: "End Date",
+                    field: "tpprice",
+                    headerFilter: true
+                },
+                {
+                    title: "Remaining CL",
+                    field: "addedcart",
+                    headerFilter: true,
+                    // visible: <?php echo ($usertype == 'user') ? 'true' : 'false'; ?>,
+                    // formatter: function(cell, formatterParams, onRendered) {
+                    //     var value = cell.getValue();
+                    //     if (value === 'yes') {
+                    //         return 'Product Added To cart';
+                    //     } else if (value === 'no') {
+                    //         return 'This Product can not be ordered.';
+                    //     } else {
+                    //         return 'Not Added to cart Yet';
+                    //     }
+                    // }
+                },
+            ];
+
+            // code for dispalying added to cart or not 
+            <?php if ($usertype != 'user') : ?>
+                columns.push({
+                    title: "Add to Cart",
+                    field: "addedcart",
+                    headerFilter: true,
+                    formatter: function(cell, formatterParams, onRendered) {
+                        var value = cell.getValue();
+                        if (value === 'yes') {
+                            var celldata = cell.getElement();
+                            celldata.disabled = true;
+                            celldata.classList.add('disabled-cell');
+                            var row = cell.getRow();
+                            row.getElement().classList.add('green-row');
+                            return 'Yes';
+                        } else if (value === 'no') {
+                            var cellEl = cell.getElement();
+                            cellEl.disabled = true;
+                            cellEl.classList.add('disabled-cell');
+                            var row = cell.getRow();
+                            row.getElement().classList.add('red-row');
+                            return 'Denied';
+                        } else {
+                            var dropdown = document.createElement('select');
+                            dropdown.classList.add('form-control');
+                            dropdown.innerHTML = `
+                                <option value="">Select</option>
+                                <option value="yes">Yes</option>
+                                <option value="no">Denied</option>
+                            `;
+                            // Add event listener to the dropdown
+                            dropdown.addEventListener('change', function(event) {
+                                var selectedValue = event.target.value;
+                                var cellData = cell.getData();
+                                var username = cellData.username;
+                                var userId = cellData.userId;
+                                var pid = cellData.pid;
+
+                                // Update the addedcartInfo with the new value
+                                updateaddedcartInfo(pid, userId, selectedValue, username);
+                            });
+
+                            return dropdown;
+                        }
+                    }
+                });
+
+            <?php endif; ?>
+            // function for that product is added  to card or not 
+            function updateaddedcartInfo(pid, userId, newValue, username) {
+                console.log(pid, userId, newValue, username);
+                var currentDateTime = new Date().toLocaleString('en-IN', {
+                    timeZone: 'Asia/Kolkata'
+                });
+                var addedusername = "<?php echo $usertype; ?>";
+                fetch('update_addtocart.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: 'pid=' + encodeURIComponent(pid) + '&userId=' + encodeURIComponent(userId) + '&status=' + encodeURIComponent(newValue) + '&userId=' + encodeURIComponent(userId) +
+                            '&datetime=' + encodeURIComponent(currentDateTime) + '&username=' + encodeURIComponent(addedusername)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        var alertdata = data['status'];
+                        if (alertdata == 'no') {
+                            alert("Product is Denied.");
+                            window.location.href = 'index1.php';
+                        } else {
+                            alert("Product is Added to Cart.");
+                            window.location.href = 'index1.php';
+                        }
+
+                    })
+                    .catch(error => {
+                        console.error('Error updating Add to Cart:', error);
+                    });
+            }
+
+
+            // // code for updating the status of product 
+            // columns.push({
+            //   title: "Product status",
+            //   field: "productstatus",
+            //   headerFilter: true,
+            //   visible: <?php echo ($usertype == 'user') ? 'false' : 'true'; ?>,
+            // });
+
+            // code for updating the user stats start here 
+            <?php if ($usertype != 'use') : ?>
+                columns.push({
+                    title: "Product status",
+                    field: "productstatus",
+                    headerFilter: true,
+                    editor: <?php echo ($usertype == 'purchaseteam' || $usertype == 'admin') ? "'input'" : "false"; ?>,
+                    cellEdited: function(cell) {
+                        var userId = cell.getData().userid;
+                        var pid = cell.getData().pid;
+                        var newValue = cell.getValue();
+                        cell.setValue(newValue);
+                        updatestatus(pid, userId, newValue);
+                    },
+                });
+            <?php endif; ?>
+            // function of the updatestatus start here 
+            function updatestatus(pid, userId, newValue) {
+                console.log(pid, userId, newValue);
+                var pid
+                fetch('updateproductstatus.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: 'pid=' + encodeURIComponent(pid) + '&status=' + encodeURIComponent(newValue)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert("Product Status Updated Successfully")
+                        //   console.log('Database update successful:', data);
+                    })
+                    .catch(error => {
+                        console.error('Error updating database:', error);
+                    });
+            }
+
+            // code for updating the to whom handed the product 
+            <?php if ($usertype != 'use') : ?>
+                columns.push({
+                    title: "Handed Over",
+                    field: "handedover",
+                    headerFilter: true,
+                    editor: <?php echo ($usertype == 'purchaseteam' || $usertype == 'admin') ? "'input'" : "false"; ?>,
+                    cellEdited: function(cell) {
+                        var userId = cell.getData().userid;
+                        //   console.log(userId)
+                        var pid = cell.getData().pid;
+                        //   console.log(pid);
+                        var newValue = cell.getValue();
+                        //   console.log(newValue);
+                        cell.setValue(newValue);
+                        updateHandedOverValue(pid, userId, newValue);
+                    },
+                });
+            <?php endif; ?>
+
+            // function for teh update the handed over the product
+            function updateHandedOverValue(pid, userId, newValue) {
+                console.log("updateHandedOver function is working");
+                var pid
+                fetch('update.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: 'pid=' + encodeURIComponent(pid) + 'userId=' + encodeURIComponent(userId) + '&status=' + encodeURIComponent(newValue)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert("Product Handed Over Updated Successfully")
+                        //   console.log('Database update successful:', data);
+                    })
+                    .catch(error => {
+                        console.error('Error updating database:', error);
+                    });
+            }
+            var pageSize = 10;
+            var currentPage = 1;
+            var table = new Tabulator("#tabulator-table", {
+                data: results,
+                layout: "fitColumns",
+                columns: columns,
+                pagination: "local", // Enable local pagination
+                paginationSize: pageSize, // Number of rows per page
+                paginationSizeSelector: [10, 15, 30],
+                paginationInitialPage: currentPage, // Initial page
+            });
+
+            // Add the following code to initialize pagination buttons
+            var prevPageBtn = document.querySelector('.pagination-btn:first-of-type');
+            var nextPageBtn = document.querySelector('.pagination-btn:last-of-type');
+
+            if (prevPageBtn && nextPageBtn) {
+                prevPageBtn.addEventListener('click', function() {
+                    table.previousPage();
+                });
+
+                nextPageBtn.addEventListener('click', function() {
+                    table.nextPage();
+                });
+            }
+
+            function updateTableData() {
+                // Fetch updated data from the server
+                fetch('fetch_data.php') // Create a new PHP file (fetch_data.php) to handle fetching data
+                    .then(response => response.json())
+                    .then(data => {
+                        // Update Tabulator table with the latest data
+                        table.setData(data);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                    });
+            }
+
+        } else {
+            console.error('Tabulator library not defined or not loaded.');
+        }
+    </script>
+
+    <script>
+        if (typeof Tabulator !== 'undefined') {
+            var results = <?php echo json_encode($results); ?>;
+            var columns = [{
+                    title: "User Name",
+                    field: "userfullname",
+                    headerFilter: true
+                },
+                {
+                    title: "User Email",
+                    field: "email",
+                    headerFilter: true
+                },
+                {
+                    title: "Contact No",
+                    field: "phoneNo",
+                    headerFilter: true
+
+                },
+                {
+                    title: "Lab",
+                    field: "lab",
+                    headerFilter: true
+                },
+
+            ];
+            // code for approved/disapproved user
+            <?php if ($usertype != 'user') : ?>
+                columns.push({
+                    title: "Approved/Disapproved User",
+                    field: "userapproved",
+                    headerFilter: true,
+                    formatter: function(cell, formatterParams, onRendered) {
+                        var value = cell.getValue();
+                        // console.log(value);
+                        var buttonText = value === 'yes' ? 'Approved' : 'Disapproved';
+                        var buttonColor = value === 'yes' ? 'btn-success' : 'btn-danger';
+                        //   var buttonHTML = '<button type="button" class="btn ' + buttonColor + '">' + buttonText + '</button>';
+                        var buttonHTML = '<button type="button" class="btn ' + buttonColor + '" style="width: 100%;">' + buttonText + '</button>';
+                        return buttonHTML;
+                    },
+                    cellClick: function(e, cell) {
+                        // Toggle the value and update the database
+                        var currentValue = cell.getValue();
+                        // console.log(currentValue);
+                        var newValue = currentValue === 'yes' ? 'no' : 'yes';
+                        cell.setValue(newValue);
+                        // console.log(newValue);
+                        // Send an AJAX request to update the database
+                        var userId = cell.getData().userid; // Assuming you have a 'userid' field in your data
+                        // console.log(userId);
+                        updateApprovalStatus(userId, newValue);
+                    }
+                });
+            <?php endif; ?>
+            // function for approved or disapproved user 
+            function updateApprovalStatus(userId, newValue) {
+                fetch('approved.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: 'userId=' + encodeURIComponent(userId) + '&status=' + encodeURIComponent(newValue)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        var datavalue = data.data;
+                        console.log(datavalue);
+                        if (datavalue == 'no') {
+                            alert("User Successfully Disapproved");
+                            window.location.href = "index1.php";
+                        } else {
+                            alert("User Successfully Approved");
+                            window.location.href = "index1.php";
+                        }
+                        // Redirect if needed
+                        // window.location.href = "index1.php";
+                        // console.log('Database update successful:', data);
+                    })
+                    .catch(error => {
+                        console.error('Error updating database:', error);
+                    });
+            }
+
+            var pageSize = 10; // Number of rows per page
+            var currentPage = 1; // Initial page
+
+            var table = new Tabulator("#usertable", {
+                data: results,
+                layout: "fitColumns",
+                columns: columns,
+                pagination: "local", // Enable local pagination
+                paginationSize: pageSize, // Number of rows per page
+                paginationSizeSelector: [10, 15, 30],
+                paginationInitialPage: currentPage, // Initial page
+            });
+            // Add the following code to initialize pagination buttons
+            var prevPageBtn = document.querySelector('.pagination-btn:first-of-type');
+            var nextPageBtn = document.querySelector('.pagination-btn:last-of-type');
+
+            if (prevPageBtn && nextPageBtn) {
+                prevPageBtn.addEventListener('click', function() {
+                    table.previousPage();
+                });
+
+                nextPageBtn.addEventListener('click', function() {
+                    table.nextPage();
+                });
+            }
+
+            function updateTableData() {
+                // Fetch updated data from the server
+                fetch('fetch_data.php') // Create a new PHP file (fetch_data.php) to handle fetching data
+                    .then(response => response.json())
+                    .then(data => {
+                        // Update Tabulator table with the latest data
+                        table.setData(data);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                    });
+            }
+
+        } else {
+            console.error('Tabulator library not defined or not loaded.');
         }
     </script>
 
