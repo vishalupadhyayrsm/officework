@@ -1,0 +1,40 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.navbar-nav {
+    flex-direction: row;
+    /* justify-content: center; */
+    width: 100%;
+}
+
+.nav-item {
+    padding-left: 20px;
+}
+
+.tab-button {
+    margin: 5px;
+}
+
+.tab-content {
+    display: none;
+    margin-top: 20px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+form {
+    max-width: 600px;
+    margin: auto;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+.btn-success {
+    width: 80px; /* Adjust width as needed */
+    padding: 6px 15px; /* Adjust padding as needed */
+ 
+}
