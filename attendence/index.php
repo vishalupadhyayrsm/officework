@@ -1,6 +1,29 @@
 <?php
 session_start();
 include 'dbconfig.php';
+include 'fecthdata.php';
+$email = $_SESSION['user_email'];
+$username = $_SESSION['username'];
+$usertype = $_SESSION['usertype'];
+// $_SESSION['userid'] = $result['sid'];
+echo $usertype;
+try {
+    if ($usertype == "user") {
+        $sql = "SELECT `sid`, `name`, `email`,`usertype`,`contact`, `cl`, `rh`, `leave_reason`,`leave_startdate`, `leave_enddate`,`leave_status` FROM `sigin` WHERE `email` = :email";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':email', $email);
+        $stmt->execute();
+    } else {
+        $sql = "SELECT * FROM `sigin`";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+    }
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    print_r($results);
+} catch (PDOException $e) {
+    echo "Error: " . $e->getMessage();
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -18,12 +41,9 @@ include 'dbconfig.php';
 </head>
 
 <body>
-    <?php
-    $usertype = "User";
-    ?>
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark">
-            <span class="navbar-brand">Welcome: <?php echo $usertype; ?></span>
+            <span class="navbar-brand">Welcome: <?php echo $_SESSION['usertype']; ?></span>
             <div class="container">
                 <div class="header-content">
                     <h2 class="model_name text-center">Leave Application Form</h2>
@@ -34,8 +54,8 @@ include 'dbconfig.php';
     </header>
     <br>
     <div class="tabs">
-        <button onclick="showTab('tab1')" class="btn btn-primary order_status_button click_here_button">Order Here</button>
-        <button onclick="showTab('tab2')" class="btn btn-primary order_status_button click_here_button">Order Status</button>
+        <button onclick="showTab('tab1')" class="btn btn-primary order_status_button click_here_button">Apply Leave</button>
+        <button onclick="showTab('tab2')" class="btn btn-primary order_status_button click_here_button">Leave Status</button>
     </div>
 
     <div id="tab1" class="container tab-content active-tab">
@@ -107,7 +127,6 @@ include 'dbconfig.php';
 
         function showTab(tabId) {
             var tabs = document.querySelectorAll('.tab-content');
-            // console.log(tabId);
             tabs.forEach(function(tab) {
                 tab.classList.remove('active-tab');
             });
@@ -120,33 +139,53 @@ include 'dbconfig.php';
             var results = <?php echo json_encode($results); ?>;
             var columns = [{
                     title: "User Name",
-                    field: "userfullname",
+                    field: "name",
                     headerFilter: true
                     // visible: <?php echo ($usertype == 'user') ? 'true' : 'true'; ?>,
                 },
                 {
                     title: "Contact No",
-                    field: "phoneNo",
+                    field: "contact",
                     headerFilter: true
                 },
                 {
-                    title: "Reason",
-                    field: "quantity",
+                    title: "Total Cl",
+                    field: "cl",
+                    headerFilter: true
+                },
+                {
+                    title: "Remaining Cl",
+                    field: "cl",
+                    headerFilter: true
+                },
+                {
+                    title: "Total RH",
+                    field: "rh",
+                    headerFilter: true
+                },
+                {
+                    title: "Remaining RH",
+                    field: "rh",
+                    headerFilter: true
+                },
+                {
+                    title: "Leave Reason",
+                    field: "leave_reason",
                     headerFilter: true
                 },
                 {
                     title: "Start Date",
-                    field: "productprice",
+                    field: "leave_startdate",
                     headerFilter: true
                 },
                 {
                     title: "End Date",
-                    field: "tpprice",
+                    field: "leave_enddate",
                     headerFilter: true
                 },
                 {
-                    title: "Remaining CL",
-                    field: "addedcart",
+                    title: "Leave Status",
+                    field: "leave_status",
                     headerFilter: true,
                     // visible: <?php echo ($usertype == 'user') ? 'true' : 'false'; ?>,
                     // formatter: function(cell, formatterParams, onRendered) {
@@ -208,7 +247,6 @@ include 'dbconfig.php';
                         }
                     }
                 });
-
             <?php endif; ?>
             // function for that product is added  to card or not 
             function updateaddedcartInfo(pid, userId, newValue, username) {
@@ -268,6 +306,7 @@ include 'dbconfig.php';
                     },
                 });
             <?php endif; ?>
+
             // function of the updatestatus start here 
             function updatestatus(pid, userId, newValue) {
                 console.log(pid, userId, newValue);
@@ -378,7 +417,7 @@ include 'dbconfig.php';
             var results = <?php echo json_encode($results); ?>;
             var columns = [{
                     title: "User Name",
-                    field: "userfullname",
+                    field: "name",
                     headerFilter: true
                 },
                 {
