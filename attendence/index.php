@@ -55,7 +55,6 @@ try {
         <button onclick="showTab('tab1')" class="btn btn-primary order_status_button click_here_button">Apply Leave</button>
         <button onclick="showTab('tab2')" class="btn btn-primary order_status_button click_here_button">Leave Status</button>
     </div>
-
     <div id="tab1" class="container tab-content active-tab">
         <div class="row">
             <!---- code for registering the leave from the user start here --->
