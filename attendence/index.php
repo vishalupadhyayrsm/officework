@@ -5,7 +5,6 @@ include 'fecthdata.php';
 $email = $_SESSION['user_email'];
 $username = $_SESSION['username'];
 $usertype = $_SESSION['usertype'];
-// $_SESSION['userid'] = $result['sid'];
 echo $usertype;
 try {
     if ($usertype == "user") {
