@@ -1,60 +1,65 @@
+
+
 .tab-content {
     display: none;
 }
+
 .active-tab {
     display: block;
 }
+
 .tabs {
     display: flex;
     justify-content: center;
     margin-bottom: 20px;
 }
+
 .tabs button {
     margin: 0 10px;
 }
+
 .navbar {
     background-color: #343a40;
 }
+
 .navbar-brand, .navbar-nav .nav-link {
     color: #fff;
 }
+
 .navbar-brand:hover, .navbar-nav .nav-link:hover {
     color: #d1d1d1;
 }
+
 .header-content {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
 }
+
 .logout {
     color: #fff;
     text-decoration: none;
     position: absolute;
     right: 20px;
     top: 15px;
-    background-color: blue;
-    padding: 12px;
-    border-radius: 5px;
 }
+
 .logout:hover {
     text-decoration: underline;
 }
+
 .model_name {
     color: #fff;
 }
+
 .container {
     margin-top: 20px;
 }
+
 .alert {
     margin-top: 20px;
 }
 .loginform{
     text-align: center;
 }
-.list_cl{
-    float: left;
-    font-size: 19px;
-    margin-left: 39px;
-}
-

@@ -7,29 +7,19 @@ if (isset($_POST['register'])) {
     $email = $_POST["email"];
     $password = $_POST["password"];
     $phoneNo = $_POST['contact'];
-    $month = $_POST['month'];
-    $monthNumber = date('n', strtotime($month)); 
-    if ($monthNumber >= 1 && $monthNumber <= 3) {
-        $cl = 8;
-    } else if ($monthNumber >= 4 && $monthNumber <= 6) {
-        $cl = 6;
-    } else if ($monthNumber >= 7 && $monthNumber <= 9) {
-        $cl = 4;
-    } else {
-        $cl = 2;
-    }
-    // echo $name;
-    $checkUsernameQuery = "SELECT * FROM sigin WHERE email = '$email'";
+
+    $checkUsernameQuery = "SELECT * FROM signin WHERE email = '$email'";
     $result = $conn->query($checkUsernameQuery);
+    // print_r($result);
     if ($result->$num_rows > 0) {
         $response = array("status" => "error", "message" => "Username Already Exists");
         echo json_encode($response);
     } else {
         $hash_password = password_hash($password, PASSWORD_BCRYPT);
-        $insertQuery = "INSERT INTO sigin (`name`, `email`, `password`, `usertype`,`cl`,`rh`,`contact`) 
-        VALUES ('$name', '$email','$hash_password','user','$cl','2','$phoneNo')";
-        // print_r($insertQuery);
+        $insertQuery = "INSERT INTO signin (`name`,`email`, `password`, `usertype`,`contactno`) 
+        VALUES ('$name', '$email','$password','user','$phoneNo')";
         if ($conn->query($insertQuery) == TRUE) {
+            echo "hello1";
             $response = array("status" => "success", "message" => "Record inserted successfully");
             echo '<script>alert("Successfully Registered"); window.location.href = "login.php";</script>';
         } else {
@@ -38,11 +28,12 @@ if (isset($_POST['register'])) {
         }
     }
 } elseif (isset($_POST['login'])) {
-    $username = $_POST['email'];
+
+    $username = $_POST['username'];
     $password = $_POST['password'];
+
     try {
-        // SELECT `sid`, `name`, `email`, `password`, `usertype`, `contact` FROM `sigin` WHERE email = 'vishalm.rsm@gmail.com';
-        $stmt = $conn->prepare("SELECT `sid`, `name`, `email`, `password`, `usertype`, `contact` FROM `sigin` WHERE email = :username");
+        $stmt = $conn->prepare("SELECT `userid`,`email`,`username`,`userapproved`, `password`, `usertype` FROM `user` WHERE email = :username");
         $stmt->bindParam(':username', $username);
         $stmt->execute();
 
@@ -54,20 +45,32 @@ if (isset($_POST['register'])) {
         }
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($result) {
-            $hashedPassword = $result['password'];
-            if (password_verify($password, $hashedPassword)) {
-                $_SESSION['user_email'] = $result['email'];
-                $_SESSION['usertype'] = $result['usertype'];
-                $_SESSION['username'] = $result['name'];
-                $_SESSION['userid'] = $result['sid']; 
-                header("Location: index.php");
-                exit();
+            // Check if the user is approved
+            if ($result['userapproved'] == 'yes') {
+                $hashedPassword = $result['password'];
+
+                if (password_verify($password, $hashedPassword)) {
+                    $_SESSION['user_email'] = $result['email'];
+                    $_SESSION['usertype'] = $result['usertype'];
+                    $_SESSION['userid'] = $result['userid'];
+                    header("Location: index1.php");
+                    exit();
+                } else {
+                    $response = array("status" => "error", "message" => "Incorrect password");
+                    //  echo "<script>alert('" . $response['message'] . "');</script>";
+                    //   header("Location: login.php");
+                    // echo "alert('" . $response['message'] . "');";
+                    // echo json_encode($response);
+                    echo "<script>alert('" . $response['message'] . "'); window.location.href = 'login.php';</script>";
+                }
             } else {
-                $response = array("status" => "error", "message" => "Incorrect password");
+                $response = array("status" => "error", "message" => "User not approved, Please Contact to Purchase team");
+                // echo json_encode($response);
                 echo "<script>alert('" . $response['message'] . "'); window.location.href = 'login.php';</script>";
             }
         } else {
             $response = array("status" => "error", "message" => "User not found");
+            // echo json_encode($response);
             echo "<script>alert('" . $response['message'] . "'); window.location.href = 'login.php';</script>";
         }
     } catch (PDOException $e) {
