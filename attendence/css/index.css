@@ -57,4 +57,44 @@
     font-size: 19px;
     margin-left: 39px;
 }
-
+/* code for dispalying the profile details */
+.resume-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 20px;
+    font-family: Arial, sans-serif;
+}
+.profile-picture {
+    flex: 1;
+    max-width: 200px;
+    margin: 10px;
+}
+.profile-details {
+    flex: 2;
+    margin: 10px;
+}
+.profile-picture img {
+    width: 100%;
+    border-radius: 50%;
+}
+.additional-details {
+    margin: 20px;
+}
+h1, p {
+    margin: 5px 0;
+}
+.title {
+    color: gray;
+}
+button {
+    padding: 10px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+}
+button:hover {
+    background-color: #45a049;
+}

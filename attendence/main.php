@@ -8,7 +8,7 @@ if (isset($_POST['register'])) {
     $password = $_POST["password"];
     $phoneNo = $_POST['contact'];
     $month = $_POST['month'];
-    $monthNumber = date('n', strtotime($month)); 
+    $monthNumber = date('n', strtotime($month));
     if ($monthNumber >= 1 && $monthNumber <= 3) {
         $cl = 8;
     } else if ($monthNumber >= 4 && $monthNumber <= 6) {
@@ -42,7 +42,7 @@ if (isset($_POST['register'])) {
     $password = $_POST['password'];
     try {
         // SELECT `sid`, `name`, `email`, `password`, `usertype`, `contact` FROM `sigin` WHERE email = 'vishalm.rsm@gmail.com';
-        $stmt = $conn->prepare("SELECT `sid`, `name`, `email`, `password`, `usertype`, `contact` FROM `sigin` WHERE email = :username");
+        $stmt = $conn->prepare("SELECT `sid`, `name`, `email`, `password`, `usertype`, `contact`, `declarationform` FROM `sigin` WHERE email = :username");
         $stmt->bindParam(':username', $username);
         $stmt->execute();
 
@@ -59,7 +59,8 @@ if (isset($_POST['register'])) {
                 $_SESSION['user_email'] = $result['email'];
                 $_SESSION['usertype'] = $result['usertype'];
                 $_SESSION['username'] = $result['name'];
-                $_SESSION['userid'] = $result['sid']; 
+                $_SESSION['userid'] = $result['sid'];
+                $_SESSION['decform'] = $result['declarationform'];
                 header("Location: index.php");
                 exit();
             } else {

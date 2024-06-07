@@ -7,17 +7,18 @@ if (isset($_SESSION['user_email'])) {
     $username = $_SESSION['username'];
     $usertype = $_SESSION['usertype'];
     $sid = $_SESSION['userid'];
+    $decform = $_SESSION['decform'];
     // echo $usertype;
     // code for checking that if the usertype is staff or not 
     try {
         if ($usertype == "staff") {
-            $sql = "SELECT sg.`sid`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid, lt.`startdate`, lt.`enddate`, lt.`reason`, lt.`leave_status` 
+            $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid, lt.`startdate`, lt.`enddate`, lt.`reason`, lt.`leave_status` 
                     FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid where sg.sid=:sid ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':sid', $sid);
             $stmt->execute();
         } else {
-            $sql = "SELECT sg.`sid`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid,lt.`startdate`, lt.`enddate`, lt.`reason`, lt.`leave_status` 
+            $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid,lt.`startdate`, lt.`enddate`, lt.`reason`, lt.`leave_status` 
                     FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid";
             $stmt = $conn->prepare($sql);
             $stmt->execute();
@@ -30,7 +31,9 @@ if (isset($_SESSION['user_email'])) {
     header("Location: login.php");
     exit();
 }
-$declarationformdone = "ye";
+// $$decform  = "ye";
+// $decform = $results['declarationform'];
+// echo $decform;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -44,6 +47,7 @@ $declarationformdone = "ye";
     <link href="https://cdn.jsdelivr.net/npm/tabulator-tables@4.10.0/dist/css/tabulator.min.css" rel="stylesheet">
     <link href="https://unpkg.com/tabulator-tables@5.5.2/dist/css/tabulator.min.css" rel="stylesheet">
     <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="css/index.css">
     <style>
         .form-page {
@@ -76,7 +80,7 @@ $declarationformdone = "ye";
     <br>
     <!---- code for checking the if usertype == staff or intern ----->
     <?php
-    if (($usertype == "staff" || $usertype == "admin") && $declarationformdone == 'yes') {
+    if (($usertype == "staff" || $usertype == "admin") && $decform  == 'yes') {
     ?>
         <div class="tabs">
             <button onclick="showTab('tab1')" class="btn btn-primary order_status_button click_here_button">Apply Leave</button>
@@ -89,7 +93,7 @@ $declarationformdone = "ye";
 
     <!-----code for dispalying the deceleration form  start here  ------>
     <?php
-    if ($declarationformdone != 'yes') {
+    if ($decform  != 'yes') {
     ?>
         <div id="" class="container tab-content active-tab">
             <div class="row">
@@ -237,7 +241,7 @@ $declarationformdone = "ye";
     ?>
 
     <?php
-    if ($usertype == 'staff' && $declarationformdone == 'yes') {
+    if ($usertype == 'staff' && $decform  == 'yes') {
     ?>
         <!--- disaplying the form for applying leave start here ----->
         <div id="tab1" class="container tab-content active-tab">
@@ -319,6 +323,48 @@ $declarationformdone = "ye";
     <?php
     }
     ?>
+    <!-- code for dispaly the intern decelartion form that user has filled  -->
+    <?php
+    if (($usertype != "staff" && $usertype != "admin") && $decform  == 'yes') {
+    ?>
+        <div id="tab1" class="container tab-content active-tab">
+            <div class="row">
+                <div class="col-md-6 offset-md-3">
+                    <div class="resume-container">
+                        <div class="profile-picture">
+                            <img src="uploads/vishal.jpeg" alt="John">
+                        </div>
+                        <div class="profile-details">
+                            <h1>John Doe</h1>
+                            <p class="title">CEO & Founder, Example</p>
+                            <p>Harvard University</p>
+                            <p><button>Contact</button></p>
+                        </div>
+                    </div>
+
+                    <div class="additional-details">
+                        <h2>Experience</h2>
+                        <p>CEO & Founder at Example</p>
+                        <p>Jan 2010 - Present</p>
+
+                        <h2>Education</h2>
+                        <p>Harvard University</p>
+                        <p>Bachelor of Science in Computer Science</p>
+
+                        <h2>Skills</h2>
+                        <p>Leadership, Strategic Planning, Business Development</p>
+
+                        <h2>Projects</h2>
+                        <p>Project A: Description...</p>
+                        <p>Project B: Description...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php
+    }
+    ?>
+
 
 
     <script>
