@@ -1,9 +1,10 @@
 <?php
-session_start(); 
+session_start();
 include 'dbconfig.php';
+
 // Check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $sid = $_SESSION['userid'] ?? ''; 
+    $sid = $_SESSION['userid'] ?? '';
     $name = $_POST['name'] ?? '';
     $emproll = $_POST['emproll'] ?? '';
     $gender = $_POST['gender'] ?? '';
@@ -21,21 +22,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $relationship2 = $_POST['relationship2'] ?? '';
     $medicalcondition = $_POST['medicalcondition'] ?? '';
     $termsCheck = $_POST['termcheck'] ?? '';
+    $video = $_FILES['profileimage'] ?? '';
 
-    $insertQuery = "INSERT INTO `declarationform`(`sid`,`name`,`emp_roll`,`gender`,`localaddress`,`localpostal`,`permanentadd`,`permpostal`,`homecontact`,`emename1`,`emerelation`,`emeadd`, `emecontact`,`empostalcode`,`emesecondname`,`emesecname`,`emesecrelation`,`medicalcondition`) 
-                    VALUES ('$sid','$name','$emproll','$gender','$localadd','$localpostalcode','$permadd','$permapostalcode','$homephone','$emergencyname1','$relationship1','$localadd_emergency1','$emecontact1','$localpostalcode_emergency1','$emergencyname2','$relationship2','$medicalcondition')";
-    
-   
-    
-    print_r($insertQuery);
-    if ($conn->query($insertQuery) === TRUE) {
-        echo '<script>alert("Successfully Registered"); window.location.href = "index.php";</script>';
-        exit; 
+    if (empty($video['name'])) {
+        die('No file selected for upload.');
+    }
+    $uploadDirectory = 'uploads/';
+    if (!file_exists($uploadDirectory)) {
+        mkdir($uploadDirectory, 0777, true);
+    }
+
+    $uploadedFilePath = $uploadDirectory . basename($video['name']);
+    if (move_uploaded_file($video['tmp_name'], $uploadedFilePath)) {
+        // echo "Successfully uploaded";
+
+        $insertQuery = "INSERT INTO `declarationform`(`sid`, `name`, `emp_roll`, `gender`, `localaddress`, `localpostal`, `permanentadd`, `permpostal`, `homecontact`, `emename1`, `emerelation`, `emeadd`, `emecontact`, `empostalcode`, `emesecondname`, `emesecrelation`, `medicalcondition`, `term`) 
+        VALUES ('$sid','$name','$emproll','$gender','$localadd','$localpostalcode','$permadd','$permapostalcode','$homephone','$emergencyname1','$relationship1',
+        '$localadd_emergency1','$emecontact1','$localpostalcode_emergency1','$emergencyname2','$relationship2','$medicalcondition','$termsCheck')";
+        // print_r($insertQuery);
+        if ($conn->query($insertQuery) == TRUE) {
+            echo '<script>alert("Successfully Registered"); window.location.href = "index.php";</script>';
+            exit;
+        } else {
+            echo "Error: " . $insertQuery . "<br>" . $conn->$error;
+        }
     } else {
-        echo "Error: " . $insertQuery . "<br>" . $conn->error;
+        die('Error uploading the file.');
     }
 } else {
     header("Location: index.php");
     exit;
 }
-?>
