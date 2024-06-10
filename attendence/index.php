@@ -17,6 +17,13 @@ if (isset($_SESSION['user_email'])) {
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':sid', $sid);
             $stmt->execute();
+        } elseif ($usertype == "intern") {
+            // SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.declarationform, de.`declarationform`, de.`name`, de.`emp_roll`, de.`gender`, de.`localaddress`, de.`localpostal`, de.`permanentadd`, de.`permpostal`, de.`homecontact`, de.`emename1`, de.`emerelation`, de.`emeadd`, de.`emecontact`, de.`empostalcode`, de.`emesecondname`, de.`emesecrelation`, de.`medicalcondition`, de.`term`, de.`profilepic` FROM `sigin` as sg LEFT JOIN declarationform as de on de.sid = sg.sid where sg.sid="17"
+            $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.declarationform, de.`declarationform`, de.`name`, de.`emp_roll`, de.`gender`, de.`localaddress`, de.`localpostal`, de.`permanentadd`, de.`permpostal`, de.`homecontact`, de.`emename1`, de.`emerelation`, de.`emeadd`, de.`emecontact`, de.`empostalcode`, de.`emesecondname`, de.`emesecrelation`, de.`medicalcondition`, de.`term`, de.`profilepic`
+             FROM `sigin` as sg LEFT JOIN declarationform as de on de.sid = sg.sid where sg.sid=:sid ";
+            $stmt = $conn->prepare($sql);
+            $stmt->bindParam(':sid', $sid);
+            $stmt->execute();
         } else {
             $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid,lt.`startdate`, lt.`enddate`, lt.`reason`, lt.`leave_status` 
                     FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid";
@@ -32,8 +39,9 @@ if (isset($_SESSION['user_email'])) {
     exit();
 }
 // $$decform  = "ye";
-// $decform = $results['declarationform'];
+$decform = $results[0]['declarationform'];
 // echo $decform;
+print_r($results);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -332,31 +340,30 @@ if (isset($_SESSION['user_email'])) {
                 <div class="col-md-6 offset-md-3">
                     <div class="resume-container">
                         <div class="profile-picture">
-                            <img src="uploads/vishal.jpeg" alt="John">
+                            <img src="<?php echo $results[0]['profilepic']; ?>" alt="John">
                         </div>
                         <div class="profile-details">
                             <h1 class="username">Vishal Kumar Upadhyay</h1>
                             <p>Desgination: Poject Research Assistant</p>
-                            <p>University: IIT Bombay </p>
-                            <p>Contact: 9899252887</p>
-                            <p>Email: vishalm.rsm@gmail.com</p>
+                            <p>University: <?php echo $results[0]['']; ?></p>
+                            <p>Contact: <?php echo $results[0]['contact']; ?></p>
+                            <p>Email: <?php echo $results[0]['email']; ?></p>
                         </div>
                     </div>
 
                     <div class="additional-details">
-                        <p>Home Contact:</p>
-                        <p>Medical Condition:</p><br>
+                        <p>Home Contact: <?php echo $results[0]['homecontact']; ?></p>
+                        <p>Medical Condition: <?php echo $results[0]['medicalcondition']; ?></p><br>
                         <h2 class="emergency_dteails">Emergency Contcat Details (First Person)</h2>
-                        <p>Person Name:</p>
-                        <p>Relation:</p>
-                        <p>Contact No:</p>
-                        <p>Address:</p>
+                        <p>Person Name: <?php echo $results[0]['emename1']; ?></p>
+                        <p>Relation: <?php echo $results[0]['emerelation']; ?></p>
+                        <p>Contact No: <?php echo $results[0]['emecontact']; ?></p>
+                        <p>Address: <?php echo $results[0]['emeadd']; ?></p>
                     </div>
                     <div class="additional-details">
                         <h2 class="emergency_dteails">Emergency Contcat Details(Second Person)</h2>
-                        <p>Person Name:</p>
-                        <p>Relation:</p>
-                        <p>Contact No:</p>
+                        <p>Person Name: <?php echo $results[0]['emesecondname']; ?></p>
+                        <p>Relation: <?php echo $results[0]['emesecrelation']; ?></p>
                     </div>
                 </div>
             </div>
@@ -364,6 +371,13 @@ if (isset($_SESSION['user_email'])) {
     <?php
     }
     ?>
+
+
+
+
+
+
+
     <script>
         /* code for displaying multipage form start here  */
         function nextPage(pageNumber) {
