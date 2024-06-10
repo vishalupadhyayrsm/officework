@@ -335,28 +335,28 @@ if (isset($_SESSION['user_email'])) {
                             <img src="uploads/vishal.jpeg" alt="John">
                         </div>
                         <div class="profile-details">
-                            <h1>John Doe</h1>
-                            <p class="title">CEO & Founder, Example</p>
-                            <p>Harvard University</p>
-                            <p><button>Contact</button></p>
+                            <h1 class="username">Vishal Kumar Upadhyay</h1>
+                            <p>Desgination: Poject Research Assistant</p>
+                            <p>University: IIT Bombay </p>
+                            <p>Contact: 9899252887</p>
+                            <p>Email: vishalm.rsm@gmail.com</p>
                         </div>
                     </div>
 
                     <div class="additional-details">
-                        <h2>Experience</h2>
-                        <p>CEO & Founder at Example</p>
-                        <p>Jan 2010 - Present</p>
-
-                        <h2>Education</h2>
-                        <p>Harvard University</p>
-                        <p>Bachelor of Science in Computer Science</p>
-
-                        <h2>Skills</h2>
-                        <p>Leadership, Strategic Planning, Business Development</p>
-
-                        <h2>Projects</h2>
-                        <p>Project A: Description...</p>
-                        <p>Project B: Description...</p>
+                        <p>Home Contact:</p>
+                        <p>Medical Condition:</p><br>
+                        <h2 class="emergency_dteails">Emergency Contcat Details (First Person)</h2>
+                        <p>Person Name:</p>
+                        <p>Relation:</p>
+                        <p>Contact No:</p>
+                        <p>Address:</p>
+                    </div>
+                    <div class="additional-details">
+                        <h2 class="emergency_dteails">Emergency Contcat Details(Second Person)</h2>
+                        <p>Person Name:</p>
+                        <p>Relation:</p>
+                        <p>Contact No:</p>
                     </div>
                 </div>
             </div>
@@ -364,9 +364,6 @@ if (isset($_SESSION['user_email'])) {
     <?php
     }
     ?>
-
-
-
     <script>
         /* code for displaying multipage form start here  */
         function nextPage(pageNumber) {
@@ -428,7 +425,6 @@ if (isset($_SESSION['user_email'])) {
             var selectedTab = document.getElementById(tabId);
             selectedTab.classList.add('active-tab');
         }
-
         // code for dispalying all the data in the table 
         if (typeof Tabulator !== 'undefined') {
             var results = <?php echo json_encode($results); ?>;

@@ -3,8 +3,8 @@
 include 'main.php';
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-  $login = (new Login())->login();
-  die;
+    $login = (new Login())->login();
+    die;
 }
 ?>
 <!DOCTYPE html>
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <nav class="navbar navbar-expand-lg navbar-dark">
             <div class="container">
                 <div class="header-content">
-                    <h2 class="model_name text-center">Leave Application Form</h2>
+                    <h2 class="model_name text-center">Machine Intelligence Program</h2>
                 </div>
             </div>
         </nav>
