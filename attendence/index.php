@@ -12,13 +12,14 @@ if (isset($_SESSION['user_email'])) {
     // code for checking that if the usertype is staff or not 
     try {
         if ($usertype == "staff") {
-            $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid, lt.`startdate`, lt.`enddate`, lt.`reason`, lt.`leave_status` 
-                    FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid where sg.sid=:sid ";
+            // $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid, lt.`startdate`, lt.`enddate`, lt.`reason`, lt.`leave_status` 
+            //         FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid where sg.sid=:sid ";
+            $sql = "SELECT sg.`sid`,sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid, lt.`startdate`, lt.`enddate`, lt.`reason`, lt.`leave_status`,de.declarationform,de.emp_roll,de.name,de.gender,de.localaddress,de.localpostal,de.permanentadd,de.permpostal, de.homecontact,de.emename1,de.emerelation,de.emeadd,de.emecontact,de.empostalcode,de.emesecondname,de.emesecrelation,de.medicalcondition,de.profilepic
+             FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid LEFT JOIN declarationform as de on de.sid = sg.sid where sg.sid=:sid ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':sid', $sid);
             $stmt->execute();
         } elseif ($usertype == "intern") {
-            // SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.declarationform, de.`declarationform`, de.`name`, de.`emp_roll`, de.`gender`, de.`localaddress`, de.`localpostal`, de.`permanentadd`, de.`permpostal`, de.`homecontact`, de.`emename1`, de.`emerelation`, de.`emeadd`, de.`emecontact`, de.`empostalcode`, de.`emesecondname`, de.`emesecrelation`, de.`medicalcondition`, de.`term`, de.`profilepic` FROM `sigin` as sg LEFT JOIN declarationform as de on de.sid = sg.sid where sg.sid="17"
             $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.declarationform, de.`declarationform`, de.`name`, de.`emp_roll`, de.`gender`, de.`localaddress`, de.`localpostal`, de.`permanentadd`, de.`permpostal`, de.`homecontact`, de.`emename1`, de.`emerelation`, de.`emeadd`, de.`emecontact`, de.`empostalcode`, de.`emesecondname`, de.`emesecrelation`, de.`medicalcondition`, de.`term`, de.`profilepic`
              FROM `sigin` as sg LEFT JOIN declarationform as de on de.sid = sg.sid where sg.sid=:sid ";
             $stmt = $conn->prepare($sql);
@@ -40,7 +41,7 @@ if (isset($_SESSION['user_email'])) {
 }
 // $$decform  = "ye";
 $decform = $results[0]['declarationform'];
-// echo $decform;
+echo $decform;
 print_r($results);
 ?>
 <!DOCTYPE html>
@@ -91,8 +92,16 @@ print_r($results);
     if (($usertype == "staff" || $usertype == "admin") && $decform  == 'yes') {
     ?>
         <div class="tabs">
-            <button onclick="showTab('tab1')" class="btn btn-primary order_status_button click_here_button">Apply Leave</button>
-            <button onclick="showTab('tab2')" class="btn btn-primary order_status_button click_here_button">Leave Status</button>
+            <?php
+            if ($usertype !== "admin") {
+            ?>
+                <button onclick="showTab('tab1')" class="btn btn-primary order_status_button click_here_button">User Profile</button>
+                <button onclick="showTab('tab2')" class="btn btn-primary order_status_button click_here_button">Apply Leave</button>
+                <button onclick="showTab('tab3')" class="btn btn-primary order_status_button click_here_button">Leave Status</button>
+            <?php
+            }
+            ?>
+
         </div>
     <?php
     }
@@ -248,11 +257,58 @@ print_r($results);
     }
     ?>
 
+
+    <!-- code for dispaly the intern decelartion form that user has filled  -->
     <?php
-    if ($usertype == 'staff' && $decform  == 'yes') {
+    if (($usertype != "admin") && $decform  == 'yes') {
+    ?>
+        <div id="tab1" class="container tab-content active-tab">
+            <div class="row">
+                <div class="col-md-6 offset-md-3">
+                    <div class="resume-container">
+                        <div class="profile-picture">
+                            <img src="<?php echo $results[0]['profilepic']; ?>" alt="John">
+                        </div>
+                        <div class="profile-details">
+                            <h1 class="username">Vishal Kumar Upadhyay</h1>
+                            <p>Desgination: Poject Research Assistant</p>
+                            <p>University: <?php echo $results[0]['']; ?></p>
+                            <p>Contact: <?php echo $results[0]['contact']; ?></p>
+                            <p>Email: <?php echo $results[0]['email']; ?></p>
+                        </div>
+                    </div>
+
+                    <div class="additional-details">
+                        <p>Roll Number/Emp Code: <?php echo $results[0]['emp_roll']; ?></p>
+                        <p>Gender: <?php echo $results[0]['gender']; ?></p>
+                        <p>Home Contact: <?php echo $results[0]['homecontact']; ?></p>
+                        <p>Local Address: <?php echo $results[0]['localaddress']; ?></p>
+                        <p>Medical Condition: <?php echo $results[0]['medicalcondition']; ?></p>
+                        <br>
+                        <h2 class="emergency_dteails">Emergency Contcat Details (First Person)</h2>
+                        <p>Person Name: <?php echo $results[0]['emename1']; ?></p>
+                        <p>Relation: <?php echo $results[0]['emerelation']; ?></p>
+                        <p>Contact No: <?php echo $results[0]['emecontact']; ?></p>
+                        <p>Address: <?php echo $results[0]['emeadd']; ?></p>
+                    </div>
+                    <div class="additional-details">
+                        <h2 class="emergency_dteails">Emergency Contcat Details(Second Person)</h2>
+                        <p>Person Name: <?php echo $results[0]['emesecondname']; ?></p>
+                        <p>Relation: <?php echo $results[0]['emesecrelation']; ?></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php
+    }
+    ?>
+
+    <!-- code for dispalying the staff data to the user start here  -->
+    <?php
+    if ($usertype == 'staff' && $decform == 'yes') {
     ?>
         <!--- disaplying the form for applying leave start here ----->
-        <div id="tab1" class="container tab-content active-tab">
+        <div id="tab2" class="container tab-content">
             <div class="row">
                 <!---- code for registering the leave from the user start here --->
                 <div class="col-md-6 offset-md-3">
@@ -318,7 +374,20 @@ print_r($results);
             </div>
         </div>
         <!------ code for dispalying the all the data to the user based on user type ------->
-        <div id="tab2" class="container tab-content">
+        <div id="tab3" class="container tab-content">
+            <div class="row">
+                <div class="col-md-12 ">
+                    <h2 class="mb-4" style="text-align:center;">Leave Status</h2>
+                    <div id="tabulator-table"></div>
+                    <!--<div class="pagination-btn" onclick="table.previousPage()">Previous</div>-->
+                    <!--<div class="pagination-btn" onclick="table.nextPage()">Next</div>-->
+                </div>
+            </div>
+        </div>
+    <?php
+    } elseif ($usertype == 'admin') {
+    ?>
+        <div id="tab3" class="container tab-content active-tab">
             <div class="row">
                 <div class="col-md-12 ">
                     <h2 class="mb-4" style="text-align:center;">Leave Status</h2>
@@ -331,48 +400,10 @@ print_r($results);
     <?php
     }
     ?>
-    <!-- code for dispaly the intern decelartion form that user has filled  -->
+
     <?php
-    if (($usertype != "staff" && $usertype != "admin") && $decform  == 'yes') {
+    // }
     ?>
-        <div id="tab1" class="container tab-content active-tab">
-            <div class="row">
-                <div class="col-md-6 offset-md-3">
-                    <div class="resume-container">
-                        <div class="profile-picture">
-                            <img src="<?php echo $results[0]['profilepic']; ?>" alt="John">
-                        </div>
-                        <div class="profile-details">
-                            <h1 class="username">Vishal Kumar Upadhyay</h1>
-                            <p>Desgination: Poject Research Assistant</p>
-                            <p>University: <?php echo $results[0]['']; ?></p>
-                            <p>Contact: <?php echo $results[0]['contact']; ?></p>
-                            <p>Email: <?php echo $results[0]['email']; ?></p>
-                        </div>
-                    </div>
-
-                    <div class="additional-details">
-                        <p>Home Contact: <?php echo $results[0]['homecontact']; ?></p>
-                        <p>Medical Condition: <?php echo $results[0]['medicalcondition']; ?></p><br>
-                        <h2 class="emergency_dteails">Emergency Contcat Details (First Person)</h2>
-                        <p>Person Name: <?php echo $results[0]['emename1']; ?></p>
-                        <p>Relation: <?php echo $results[0]['emerelation']; ?></p>
-                        <p>Contact No: <?php echo $results[0]['emecontact']; ?></p>
-                        <p>Address: <?php echo $results[0]['emeadd']; ?></p>
-                    </div>
-                    <div class="additional-details">
-                        <h2 class="emergency_dteails">Emergency Contcat Details(Second Person)</h2>
-                        <p>Person Name: <?php echo $results[0]['emesecondname']; ?></p>
-                        <p>Relation: <?php echo $results[0]['emesecrelation']; ?></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    <?php
-    }
-    ?>
-
-
 
 
 

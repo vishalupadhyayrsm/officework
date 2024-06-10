@@ -30,6 +30,7 @@ if (isset($_POST['register'])) {
         VALUES ('$name', '$email','$hash_password','user','$cl','2','$phoneNo')";
         // print_r($insertQuery);
         if ($conn->query($insertQuery) == TRUE) {
+            // code for sending the mail to the user whenever new useer register
             $response = array("status" => "success", "message" => "Record inserted successfully");
             echo '<script>alert("Successfully Registered"); window.location.href = "login.php";</script>';
         } else {

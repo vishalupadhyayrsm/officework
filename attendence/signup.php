@@ -5,6 +5,7 @@ session_destroy();
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Regiter Here</title>
     <meta charset="utf-8">
@@ -16,6 +17,7 @@ session_destroy();
     <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
     <link rel="stylesheet" href="css/index.css">
 </head>
+
 <body>
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark">
@@ -46,26 +48,35 @@ session_destroy();
                 <label for="contact">Contact Number:</label>
                 <input type="tel" class="form-control" id="contact" placeholder="Enter contact number" name="contact">
             </div>
-           <div class="mb-3">
-            <label for="month">Select Joining Month:</label>
-            <select class="form-control" id="month" name="month">
-                <option value="1">January</option>
-                <option value="2">February</option>
-                <option value="3">March</option>
-                <option value="4">April</option>
-                <option value="5">May</option>
-                <option value="6">June</option>
-                <option value="7">July</option>
-                <option value="8">August</option>
-                <option value="9">September</option>
-                <option value="10">October</option>
-                <option value="11">November</option>
-                <option value="12">December</option>
-            </select>
-        </div>
+            <div class="mb-3">
+                <label for="month">Joining as :</label>
+                <select class="form-control" id="month" name="month">
+                    <option value="">Select</option>
+                    <option value="staff">Staff</option>
+                    <option value="intern">Intern</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="month">Select Joining Month:</label>
+                <select class="form-control" id="month" name="month">
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
 
             <button type="submit" name="register" class="btn btn-primary">Submit</button>
-           <a href="login.php" class="btn btn-secondary">Login</a>
+            <a href="login.php" class="btn btn-secondary">Login</a>
         </form>
     </div>
 
