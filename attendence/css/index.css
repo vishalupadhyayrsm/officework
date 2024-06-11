@@ -116,9 +116,25 @@ button:hover {
     border-radius: 10px;
     margin-bottom: 20px;
 }
-.profile-picture img {
+.profile-picture {
+    position: relative;
+    display: inline-block;
     max-width: 100px;
+}
+.profile-picture img {
+    width: 100%;
     border-radius: 50%;
+    transition: filter 0.3s;
+}
+.profile-picture .edit-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    color: black;
+    display: none;
+    cursor: pointer;
 }
 .additional-details {
     margin-top: 20px;
