@@ -54,6 +54,7 @@ session_destroy();
                     <option value="">Select</option>
                     <option value="staff">Staff</option>
                     <option value="intern">Intern</option>
+                    <option value="staff">Student</option>
                 </select>
             </div>
 

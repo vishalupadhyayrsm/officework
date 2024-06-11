@@ -41,8 +41,8 @@ if (isset($_SESSION['user_email'])) {
 }
 // $$decform  = "ye";
 $decform = $results[0]['declarationform'];
-echo $decform;
-print_r($results);
+// echo $decform;
+// print_r($results);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -263,477 +263,550 @@ print_r($results);
     if (($usertype != "admin") && $decform  == 'yes') {
     ?>
         <div id="tab1" class="container tab-content active-tab">
-            <div class="row">
-                <div class="col-md-6 offset-md-3">
-                    <div class="resume-container">
-                        <div class="profile-picture">
-                            <img src="<?php echo $results[0]['profilepic']; ?>" alt="John">
-                        </div>
-                        <div class="profile-details">
-                            <h1 class="username">Vishal Kumar Upadhyay</h1>
-                            <p>Desgination: Poject Research Assistant</p>
-                            <p>University: <?php echo $results[0]['']; ?></p>
-                            <p>Contact: <?php echo $results[0]['contact']; ?></p>
-                            <p>Email: <?php echo $results[0]['email']; ?></p>
-                        </div>
-                    </div>
-
-                    <div class="additional-details">
-                        <p>Roll Number/Emp Code: <?php echo $results[0]['emp_roll']; ?></p>
-                        <p>Gender: <?php echo $results[0]['gender']; ?></p>
-                        <p>Home Contact: <?php echo $results[0]['homecontact']; ?></p>
-                        <p>Local Address: <?php echo $results[0]['localaddress']; ?></p>
-                        <p>Medical Condition: <?php echo $results[0]['medicalcondition']; ?></p>
-                        <br>
-                        <h2 class="emergency_dteails">Emergency Contcat Details (First Person)</h2>
-                        <p>Person Name: <?php echo $results[0]['emename1']; ?></p>
-                        <p>Relation: <?php echo $results[0]['emerelation']; ?></p>
-                        <p>Contact No: <?php echo $results[0]['emecontact']; ?></p>
-                        <p>Address: <?php echo $results[0]['emeadd']; ?></p>
-                    </div>
-                    <div class="additional-details">
-                        <h2 class="emergency_dteails">Emergency Contcat Details(Second Person)</h2>
-                        <p>Person Name: <?php echo $results[0]['emesecondname']; ?></p>
-                        <p>Relation: <?php echo $results[0]['emesecrelation']; ?></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    <?php
-    }
-    ?>
-
-    <!-- code for dispalying the staff data to the user start here  -->
-    <?php
-    if ($usertype == 'staff' && $decform == 'yes') {
-    ?>
-        <!--- disaplying the form for applying leave start here ----->
-        <div id="tab2" class="container tab-content">
-            <div class="row">
-                <!---- code for registering the leave from the user start here --->
-                <div class="col-md-6 offset-md-3">
-                    <?php
-                    if ($usertype == "staff") {
-                        $row = $results[0];
-                    ?>
-                        <div class"col-md-4">
-                            <h2 class="mb-4 list_cl">Total CL:<span style="color:red;"> <?php echo htmlspecialchars($row['cl']); ?></span></h2>
-                            <h2 class="mb-4 list_cl">Total RH: <span style="color:red;"><?php echo htmlspecialchars($row['rh']); ?></span></h2>
-                        </div>
-                        <div class"col-md-4">
-                            <h2 class="mb-4 list_cl">Remainig CL: <?php echo htmlspecialchars($row['remainingcl']); ?></h2>
-                            <h2 class="mb-4 list_cl">Reamining RH: <?php echo htmlspecialchars($row['remainingrh']); ?></h2>
-                            <br>
-                        </div>
-                        <br>
-                        <form method="post" action="leaveupload.php" class="form_data">
-                            <h2 style="text-align:center;">Leave Application Form</h2>
-                            <br>
-                            <div class="form-group">
-                                <label for="start_date">Start Date:</label>
-                                <input type="date" class="form-control" id="start_date" name="start_date" required>
-                            </div><br>
-                            <div class="form-group">
-                                <label for="end_date">End Date:</label>
-                                <input type="date" class="form-control" id="end_date" name="end_date" required>
-                            </div><br>
-                            <div class="form-group">
-                                <label for="end_date">No. Of CL:</label>
-                                <input type="number" class="form-control" id="end_date" name="cl" min="0" max="8" required>
-                            </div><br>
-                            <div class="form-group">
-                                <label for="end_date">No. Of RH:</label>
-                                <input type="number" class="form-control" id="end_date" name="rh" min="0" max="2" required>
-                            </div><br>
-
-                            <!--    <div class="form-group">-->
-                            <!--    <label for="month">CL/RH:</label>-->
-                            <!--    <select class="form-control" name="cl_el" required>-->
-                            <!--         <option value="">Select</option>-->
-                            <!--        <option value="1">Cl</option>-->
-                            <!--        <option value="2">RH</option>-->
-                            <!--    </select>-->
-                            <!--</div><br>-->
-                            <!--<div class="form-group">-->
-                            <!--    <label for="month">No.of CL/RH:</label>-->
-                            <!--    <input type="text" class="form-control" id="end_date" name="noof_cl_el" required>-->
-                            <!--</div><br>-->
-
-                            <div class="form-group">
-                                <label for="reason">Reason:</label>
-                                <input type="text" class="form-control" id="reason" name="reason" required>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6 offset-md-3">
+                        <div class="resume-container">
+                            <div class="profile-picture">
+                                <img src="<?php echo $results[0]['profilepic']; ?>" alt="John">
                             </div>
-                            <input type="hidden" name="userid" value="<?php echo $_SESSION['userid']; ?>" />
+                            <div class="profile-details">
+                                <h1 class="username">Vishal Kumar Upadhyay</h1>
+                                <p>Designation: Project Research Assistant</p>
+                                <p>University: <span class="text-display"><?php echo $results[0]['university']; ?></span><input class="input-display" type="text" name="university" value="<?php echo $results[0]['university']; ?>"></p>
+                                <p>Contact: <span class="text-display"><?php echo $results[0]['contact']; ?></span><input class="input-display" type="text" name="contact" value="<?php echo $results[0]['contact']; ?>"></p>
+                                <p>Email: <span class="text-display"><?php echo $results[0]['email']; ?></span><input class="input-display" type="email" name="email" value="<?php echo $results[0]['email']; ?>"></p>
+                            </div>
+                        </div>
+
+                        <div class="additional-details">
+                            <p>Roll Number/Emp Code: <span class="text-display"><?php echo $results[0]['emp_roll']; ?></span><input class="input-display" type="text" name="emp_roll" value="<?php echo $results[0]['emp_roll']; ?>" disabled></p>
+                            <p>Gender: <span class="text-display"><?php echo $results[0]['gender']; ?></span><input class="input-display" type="text" name="gender" value="<?php echo $results[0]['gender']; ?>"></p>
+                            <p>Home Contact: <span class="text-display"><?php echo $results[0]['homecontact']; ?></span><input class="input-display" type="text" name="homecontact" value="<?php echo $results[0]['homecontact']; ?>"></p>
+                            <p>Local Address: <span class="text-display"><?php echo $results[0]['localaddress']; ?></span><input class="input-display" type="text" name="localaddress" value="<?php echo $results[0]['localaddress']; ?>"></p>
+                            <p>Medical Condition: <span class="text-display"><?php echo $results[0]['medicalcondition']; ?></span><input class="input-display" type="text" name="medicalcondition" value="<?php echo $results[0]['medicalcondition']; ?>"></p>
                             <br>
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                        </form>
-                    <?php
-                    }
-                    ?>
+                            <h2 class="emergency_details">Emergency Contact Details (First Person)</h2>
+                            <p>Person Name: <span class="text-display"><?php echo $results[0]['emename1']; ?></span><input class="input-display" type="text" name="emename1" value="<?php echo $results[0]['emename1']; ?>"></p>
+                            <p>Relation: <span class="text-display"><?php echo $results[0]['emerelation']; ?></span><input class="input-display" type="text" name="emerelation" value="<?php echo $results[0]['emerelation']; ?>"></p>
+                            <p>Contact No: <span class="text-display"><?php echo $results[0]['emecontact']; ?></span><input class="input-display" type="text" name="emecontact" value="<?php echo $results[0]['emecontact']; ?>"></p>
+                            <p>Address: <span class="text-display"><?php echo $results[0]['emeadd']; ?></span><input class="input-display" type="text" name="emeadd" value="<?php echo $results[0]['emeadd']; ?>"></p>
+                        </div>
+                        <div class="additional-details">
+                            <h2 class="emergency_details">Emergency Contact Details (Second Person)</h2>
+                            <p>Person Name: <span class="text-display"><?php echo $results[0]['emesecondname']; ?></span><input class="input-display" type="text" name="emesecondname" value="<?php echo $results[0]['emesecondname']; ?>"></p>
+                            <p>Relation: <span class="text-display"><?php echo $results[0]['emesecrelation']; ?></span><input class="input-display" type="text" name="emesecrelation" value="<?php echo $results[0]['emesecrelation']; ?>"></p>
+                        </div>
+                        <button id="edit-btn" class="btn btn-primary">Edit</button>
+                        <button id="save-btn" class="btn btn-success" style="display: none;">Save</button>
+                    </div>
                 </div>
             </div>
-        </div>
-        <!------ code for dispalying the all the data to the user based on user type ------->
-        <div id="tab3" class="container tab-content">
-            <div class="row">
-                <div class="col-md-12 ">
-                    <h2 class="mb-4" style="text-align:center;">Leave Status</h2>
-                    <div id="tabulator-table"></div>
-                    <!--<div class="pagination-btn" onclick="table.previousPage()">Previous</div>-->
-                    <!--<div class="pagination-btn" onclick="table.nextPage()">Next</div>-->
-                </div>
-            </div>
-        </div>
-    <?php
-    } elseif ($usertype == 'admin') {
-    ?>
-        <div id="tab3" class="container tab-content active-tab">
-            <div class="row">
-                <div class="col-md-12 ">
-                    <h2 class="mb-4" style="text-align:center;">Leave Status</h2>
-                    <div id="tabulator-table"></div>
-                    <!--<div class="pagination-btn" onclick="table.previousPage()">Previous</div>-->
-                    <!--<div class="pagination-btn" onclick="table.nextPage()">Next</div>-->
-                </div>
-            </div>
-        </div>
-    <?php
+        <?php
     }
-    ?>
+        ?>
 
-    <?php
-    // }
-    ?>
+        <!-- code for dispalying the staff data to the user start here  -->
+        <?php
+        if ($usertype == 'staff' && $decform == 'yes') {
+        ?>
+            <!--- disaplying the form for applying leave start here ----->
+            <div id="tab2" class="container tab-content">
+                <div class="row">
+                    <!---- code for registering the leave from the user start here --->
+                    <div class="col-md-6 offset-md-3">
+                        <?php
+                        if ($usertype == "staff") {
+                            $row = $results[0];
+                        ?>
+                            <div class"col-md-4">
+                                <h2 class="mb-4 list_cl">Total CL:<span style="color:red;"> <?php echo htmlspecialchars($row['cl']); ?></span></h2>
+                                <h2 class="mb-4 list_cl">Total RH: <span style="color:red;"><?php echo htmlspecialchars($row['rh']); ?></span></h2>
+                            </div>
+                            <div class"col-md-4">
+                                <h2 class="mb-4 list_cl">Remainig CL: <?php echo htmlspecialchars($row['remainingcl']); ?></h2>
+                                <h2 class="mb-4 list_cl">Reamining RH: <?php echo htmlspecialchars($row['remainingrh']); ?></h2>
+                                <br>
+                            </div>
+                            <br>
+                            <form method="post" action="leaveupload.php" class="form_data">
+                                <h2 style="text-align:center;">Leave Application Form</h2>
+                                <br>
+                                <div class="form-group">
+                                    <label for="start_date">Start Date:</label>
+                                    <input type="date" class="form-control" id="start_date" name="start_date" required>
+                                </div><br>
+                                <div class="form-group">
+                                    <label for="end_date">End Date:</label>
+                                    <input type="date" class="form-control" id="end_date" name="end_date" required>
+                                </div><br>
+                                <div class="form-group">
+                                    <label for="end_date">No. Of CL:</label>
+                                    <input type="number" class="form-control" id="end_date" name="cl" min="0" max="8" required>
+                                </div><br>
+                                <div class="form-group">
+                                    <label for="end_date">No. Of RH:</label>
+                                    <input type="number" class="form-control" id="end_date" name="rh" min="0" max="2" required>
+                                </div><br>
 
+                                <!--    <div class="form-group">-->
+                                <!--    <label for="month">CL/RH:</label>-->
+                                <!--    <select class="form-control" name="cl_el" required>-->
+                                <!--         <option value="">Select</option>-->
+                                <!--        <option value="1">Cl</option>-->
+                                <!--        <option value="2">RH</option>-->
+                                <!--    </select>-->
+                                <!--</div><br>-->
+                                <!--<div class="form-group">-->
+                                <!--    <label for="month">No.of CL/RH:</label>-->
+                                <!--    <input type="text" class="form-control" id="end_date" name="noof_cl_el" required>-->
+                                <!--</div><br>-->
 
-
-
-
-    <script>
-        /* code for displaying multipage form start here  */
-        function nextPage(pageNumber) {
-            const currentPage = document.querySelector('.form-page.active');
-            const nextPage = document.getElementById('page' + pageNumber);
-            if (currentPage) {
-                currentPage.classList.remove('active');
-            }
-            if (nextPage) {
-                nextPage.classList.add('active');
-            }
+                                <div class="form-group">
+                                    <label for="reason">Reason:</label>
+                                    <input type="text" class="form-control" id="reason" name="reason" required>
+                                </div>
+                                <input type="hidden" name="userid" value="<?php echo $_SESSION['userid']; ?>" />
+                                <br>
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </form>
+                        <?php
+                        }
+                        ?>
+                    </div>
+                </div>
+            </div>
+            <!------ code for dispalying the all the data to the user based on user type ------->
+            <div id="tab3" class="container tab-content">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <h2 class="mb-4" style="text-align:center;">Leave Status</h2>
+                        <div id="tabulator-table"></div>
+                        <!--<div class="pagination-btn" onclick="table.previousPage()">Previous</div>-->
+                        <!--<div class="pagination-btn" onclick="table.nextPage()">Next</div>-->
+                    </div>
+                </div>
+            </div>
+        <?php
+        } elseif ($usertype == 'admin') {
+        ?>
+            <div id="tab3" class="container tab-content active-tab">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <h2 class="mb-4" style="text-align:center;">Leave Status</h2>
+                        <div id="tabulator-table"></div>
+                        <!--<div class="pagination-btn" onclick="table.previousPage()">Previous</div>-->
+                        <!--<div class="pagination-btn" onclick="table.nextPage()">Next</div>-->
+                    </div>
+                </div>
+            </div>
+        <?php
         }
+        ?>
 
-        function previousPage(pageNumber) {
-            nextPage(pageNumber);
-        }
-        document.getElementById('multiPageForm').addEventListener('input', function(e) {
-            const input = e.target;
-            if (input.id === 'postal') {
-                const errorMessage = document.getElementById('error-message');
-                if (input.value.length !== 6) {
-                    errorMessage.style.display = 'block';
-                } else {
-                    errorMessage.style.display = 'none';
+        <?php
+        // }
+        ?>
+
+
+
+
+
+
+        <script>
+            document.getElementById('edit-btn').addEventListener('click', function() {
+                var inputs = document.querySelectorAll('.input-display');
+                var textDisplays = document.querySelectorAll('.text-display');
+                inputs.forEach(function(input) {
+                    if (input.name !== 'emp_roll') {
+                        input.disabled = false;
+                        input.style.display = 'inline';
+                    }
+                });
+                textDisplays.forEach(function(text) {
+                    text.style.display = 'none';
+                });
+                document.getElementById('edit-btn').style.display = 'none';
+                document.getElementById('save-btn').style.display = 'inline-block';
+            });
+
+            document.getElementById('save-btn').addEventListener('click', function() {
+                var inputs = document.querySelectorAll('.input-display');
+                var textDisplays = document.querySelectorAll('.text-display');
+                inputs.forEach(function(input) {
+                    input.disabled = true;
+                    input.style.display = 'none';
+                });
+                textDisplays.forEach(function(text, index) {
+                    text.innerText = inputs[index].value;
+                    text.style.display = 'inline';
+                });
+                document.getElementById('edit-btn').style.display = 'inline-block';
+                document.getElementById('save-btn').style.display = 'none';
+
+                // Collecting all input values
+                var formData = {};
+                inputs.forEach(function(input) {
+                    formData[input.name] = input.value;
+                });
+
+                // Printing form data to console
+                console.log(formData);
+
+                // Add your form submission code here if needed
+            });
+        </script>
+        </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <script>
+            /* code for displaying multipage form start here  */
+            function nextPage(pageNumber) {
+                const currentPage = document.querySelector('.form-page.active');
+                const nextPage = document.getElementById('page' + pageNumber);
+                if (currentPage) {
+                    currentPage.classList.remove('active');
+                }
+                if (nextPage) {
+                    nextPage.classList.add('active');
                 }
             }
-        });
-        window.onload = function() {
-            document.getElementById('page1').classList.add('active');
-        }
 
-        // code for the validating the contact number 
-        document.getElementById('contact-form').addEventListener('submit', function(event) {
-            const phoneInput = document.getElementById('localadd');
-            const phoneError = document.getElementById('phone-error');
-            const phoneNumber = phoneInput.value;
-
-            const phonePattern = /^\d{10}$/;
-
-            if (!phonePattern.test(phoneNumber)) {
-                phoneError.style.display = 'block';
-                phoneInput.focus();
-                event.preventDefault();
-            } else {
-                phoneError.style.display = 'none';
+            function previousPage(pageNumber) {
+                nextPage(pageNumber);
             }
-        });
-    </script>
-    <!---- javascript code start here  ---->
-    <script src="js/index.js"></script>
-    <script>
-        var tabId;
-
-        function showTab(tabId) {
-            var tabs = document.querySelectorAll('.tab-content');
-            tabs.forEach(function(tab) {
-                tab.classList.remove('active-tab');
-            });
-            var selectedTab = document.getElementById(tabId);
-            selectedTab.classList.add('active-tab');
-        }
-        // code for dispalying all the data in the table 
-        if (typeof Tabulator !== 'undefined') {
-            var results = <?php echo json_encode($results); ?>;
-            var columns = [{
-                    title: "User Name",
-                    field: "name",
-                    headerFilter: true
-                    // visible: <?php echo ($usertype == 'user') ? 'true' : 'true'; ?>,
-                },
-                {
-                    title: "Contact No",
-                    field: "contact",
-                    headerFilter: true
-                },
-                {
-                    title: "Total Cl",
-                    field: "cl",
-                    headerFilter: true,
-                },
-                {
-                    title: "Remaining Cl",
-                    field: "remainingcl",
-                    headerFilter: true
-                },
-                {
-                    title: "Total RH",
-                    field: "rh",
-                    headerFilter: true
-                },
-                {
-                    title: "Remaining RH",
-                    field: "remainingrh",
-                    headerFilter: true
-                },
-                {
-                    title: "Leave Reason",
-                    field: "reason",
-                    headerFilter: true
-                },
-                {
-                    title: "Start Date",
-                    field: "startdate",
-                    headerFilter: true
-                },
-                {
-                    title: "End Date",
-                    field: "enddate",
-                    headerFilter: true
-                },
-            ];
-
-            // code for updating the user leave status start here 
-            <?php //if ($usertype != 'user') : 
-            ?>
-            columns.push({
-                title: "Leave Status",
-                field: "leave_status",
-                headerFilter: true,
-                editor: <?php echo ($usertype == 'admin') ? "'input'" : "false"; ?>,
-                cellEdited: function(cell) {
-                    console.log(cell);
-                    var userId = cell.getData().sid;
-                    var lid = cell.getData().leaveid;
-                    var newValue = cell.getValue();
-                    cell.setValue(newValue);
-                    updatestatus(lid, userId, newValue);
-                },
-            });
-            <?php // endif; 
-            ?>
-
-            // function of the updatestatus start here 
-            function updatestatus(lid, userId, newValue) {
-                console.log(lid, userId, newValue);
-                fetch('updateproductstatus.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-
-                        body: 'lid=' + encodeURIComponent(lid) + '&status=' + encodeURIComponent(newValue)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert("Product Status Updated Successfully")
-                        //   console.log('Database update successful:', data);
-                    })
-                    .catch(error => {
-                        console.error('Error updating database:', error);
-                    });
-            }
-
-            var pageSize = 10;
-            var currentPage = 1;
-            var table = new Tabulator("#tabulator-table", {
-                data: results,
-                layout: "fitColumns",
-                columns: columns,
-                pagination: "local", // Enable local pagination
-                paginationSize: pageSize, // Number of rows per page
-                paginationSizeSelector: [10, 15, 30],
-                paginationInitialPage: currentPage, // Initial page
-            });
-            // Add the following code to initialize pagination buttons
-            var prevPageBtn = document.querySelector('.pagination-btn:first-of-type');
-            var nextPageBtn = document.querySelector('.pagination-btn:last-of-type');
-
-            if (prevPageBtn && nextPageBtn) {
-                prevPageBtn.addEventListener('click', function() {
-                    table.previousPage();
-                });
-
-                nextPageBtn.addEventListener('click', function() {
-                    table.nextPage();
-                });
-            }
-
-            function updateTableData() {
-                // Fetch updated data from the server
-                fetch('fetch_data.php') // Create a new PHP file (fetch_data.php) to handle fetching data
-                    .then(response => response.json())
-                    .then(data => {
-                        // Update Tabulator table with the latest data
-                        table.setData(data);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching data:', error);
-                    });
-            }
-
-        } else {
-            console.error('Tabulator library not defined or not loaded.');
-        }
-    </script>
-    <script>
-        if (typeof Tabulator !== 'undefined') {
-            var results = <?php echo json_encode($results); ?>;
-            var columns = [{
-                    title: "User Name",
-                    field: "name",
-                    headerFilter: true
-                },
-                {
-                    title: "User Email",
-                    field: "email",
-                    headerFilter: true
-                },
-                {
-                    title: "Contact No",
-                    field: "phoneNo",
-                    headerFilter: true
-
-                },
-                {
-                    title: "Lab",
-                    field: "lab",
-                    headerFilter: true
-                },
-
-            ];
-            // code for approved/disapproved user
-            <?php if ($usertype != 'user') : ?>
-                columns.push({
-                    title: "Approved/Disapproved User",
-                    field: "userapproved",
-                    headerFilter: true,
-                    formatter: function(cell, formatterParams, onRendered) {
-                        var value = cell.getValue();
-                        // console.log(value);
-                        var buttonText = value === 'yes' ? 'Approved' : 'Disapproved';
-                        var buttonColor = value === 'yes' ? 'btn-success' : 'btn-danger';
-                        //   var buttonHTML = '<button type="button" class="btn ' + buttonColor + '">' + buttonText + '</button>';
-                        var buttonHTML = '<button type="button" class="btn ' + buttonColor + '" style="width: 100%;">' + buttonText + '</button>';
-                        return buttonHTML;
-                    },
-                    cellClick: function(e, cell) {
-                        // Toggle the value and update the database
-                        var currentValue = cell.getValue();
-                        // console.log(currentValue);
-                        var newValue = currentValue === 'yes' ? 'no' : 'yes';
-                        cell.setValue(newValue);
-                        // console.log(newValue);
-                        // Send an AJAX request to update the database
-                        var userId = cell.getData().userid; // Assuming you have a 'userid' field in your data
-                        // console.log(userId);
-                        updateApprovalStatus(userId, newValue);
+            document.getElementById('multiPageForm').addEventListener('input', function(e) {
+                const input = e.target;
+                if (input.id === 'postal') {
+                    const errorMessage = document.getElementById('error-message');
+                    if (input.value.length !== 6) {
+                        errorMessage.style.display = 'block';
+                    } else {
+                        errorMessage.style.display = 'none';
                     }
-                });
-            <?php endif; ?>
-            // function for approved or disapproved user 
-            function updateApprovalStatus(userId, newValue) {
-                fetch('approved.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
-                        body: 'userId=' + encodeURIComponent(userId) + '&status=' + encodeURIComponent(newValue)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        var datavalue = data.data;
-                        console.log(datavalue);
-                        if (datavalue == 'no') {
-                            alert("User Successfully Disapproved");
-                            window.location.href = "index1.php";
-                        } else {
-                            alert("User Successfully Approved");
-                            window.location.href = "index1.php";
-                        }
-                        // Redirect if needed
-                        // window.location.href = "index1.php";
-                        // console.log('Database update successful:', data);
-                    })
-                    .catch(error => {
-                        console.error('Error updating database:', error);
-                    });
-            }
-
-            var pageSize = 10; // Number of rows per page
-            var currentPage = 1; // Initial page
-
-            var table = new Tabulator("#usertable", {
-                data: results,
-                layout: "fitColumns",
-                columns: columns,
-                pagination: "local", // Enable local pagination
-                paginationSize: pageSize, // Number of rows per page
-                paginationSizeSelector: [10, 15, 30],
-                paginationInitialPage: currentPage, // Initial page
+                }
             });
-            // Add the following code to initialize pagination buttons
-            var prevPageBtn = document.querySelector('.pagination-btn:first-of-type');
-            var nextPageBtn = document.querySelector('.pagination-btn:last-of-type');
-
-            if (prevPageBtn && nextPageBtn) {
-                prevPageBtn.addEventListener('click', function() {
-                    table.previousPage();
-                });
-
-                nextPageBtn.addEventListener('click', function() {
-                    table.nextPage();
-                });
+            window.onload = function() {
+                document.getElementById('page1').classList.add('active');
             }
 
-            function updateTableData() {
-                // Fetch updated data from the server
-                fetch('fetch_data.php') // Create a new PHP file (fetch_data.php) to handle fetching data
-                    .then(response => response.json())
-                    .then(data => {
-                        // Update Tabulator table with the latest data
-                        table.setData(data);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching data:', error);
+            // code for the validating the contact number 
+            document.getElementById('contact-form').addEventListener('submit', function(event) {
+                const phoneInput = document.getElementById('localadd');
+                const phoneError = document.getElementById('phone-error');
+                const phoneNumber = phoneInput.value;
+
+                const phonePattern = /^\d{10}$/;
+
+                if (!phonePattern.test(phoneNumber)) {
+                    phoneError.style.display = 'block';
+                    phoneInput.focus();
+                    event.preventDefault();
+                } else {
+                    phoneError.style.display = 'none';
+                }
+            });
+        </script>
+        <!---- javascript code start here  ---->
+        <script src="js/index.js"></script>
+        <script>
+            var tabId;
+
+            function showTab(tabId) {
+                var tabs = document.querySelectorAll('.tab-content');
+                tabs.forEach(function(tab) {
+                    tab.classList.remove('active-tab');
+                });
+                var selectedTab = document.getElementById(tabId);
+                selectedTab.classList.add('active-tab');
+            }
+            // code for dispalying all the data in the table 
+            if (typeof Tabulator !== 'undefined') {
+                var results = <?php echo json_encode($results); ?>;
+                var columns = [{
+                        title: "User Name",
+                        field: "name",
+                        headerFilter: true
+                        // visible: <?php echo ($usertype == 'user') ? 'true' : 'true'; ?>,
+                    },
+                    {
+                        title: "Contact No",
+                        field: "contact",
+                        headerFilter: true
+                    },
+                    {
+                        title: "Total Cl",
+                        field: "cl",
+                        headerFilter: true,
+                    },
+                    {
+                        title: "Remaining Cl",
+                        field: "remainingcl",
+                        headerFilter: true
+                    },
+                    {
+                        title: "Total RH",
+                        field: "rh",
+                        headerFilter: true
+                    },
+                    {
+                        title: "Remaining RH",
+                        field: "remainingrh",
+                        headerFilter: true
+                    },
+                    {
+                        title: "Leave Reason",
+                        field: "reason",
+                        headerFilter: true
+                    },
+                    {
+                        title: "Start Date",
+                        field: "startdate",
+                        headerFilter: true
+                    },
+                    {
+                        title: "End Date",
+                        field: "enddate",
+                        headerFilter: true
+                    },
+                ];
+
+                // code for updating the user leave status start here 
+                <?php //if ($usertype != 'user') : 
+                ?>
+                columns.push({
+                    title: "Leave Status",
+                    field: "leave_status",
+                    headerFilter: true,
+                    editor: <?php echo ($usertype == 'admin') ? "'input'" : "false"; ?>,
+                    cellEdited: function(cell) {
+                        console.log(cell);
+                        var userId = cell.getData().sid;
+                        var lid = cell.getData().leaveid;
+                        var newValue = cell.getValue();
+                        cell.setValue(newValue);
+                        updatestatus(lid, userId, newValue);
+                    },
+                });
+                <?php // endif; 
+                ?>
+
+                // function of the updatestatus start here 
+                function updatestatus(lid, userId, newValue) {
+                    console.log(lid, userId, newValue);
+                    fetch('updateproductstatus.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+
+                            body: 'lid=' + encodeURIComponent(lid) + '&status=' + encodeURIComponent(newValue)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            alert("Product Status Updated Successfully")
+                            //   console.log('Database update successful:', data);
+                        })
+                        .catch(error => {
+                            console.error('Error updating database:', error);
+                        });
+                }
+
+                var pageSize = 10;
+                var currentPage = 1;
+                var table = new Tabulator("#tabulator-table", {
+                    data: results,
+                    layout: "fitColumns",
+                    columns: columns,
+                    pagination: "local", // Enable local pagination
+                    paginationSize: pageSize, // Number of rows per page
+                    paginationSizeSelector: [10, 15, 30],
+                    paginationInitialPage: currentPage, // Initial page
+                });
+                // Add the following code to initialize pagination buttons
+                var prevPageBtn = document.querySelector('.pagination-btn:first-of-type');
+                var nextPageBtn = document.querySelector('.pagination-btn:last-of-type');
+
+                if (prevPageBtn && nextPageBtn) {
+                    prevPageBtn.addEventListener('click', function() {
+                        table.previousPage();
                     });
-            }
 
-        } else {
-            console.error('Tabulator library not defined or not loaded.');
-        }
-    </script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+                    nextPageBtn.addEventListener('click', function() {
+                        table.nextPage();
+                    });
+                }
+
+                function updateTableData() {
+                    // Fetch updated data from the server
+                    fetch('fetch_data.php') // Create a new PHP file (fetch_data.php) to handle fetching data
+                        .then(response => response.json())
+                        .then(data => {
+                            // Update Tabulator table with the latest data
+                            table.setData(data);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching data:', error);
+                        });
+                }
+
+            } else {
+                console.error('Tabulator library not defined or not loaded.');
+            }
+        </script>
+        <script>
+            if (typeof Tabulator !== 'undefined') {
+                var results = <?php echo json_encode($results); ?>;
+                var columns = [{
+                        title: "User Name",
+                        field: "name",
+                        headerFilter: true
+                    },
+                    {
+                        title: "User Email",
+                        field: "email",
+                        headerFilter: true
+                    },
+                    {
+                        title: "Contact No",
+                        field: "phoneNo",
+                        headerFilter: true
+
+                    },
+                    {
+                        title: "Lab",
+                        field: "lab",
+                        headerFilter: true
+                    },
+
+                ];
+                // code for approved/disapproved user
+                <?php if ($usertype != 'user') : ?>
+                    columns.push({
+                        title: "Approved/Disapproved User",
+                        field: "userapproved",
+                        headerFilter: true,
+                        formatter: function(cell, formatterParams, onRendered) {
+                            var value = cell.getValue();
+                            // console.log(value);
+                            var buttonText = value === 'yes' ? 'Approved' : 'Disapproved';
+                            var buttonColor = value === 'yes' ? 'btn-success' : 'btn-danger';
+                            //   var buttonHTML = '<button type="button" class="btn ' + buttonColor + '">' + buttonText + '</button>';
+                            var buttonHTML = '<button type="button" class="btn ' + buttonColor + '" style="width: 100%;">' + buttonText + '</button>';
+                            return buttonHTML;
+                        },
+                        cellClick: function(e, cell) {
+                            // Toggle the value and update the database
+                            var currentValue = cell.getValue();
+                            // console.log(currentValue);
+                            var newValue = currentValue === 'yes' ? 'no' : 'yes';
+                            cell.setValue(newValue);
+                            // console.log(newValue);
+                            // Send an AJAX request to update the database
+                            var userId = cell.getData().userid; // Assuming you have a 'userid' field in your data
+                            // console.log(userId);
+                            updateApprovalStatus(userId, newValue);
+                        }
+                    });
+                <?php endif; ?>
+                // function for approved or disapproved user 
+                function updateApprovalStatus(userId, newValue) {
+                    fetch('approved.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: 'userId=' + encodeURIComponent(userId) + '&status=' + encodeURIComponent(newValue)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            var datavalue = data.data;
+                            console.log(datavalue);
+                            if (datavalue == 'no') {
+                                alert("User Successfully Disapproved");
+                                window.location.href = "index1.php";
+                            } else {
+                                alert("User Successfully Approved");
+                                window.location.href = "index1.php";
+                            }
+                            // Redirect if needed
+                            // window.location.href = "index1.php";
+                            // console.log('Database update successful:', data);
+                        })
+                        .catch(error => {
+                            console.error('Error updating database:', error);
+                        });
+                }
+
+                var pageSize = 10; // Number of rows per page
+                var currentPage = 1; // Initial page
+
+                var table = new Tabulator("#usertable", {
+                    data: results,
+                    layout: "fitColumns",
+                    columns: columns,
+                    pagination: "local", // Enable local pagination
+                    paginationSize: pageSize, // Number of rows per page
+                    paginationSizeSelector: [10, 15, 30],
+                    paginationInitialPage: currentPage, // Initial page
+                });
+                // Add the following code to initialize pagination buttons
+                var prevPageBtn = document.querySelector('.pagination-btn:first-of-type');
+                var nextPageBtn = document.querySelector('.pagination-btn:last-of-type');
+
+                if (prevPageBtn && nextPageBtn) {
+                    prevPageBtn.addEventListener('click', function() {
+                        table.previousPage();
+                    });
+
+                    nextPageBtn.addEventListener('click', function() {
+                        table.nextPage();
+                    });
+                }
+
+                function updateTableData() {
+                    // Fetch updated data from the server
+                    fetch('fetch_data.php') // Create a new PHP file (fetch_data.php) to handle fetching data
+                        .then(response => response.json())
+                        .then(data => {
+                            // Update Tabulator table with the latest data
+                            table.setData(data);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching data:', error);
+                        });
+                }
+
+            } else {
+                console.error('Tabulator library not defined or not loaded.');
+            }
+        </script>
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 </body>
 
