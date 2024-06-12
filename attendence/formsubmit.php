@@ -143,10 +143,69 @@ switch ($endpoint) {
     case "editprofile":
         try {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $sid = isset($_POST['sid']) ? $_POST['sid'] : '';
                 $contact = isset($_POST['contact']) ? $_POST['contact'] : '';
+                $email = isset($_POST['email']) ? $_POST['email'] : '';
+                $gender = isset($_POST['gender']) ? $_POST['gender'] : '';
+                $homecontact = isset($_POST['homecontact']) ? $_POST['homecontact'] : '';
+                $localaddress = isset($_POST['localaddress']) ? $_POST['localaddress'] : '';
+                $medicalcondition = isset($_POST['medicalcondition']) ? $_POST['medicalcondition'] : '';
+                $emename1 = isset($_POST['emename1']) ? $_POST['emename1'] : '';
+                $emerelation = isset($_POST['emerelation']) ? $_POST['emerelation'] : '';
+                $emecontact = isset($_POST['emecontact']) ? $_POST['emecontact'] : '';
+                $emeadd = isset($_POST['emeadd']) ? $_POST['emeadd'] : '';
+                $emesecondname = isset($_POST['emesecondname']) ? $_POST['emesecondname'] : '';
+                $emesecrelation = isset($_POST['emesecrelation']) ? $_POST['emesecrelation'] : '';
+                $profilepic = isset($_FILES['profilepic']) ? $_FILES['profilepic'] : '';
+                if (empty($profilepic['name'])) {
+                    die('No file selected for upload.');
+                }
+                $uploadDirectory = 'uploads/';
+                if (!file_exists($uploadDirectory)) {
+                    mkdir($uploadDirectory, 0777, true);
+                }
+                $uploadedFilePath = $uploadDirectory . basename($profilepic['name']);
+                move_uploaded_file($profilepic['tmp_name'], $uploadedFilePath);
+                $stmt = $conn->prepare("UPDATE `sigin` SET `email` = :email, `contact` = :contact WHERE sid = :sid");
+                $stmt->bindParam(":sid", $sid);
+                $stmt->bindParam(":email", $email);
+                $stmt->bindParam(":contact", $contact);
+                $stmt->execute();
+
+                $stmt = $conn->prepare("UPDATE `declarationform` SET 
+                `gender` = :gender,
+                `localaddress` = :localaddress,
+                `homecontact` = :homecontact,
+                `emename1` = :emename1,
+                `emerelation` = :emerelation,
+                `emeadd` = :emeadd,
+                `emecontact` = :emecontact,
+                `emesecondname` = :emesecondname,
+                `emesecrelation` = :emesecrelation,
+                `medicalcondition` = :medicalcondition,
+                `profilepic` = :profilepic
+                WHERE `sid` = :sid");
+
+                $stmt->bindParam(':sid', $sid);
+                $stmt->bindParam(':gender', $gender);
+                $stmt->bindParam(':localaddress', $localaddress);
+                $stmt->bindParam(':homecontact', $homecontact);
+                $stmt->bindParam(':emename1', $emename1);
+                $stmt->bindParam(':emerelation', $emerelation);
+                $stmt->bindParam(':emeadd', $emeadd);
+                $stmt->bindParam(':emecontact', $emecontact);
+                $stmt->bindParam(':emesecondname', $emesecondname);
+                $stmt->bindParam(':emesecrelation', $emesecrelation);
+                $stmt->bindParam(':medicalcondition', $medicalcondition);
+                $stmt->bindParam(':profilepic', $uploadedFilePath);
+
+                $stmt->execute();
+
+
+
                 $response = array(
                     'status' => 'Success',
-                    "data" => $contact
+                    "data" => $profilepic,
                 );
                 header('Content-Type: application/json');
                 echo json_encode($response);
@@ -158,6 +217,32 @@ switch ($endpoint) {
                 'message' => 'Exception caught: ' . $e->getMessage(),
             );
             echo json_encode($response);
+        }
+        break;
+
+    case "leaveapproved":
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            try {
+                $lid = $_POST['lid'];
+                $status = $_POST['status'];
+                $stmt = $conn->prepare("UPDATE `leavetable` SET `leave_status` = :status WHERE `leaveid` = :lid");
+                $stmt->bindParam(':lid', $lid);
+                $stmt->bindParam(':status', $status);
+                $stmt->execute();
+
+                if ($stmt->errorCode() === '00000') {
+                    $response = ['status' => 'success', 'message' => 'Database update successful', 'data' => ['lid' => $lid, 'status' => $status]];
+                    echo json_encode($response);
+                } else {
+                    $errors = $stmt->errorInfo();
+                    echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $errors]);
+                }
+            } catch (PDOException $e) {
+                echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $e->getMessage()]);
+            }
+        } else {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'Invalid request']);
         }
         break;
 
