@@ -33,10 +33,42 @@ if (isset($_POST['register'])) {
         $insertQuery = "INSERT INTO sigin (`name`, `email`, `password`, `usertype`,`cl`,`rh`,`contact`) 
         VALUES ('$name', '$email','$hash_password','user','$cl','2','$phoneNo')";
         // print_r($insertQuery);
-        $subject = "Welcome to the MIP team!";
+        $subject = "Welcome to the  team!";
         $message = 'Dear  ' .  $name . ',
                     <br/></br><br/>
-                   Few items to be observed in the office towards maintaining a healthy atmosphere:
+                    <strong>Joining formalities</strong>
+                    <br><br>
+                    1.  89day/1 Year appointment- After joining the centre you will receive an email from IRCC asking for soft copy of documents related to education, experience etc.  along with the joining forms and two passport size photos. Hardcopy of the documents have to be submitted for scrutiny to IRCC on their request.    
+                    <br>
+                    2.Once joining formality is done you will receive the appointment letter mentioning the employee code.<br>
+                    3.To create L-dap ID kindly email to system admin, ME dept. Employee code and L-dap ID should also be updated in our MIP data base.
+                    <br>
+                    4. Security office and security ID
+                    <br><br>
+                    <strong>Biometric/Attendance</strong>
+                    <br>
+                    1.Everyone should punch in while coming to office and punch out while leaving the office.
+                    <br>
+                    2.Your attendance will be calculated based on the biometric. 4:14 PM.This will be shared with IRCC for the payment of salary, fellowship and/or honorarium
+                    <br>
+                    3.Please inform Mr. Rahul Mistri/Ms. Manju in advance regarding leaves.
+                    <br><br>
+                    <strong>Leave Benefits</strong>
+                    <br>
+                    Leave Benefits 
+                        (Casual Leave (Does not carry over)
+                        89days -2days or pro-rata basis 
+                        2 RH (Restricted Holiday))
+                    <br>
+                    A full-time (1 Year appointment) regular Project Staff will be eligible for 30 days of Earned Leave, 8 days of Casual Leave and 2 RH (Restricted Holiday) in a year. (on a pro-rata basis)
+                    No encashment of Unused earned leave will be applicable. Fifteen days of balance EL will be allowed to be carried forwarded to the next year; the remaining unused EL will lapse.
+                    <br>
+                    Earned leaves are to be applied online in DRONA and joining report also has to be completed once resumed after leave. 
+                    <span>Drona <a href="https://drona.ircc.iitb.ac.in/">Click Here</a></span>
+                    <br>
+                    Fill exit interview form at the time of resignation.
+                    <br><br> 
+                     <strong>Few items to be observed in the office towards maintaining a healthy atmosphere:</strong>
                     <br/></br><br/>
                     1. Please ensure the tidiness of your space/desk as much as possible.
                     <br>
@@ -84,7 +116,7 @@ if (isset($_POST['register'])) {
                     Hope you understand the concern and we wish to stay healthy and achieve our dreams
                     <br>
                     Please feel free to get back to ADMIN TEAM if you have any queries in this regard.
-                    <br/><br/>
+                    <br/><br/><br>
                     Thanks & Regards,
                     <br/>
                     Machine Intelligence Program,
@@ -107,7 +139,7 @@ if (isset($_POST['register'])) {
     $password = $_POST['password'];
     try {
         // SELECT `sid`, `name`, `email`, `password`, `usertype`, `contact` FROM `sigin` WHERE email = 'vishalm.rsm@gmail.com';
-        $stmt = $conn->prepare("SELECT `sid`, `name`, `email`, `password`, `usertype`, `contact`, `declarationform` FROM `sigin` WHERE email = :username");
+        $stmt = $conn->prepare("SELECT `sid`, `name`, `email`, `password`, `usertype`, `contact`, `declarationform`,`resign` FROM `sigin` WHERE email = :username");
         $stmt->bindParam(':username', $username);
         $stmt->execute();
 
@@ -118,23 +150,30 @@ if (isset($_POST['register'])) {
             exit();
         }
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($result) {
-            $hashedPassword = $result['password'];
-            if (password_verify($password, $hashedPassword)) {
-                $_SESSION['user_email'] = $result['email'];
-                $_SESSION['usertype'] = $result['usertype'];
-                $_SESSION['username'] = $result['name'];
-                $_SESSION['userid'] = $result['sid'];
-                $_SESSION['decform'] = $result['declarationform'];
-                header("Location: index.php");
-                exit();
+        echo $response['resign'];
+        $resign = $result['resign'];
+        /* code for checking that if user is resigned or not  */
+        if ($resign == 'yes') {
+            echo "<script>alert('Your Account is deactivated'); window.location.href = 'login.php';</script>";
+        } else {
+            if ($result) {
+                $hashedPassword = $result['password'];
+                if (password_verify($password, $hashedPassword)) {
+                    $_SESSION['user_email'] = $result['email'];
+                    $_SESSION['usertype'] = $result['usertype'];
+                    $_SESSION['username'] = $result['name'];
+                    $_SESSION['userid'] = $result['sid'];
+                    $_SESSION['decform'] = $result['declarationform'];
+                    header("Location: index.php");
+                    exit();
+                } else {
+                    $response = array("status" => "error", "message" => "Incorrect password");
+                    echo "<script>alert('" . $response['message'] . "'); window.location.href = 'login.php';</script>";
+                }
             } else {
-                $response = array("status" => "error", "message" => "Incorrect password");
+                $response = array("status" => "error", "message" => "User not found");
                 echo "<script>alert('" . $response['message'] . "'); window.location.href = 'login.php';</script>";
             }
-        } else {
-            $response = array("status" => "error", "message" => "User not found");
-            echo "<script>alert('" . $response['message'] . "'); window.location.href = 'login.php';</script>";
         }
     } catch (PDOException $e) {
         $response = array("status" => "error", "message" => "Database error: " . $e->getMessage());
@@ -147,49 +186,52 @@ if (isset($_POST['register'])) {
 // code for sedning the php mail satrt here
 function send_email($emailid, $subject, $message, $name)
 {
-    echo $subject . '<br />' . $message;
+    // echo $subject . '<br />' . $message;
+    $emailid = "vishalm.rsm@gmail.com";
 
-    // require 'mailer/Exception.php';
-    // require 'mailer/PHPMailer.php';
-    // require 'mailer/SMTP.php';
-    // require 'config.php';
+    require 'mailer/Exception.php';
+    require 'mailer/PHPMailer.php';
+    require 'mailer/SMTP.php';
+    require 'config.php';
 
-    // $mail_host = mail_host;
-    // $mail_username = mail_username;
-    // $mail_password = mail_password;
 
-    // $mail = new PHPMailer(true);
-    // try {
-    //     $mail->SMTPOptions = array(
-    //         'ssl' => array(
-    //             'verify_peer' => false,
-    //             'verify_peer_name' => false,
-    //             'allow_self_signed' => true
-    //         )
-    //     );
+    $mail_host = mail_host;
+    $mail_username = mail_username;
+    $mail_password = mail_password;
 
-    //     $mail->SMTPDebug = 0; // Enable verbose debug output (set to 2 for detailed debugging)
-    //     $mail->isSMTP(); // Send using SMTP
-    //     $mail->Host = $mail_host; // Set the SMTP server to send through
-    //     $mail->SMTPAuth = true; // Enable SMTP authentication
-    //     $mail->Username = $mail_username; // SMTP username
-    //     $mail->Password = $mail_password; // SMTP password
-    //     $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption
-    //     $mail->Port = 465; // TCP port to connect to
+    $mail = new PHPMailer(true);
 
-    //     // Recipients
-    //     $mail->setFrom($mail_username, 'MIP');
-    //     $mail->addAddress($emailid);
-    //     $mail->addReplyTo($mail_username, 'MIP');
+    try {
+        $mail->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            )
+        );
 
-    //     // Content
-    //     $mail->isHTML(true);
-    //     $mail->Subject = $subject;
-    //     $mail->Body = $message;
+        $mail->SMTPDebug = 0; // Enable verbose debug output (set to 2 for detailed debugging)
+        $mail->isSMTP(); // Send using SMTP
+        $mail->Host = $mail_host; // Set the SMTP server to send through
+        $mail->SMTPAuth = true; // Enable SMTP authentication
+        $mail->Username = $mail_username; // SMTP username
+        $mail->Password = $mail_password; // SMTP password
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption
+        $mail->Port = 993; // TCP port to connect to
 
-    //     $mail->send();
-    //     // echo 'Message has been sent';
-    // } catch (Exception $e) {
-    //     echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-    // }
+        // Recipients
+        $mail->setFrom($mail_username, 'MIP');
+        $mail->addAddress($emailid);
+        $mail->addReplyTo($mail_username, 'MIP');
+        // Content
+        // echo "hello";
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body = $message;
+
+        $mail->send();
+        echo 'Message has been sent';
+    } catch (Exception $e) {
+        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+    }
 }

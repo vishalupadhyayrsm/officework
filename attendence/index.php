@@ -1,6 +1,7 @@
 <?php
 session_start();
 include 'dbconfig.php';
+
 // include 'fecthdata.php';
 if (isset($_SESSION['user_email'])) {
     $email = $_SESSION['user_email'];
@@ -25,13 +26,15 @@ if (isset($_SESSION['user_email'])) {
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':sid', $sid);
             $stmt->execute();
-        } else {
+        } elseif ($usertype == "hr") {
             $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid,lt.`startdate`, lt.`enddate`, lt.`reason`, lt.`leave_status` 
                     FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid";
             $stmt = $conn->prepare($sql);
+            // $stmt->bindParam(':sid', $sid);
             $stmt->execute();
         }
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // print_r($results);
     } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();
     }
@@ -42,6 +45,7 @@ if (isset($_SESSION['user_email'])) {
 // $$decform  = "ye";
 $decform = $results[0]['declarationform'];
 // echo $decform;
+$decform = "yes";
 // print_r($results);
 ?>
 <!DOCTYPE html>
@@ -71,7 +75,23 @@ $decform = $results[0]['declarationform'];
             margin: 10px 0;
         }
     </style>
+    <script>
+        // all code for laerting the user tht user has done something 
+        <?php if (isset($_SESSION['form_submitted']) && $_SESSION['form_submitted']) : ?>
+            alert("Record inserted successfully");
+            <?php unset($_SESSION['form_submitted']); ?>
+        <?php endif; ?>
+        <?php if (isset($_SESSION['resign_form']) && $_SESSION['resign_form']) : ?>
+            alert("Successfully Submitted");
+            <?php unset($_SESSION['resign_form']); ?>
+        <?php endif; ?>
+        <?php if (isset($_SESSION['dec_form']) && $_SESSION['dec_form']) : ?>
+            alert("Successfully Submitted Decleration form");
+            <?php unset($_SESSION['dec_form']); ?>
+        <?php endif; ?>
+    </script>
 </head>
+
 
 <body>
     <header>
@@ -89,15 +109,29 @@ $decform = $results[0]['declarationform'];
     <br>
     <!---- code for checking the if usertype == staff or intern ----->
     <?php
-    if (($usertype == "staff" || $usertype == "admin") && $decform  == 'yes') {
+    if ($decform  == 'yes') {
     ?>
         <div class="tabs">
             <?php
-            if ($usertype !== "admin") {
+            if ($usertype == "staff") {
             ?>
                 <button onclick="showTab('tab1')" class="btn btn-primary order_status_button click_here_button">User Profile</button>
                 <button onclick="showTab('tab2')" class="btn btn-primary order_status_button click_here_button">Apply Leave</button>
                 <button onclick="showTab('tab3')" class="btn btn-primary order_status_button click_here_button">Leave Status</button>
+                <button onclick="showTab('tab5')" class="btn btn-primary order_status_button click_here_button">RESIGNATION FORM</button>
+            <?php
+            } elseif ($usertype == 'intern') {
+            ?>
+                <button onclick="showTab('tab1')" class="btn btn-primary order_status_button click_here_button">User Profile</button>
+                <button onclick="showTab('tab6')" class="btn btn-primary order_status_button click_here_button">Certificate Form</button>
+                <button onclick="showTab('tab5')" class="btn btn-primary order_status_button click_here_button">RESIGNATION FORM</button>
+            <?php
+            } else {
+            ?>
+                <button onclick="showTab('tab3')" class="btn btn-primary order_status_button click_here_button">Leave Status</button>
+                <button onclick="showTab('tab4')" class="btn btn-primary order_status_button click_here_button">User Details</button>
+                <button onclick="showTab('tab7')" class="btn btn-primary order_status_button click_here_button">Certificate Request</button>
+                <button onclick="showTab('tab8')" class="btn btn-primary order_status_button click_here_button">Resignation List</button>
             <?php
             }
             ?>
@@ -110,13 +144,13 @@ $decform = $results[0]['declarationform'];
 
     <!-----code for dispalying the deceleration form  start here  ------>
     <?php
-    if ($decform  != 'yes') {
+    if ($decform  !== 'yes') {
     ?>
         <div id="" class="container tab-content active-tab">
             <div class="row">
                 <div class="col-md-6 offset-md-3">
                     <!--- code for multpage form start here ---->
-                    <form id="multiPageForm" method="post" action="deceleratonform.php" class="form_data" enctype="multipart/form-data">
+                    <form id="multiPageForm" method="post" action="formsubmit.php/deceleration" class="form_data" enctype="multipart/form-data">
                         <div class="form-page active" id="page1">
                             <h2 style="text-align:center;">MIP Deceleraton Form</h2>
                             <div class="form-group">
@@ -257,10 +291,9 @@ $decform = $results[0]['declarationform'];
     }
     ?>
 
-
     <!-- code for dispaly the intern decelartion form that user has filled  -->
     <?php
-    if (($usertype != "admin") && $decform  == 'yes') {
+    if (($usertype != "hr") && $decform  == 'yes') {
     ?>
         <div id="tab1" class="container tab-content active-tab">
             <div class="row">
@@ -316,6 +349,8 @@ $decform = $results[0]['declarationform'];
             <div class="row">
                 <!---- code for registering the leave from the user start here --->
                 <div class="col-md-6 offset-md-3">
+                    <h2 style="text-align:center;">Leave Application Form</h2>
+                    <br>
                     <?php
                     if ($usertype == "staff") {
                         $row = $results[0];
@@ -331,8 +366,6 @@ $decform = $results[0]['declarationform'];
                         </div>
                         <br>
                         <form method="post" action="leaveupload.php" class="form_data">
-                            <h2 style="text-align:center;">Leave Application Form</h2>
-                            <br>
                             <div class="form-group">
                                 <label for="start_date">Start Date:</label>
                                 <input type="date" class="form-control" id="start_date" name="start_date" required>
@@ -349,20 +382,6 @@ $decform = $results[0]['declarationform'];
                                 <label for="end_date">No. Of RH:</label>
                                 <input type="number" class="form-control" id="end_date" name="rh" min="0" max="2" required>
                             </div><br>
-
-                            <!--    <div class="form-group">-->
-                            <!--    <label for="month">CL/RH:</label>-->
-                            <!--    <select class="form-control" name="cl_el" required>-->
-                            <!--         <option value="">Select</option>-->
-                            <!--        <option value="1">Cl</option>-->
-                            <!--        <option value="2">RH</option>-->
-                            <!--    </select>-->
-                            <!--</div><br>-->
-                            <!--<div class="form-group">-->
-                            <!--    <label for="month">No.of CL/RH:</label>-->
-                            <!--    <input type="text" class="form-control" id="end_date" name="noof_cl_el" required>-->
-                            <!--</div><br>-->
-
                             <div class="form-group">
                                 <label for="reason">Reason:</label>
                                 <input type="text" class="form-control" id="reason" name="reason" required>
@@ -389,7 +408,7 @@ $decform = $results[0]['declarationform'];
             </div>
         </div>
     <?php
-    } elseif ($usertype == 'admin') {
+    } elseif ($usertype == 'hr') {
     ?>
         <div id="tab3" class="container tab-content active-tab">
             <div class="row">
@@ -401,13 +420,315 @@ $decform = $results[0]['declarationform'];
                 </div>
             </div>
         </div>
+        <!--  this code is for updating the details of user for the admin team  -->
+        <div id="tab4" class="container tab-content active-tab">
+            <div class="row">
+                <div class="col-md-12 ">
+                    <h2 class="mb-4" style="text-align:center;">User Details</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- code for displaying the data of certifiate form teh user  -->
+        <div id="tab7" class="container tab-content">
+            <div class="row">
+                <div class="col-md-12 ">
+                    <div class="container col-md-6 mt-3">
+                        <h2 style="text-align: center;padding: 15px;">Certificate Request</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- code for list of user resign -->
+        <div id="tab8" class="container tab-content">
+            <div class="row">
+                <div class="col-md-12 ">
+                    <div class="container col-md-6 mt-3">
+                        <h2 style="text-align: center;padding: 15px;">Resignation of User</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
     <?php
     }
     ?>
 
+    <!-- code for dispalying the resigantion form for everyone -->
     <?php
-    // }
+    if ($usertype == 'staff' || $usertype == 'intern') {
     ?>
+        <div id="tab5" class="container tab-content">
+            <div class="row">
+                <div class="col-md-12 ">
+                    <div class="container col-md-6 mt-3">
+                        <h2 style="text-align: center;padding: 15px;">RESIGNATION FORM</h2>
+                        <form method="post" action="formsubmit.php/resign">
+                            <!-- <div class="form-group">
+                                <label for="start_date">Start Date:</label>
+                                <input type="date" class="form-control" id="start_date" name="start_date" required>
+                            </div><br>
+
+                            <div class="form-group">
+                                <label for="end_date">Termination Date:</label>
+                                <input type="date" class="form-control" id="end_date" name="termination_date" required>
+                            </div><br>
+
+                            <?php foreach ($text_inputs as $input) { ?>
+                                <div class="mb-3 mt-3">
+                                    <label for="<?= $input['id'] ?>"><?= $input['label'] ?></label>
+                                    <input type="text" class="form-control" id="<?= $input['id'] ?>" placeholder="<?= $input['placeholder'] ?>" name="<?= $input['name'] ?>">
+                                </div>
+                            <?php } ?>
+
+                            <div class="mb-3">
+                                <label for="reason_leaving">REASONS FOR LEAVING:</label>
+                                <select class="form-control" id="reason_leaving" name="reason_leaving">
+                                    <?php foreach ($reasons_for_leaving as $reason) { ?>
+                                        <option value="<?= $reason ?>"><?= $reason ?></option>
+                                    <?php } ?>
+                                </select>
+                            </div>
+
+                            <h2>We are interested in what our employees have to say about their work experience. Please share your experience.</h2>
+
+                            <?php foreach ($item_returns as $item) { ?>
+                                <div class="form-check">
+                                    <label class="form-check-label" for="<?= $item['name'] ?>"><?= $item['label'] ?></label>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="<?= $item['name'] ?>" id="<?= $item['name'] ?>_yes" value="yes">
+                                        <label class="form-check-label" for="<?= $item['name'] ?>_yes">Yes</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="<?= $item['name'] ?>" id="<?= $item['name'] ?>_no" value="no">
+                                        <label class="form-check-label" for="<?= $item['name'] ?>_no">No</label>
+                                    </div>
+                                </div>
+                            <?php } ?> -->
+                            <input type="hidden" name="sid" value="<?php echo $decform = $results[0]['sid']; ?>">
+                            <!-- <div class="mb-3 mt-3">
+                                <label for="name">Name:</label>
+                                <input type="text" class="form-control" id="name" placeholder="Enter name" name="name">
+                            </div>
+                            <div class="mb-3 mt-3">
+                                <label for="emp_roll">Emp/Roll No:</label>
+                                <input type="text" class="form-control" id="emp_roll" placeholder="Enter Employee" name="emp_roll">
+                            </div> -->
+                            <div class="mb-3 mt-3">
+                                <label for="pi">Principal Investigator (PI):</label>
+                                <input type="text" class="form-control" id="pi" name="principle" placeholder="Enter name">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="start_date">Start Date:</label>
+                                <input type="date" class="form-control" id="start_date" name="start_date" required>
+                            </div><br>
+
+                            <div class="form-group">
+                                <label for="end_date">Termination Date:</label>
+                                <input type="date" class="form-control" id="end_date" name="termination_date" required>
+                            </div><br>
+
+                            <div class="mb-3 mt-3">
+                                <label for="startposition">Starting Position:</label>
+                                <input type="text" class="form-control" id="name" placeholder="Enter name" name="start_postion">
+                            </div>
+
+                            <div class="mb-3 mt-3">
+                                <label for="endingposition">Ending Position:</label>
+                                <input type="text" class="form-control" id="name" placeholder="Enter name" name="ending_postion">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="reason_leaving">REASONS FOR LEAVING:</label>
+                                <select class="form-control" id="reason_leaving" name="reason_leaving">
+                                    <option value="Took another position">Took another position </option>
+                                    <option value="Dissatisfaction with salary">Dissatisfaction with salary</option>
+                                    <option value="Pregnancy/home/family needs">Pregnancy/home/family needs</option>
+                                    <option value="Dissatisfaction with type of work">Dissatisfaction with type of work</option>
+                                    <option value="Poor health/physical disability">Poor health/physical disability</option>
+                                    <option value="Dissatisfaction with supervisor">Dissatisfaction with supervisor</option>
+                                    <option value="Relocation to another city">Relocation to another city</option>
+                                    <option value="Dissatisfaction with co-workers">Dissatisfaction with co-workers</option>
+                                    <option value="Travel difficulties">Travel difficulties</option>
+                                    <option value="Dissatisfaction with working conditions">Dissatisfaction with working conditions</option>
+                                    <option value="To attend school">To attend school</option>
+                                    <option value="Dissatisfaction with benefits">Dissatisfaction with benefits</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3 mt-3">
+                                <label for="PlansAfterLeaving">Plans After Leaving:</label>
+                                <input type="text" class="form-control" id="planafterleaving" placeholder="Enter name" name="planafterleaving">
+                            </div>
+
+                            <div class="mb-3 mt-3">
+                                <label for="imporove_suggestion">COMMENTS/SUGGESTIONS FOR IMPROVEMENT:</label>
+                                <input type="text" class="form-control" id="imporove_suggestion" placeholder="Enter name" name="imporove_suggestion">
+                            </div>
+
+                            <h2>
+                                We are interested in what our employees have to say about their work experience with Please Share your Experienace
+                            </h2>
+                            <div class="mb-3 mt-3">
+                                <label for="what_mostlike">What did you like most about your job?:</label>
+                                <input type="text" class="form-control" id="what_mostlike" placeholder="Enter name" name="what_mostlike">
+                            </div>
+                            <div class="mb-3 mt-3">
+                                <label for="what_leastlike">What did you like least about your job?:</label>
+                                <input type="text" class="form-control" id="what_leastlike" placeholder="Enter name" name="what_leastlike">
+                            </div>
+                            <div class="mb-3 mt-3">
+                                <label for="taking_anotherjob"> If you are taking another job, what kind of work will you be doing? :</label>
+                                <input type="text" class="form-control" id="taking_anotherjob" placeholder="Enter name" name="taking_anotherjob">
+                            </div>
+                            <div class="mb-3 mt-3">
+                                <label for="new_place_job">What has your new place of employment offered you that is more attractive than your present job? :</label>
+                                <input type="text" class="form-control" id="new_place_job" placeholder="Enter name" name="new_place_job">
+                            </div>
+                            <div class="mb-3 mt-3">
+                                <label for="improvement">Could the Centre have made any improvements that might have influenced you to work better?:</label>
+                                <input type="text" class="form-control" id="improvement" placeholder="Enter name" name="improvement">
+                            </div>
+
+                            <div class="mb-3 mt-3">
+                                <label for="improvement">Have you returned the following to the Centre (Tick as appropriate):</label>
+
+                                <div class="form-check">
+                                    <label class="form-check-label" for="Drawer">Drawer keys</label>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="Drawer_yesno" id="Drawer_yes" value="yes">
+                                        <label class="form-check-label" for="Drawer_yes">Yes</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="Drawer_yesno" id="Drawer_no" value="no">
+                                        <label class="form-check-label" for="Drawer_no">No</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-check">
+                                    <label class="form-check-label" for="Cupboard Keys">Cupboard Keys</label>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="CupboardKeys_yesno" id="Cupboard Keys_yes" value="yes">
+                                        <label class="form-check-label" for="Cupboard Keys_yes">Yes</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="CupboardKeys_yesno" id="Cupboard Keys_no" value="no">
+                                        <label class="form-check-label" for="Cupboard Keys_no">No</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-check">
+                                    <label class="form-check-label" for="labbook">Lab books returned</label>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="labbookyesno" id="labbookyes" value="yes">
+                                        <label class="form-check-label" for="labbookyes">Yes</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="labbookyesno" id="labbookno" value="no">
+                                        <label class="form-check-label" for="labbookno">No</label>
+                                    </div>
+                                </div>
+                                <div class="form-check">
+                                    <label class="form-check-label" for="hardware">Laptop, hard drive, pendrive, etc</label>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="hardwareno" id="hardware" value="yes">
+                                        <label class="form-check-label" for="hardware">Yes</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="hardwareno" id="labbookno" value="no">
+                                        <label class="form-check-label" for="labbookno">No</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-check">
+                                    <label class="form-check-label" for="tools">Tools used/unused</label>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="toolsno" id="tools" value="yes">
+                                        <label class="form-check-label" for="tools">Yes</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="toolsno" id="labbookno" value="no">
+                                        <label class="form-check-label" for="labbookno">No</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-check">
+                                    <label class="form-check-label" for="anyothers">Any other office hardware</label>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="anyothersno" id="anyothers" value="yes">
+                                        <label class="form-check-label" for="anyothers">Yes</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="radio" name="anyothersno" id="labbookno" value="no">
+                                        <label class="form-check-label" for="labbookno">No</label>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <?php } ?>
+
+
+    <!-- code for applying certficate for the intern -->
+    <?php
+    if ($usertype == 'intern') {
+    ?>
+        <div id="tab6" class="container tab-content">
+            <div class="row">
+                <div class="col-md-12 ">
+                    <div class="container col-md-6 mt-3">
+                        <h2 style="text-align: center;padding: 15px;">Certificate Form</h2>
+                        <form method="post" action="formsubmit.php/certificate">
+                            <input type="hidden" name="sid" value="<?php echo $decform = $results[0]['sid']; ?>">
+                            <div class="mb-3 mt-3">
+                                <label for="profname">Professor Name:</label>
+                                <input type="text" class="form-control" id="profname" name="profname" placeholder="Enter name Professor Name">
+                            </div>
+
+                            <div class="mb-3 mt-3">
+                                <label for="name">Name:</label>
+                                <input type="text" class="form-control" id="pi" name="name" placeholder="Enter  your name">
+                            </div>
+                            <div class="form-group">
+                                <label for="collegename">College Name:</label>
+                                <input type="text" class="form-control" id="start_date" name="collegename" placeholder="University/College Name" required>
+                            </div><br>
+
+                            <div class="form-group">
+                                <label for="internshipdate">Start Date of Internship:</label>
+                                <input type="date" class="form-control" id="internshipdate" name="internshipdate" required>
+                            </div><br>
+
+                            <div class="form-group">
+                                <label for="internshipdateend">End Date of Internship:</label>
+                                <input type="date" class="form-control" id="internshipdate" name="internshipdateend" required>
+                            </div><br>
+
+                            <div class="mb-3 mt-3">
+                                <label for="point_internship">4-5 points about the project/work done during the Internship:</label>
+                                <input type="text" class="form-control" id="point_internship" name="point_internship">
+                            </div>
+
+                            <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+                    </div>
+
+
+                    </form>
+                </div>
+            </div>
+        </div>
+        </div>
+    <?php } ?>
+
+
 
     <!-- code for edit the data and send it to the database  -->
     <script>
@@ -466,24 +787,34 @@ $decform = $results[0]['declarationform'];
             }
 
             console.log(formData);
-
-            var xhr = new XMLHttpRequest();
-            xhr.open('POST', 'useredit.php', true);
-            xhr.onload = function() {
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    console.log(xhr.responseText); // Print response in console
-                } else {
-                    console.error('Error:', xhr.statusText);
-                }
-            };
-            xhr.onerror = function() {
-                console.error('Request failed');
-            };
-            xhr.send(formData);
+            try {
+                fetch('formsubmit.php/editprofile', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log(data);
+                        if (data.status === "success") {
+                            console.log("Data received successfully:", data.data);
+                        } else {
+                            console.error("Error:", data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('There was a problem with the fetch operation:', error.message);
+                    });
+            } catch (error) {
+                console.error('There was a problem with the fetch operation:', error.message);
+            }
 
 
         });
-    </script>
     </script>
 
 
@@ -629,7 +960,7 @@ $decform = $results[0]['declarationform'];
                 title: "Leave Status",
                 field: "leave_status",
                 headerFilter: true,
-                editor: <?php echo ($usertype == 'admin') ? "'input'" : "false"; ?>,
+                editor: <?php echo ($usertype == 'hr') ? "'input'" : "false"; ?>,
                 cellEdited: function(cell) {
                     console.log(cell);
                     var userId = cell.getData().sid;
