@@ -77,8 +77,14 @@ if (isset($_POST['register'])) {
                     $_SESSION['username'] = $result['name'];
                     $_SESSION['userid'] = $result['sid'];
                     $_SESSION['decform'] = $result['declarationform'];
-                    header("Location: index.php");
-                    exit();
+
+                    if ($result['usertype'] == 'system') {
+                        header("Location: system/index.php");
+                        exit();
+                    } else {
+                        header("Location: index.php");
+                        exit();
+                    }
                 } else {
                     $response = array("status" => "error", "message" => "Incorrect password");
                     echo "<script>alert('" . $response['message'] . "'); window.location.href = 'login.php';</script>";

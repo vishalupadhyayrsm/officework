@@ -92,6 +92,39 @@ $decform = $results[0]['declarationform'];
         button {
             margin: 10px 0;
         }
+
+        /* code for updating the tabel based on color start here  */
+        .tab-content {
+            display: none;
+        }
+
+        .active-tab {
+            display: block;
+        }
+
+        .red-row {
+            color: red;
+        }
+
+        .green-row {
+            color: green;
+        }
+
+        .not-editable-row,
+        .disabled-cell {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .disabled-row {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .disabled-cell {
+            opacity: 0.5;
+            pointer-events: none;
+        }
     </style>
     <script>
         // all code for laerting the user tht user has done something 
@@ -980,8 +1013,6 @@ $decform = $results[0]['declarationform'];
             ];
 
             // code for updating the user leave status start here 
-            <?php //if ($usertype != 'user') : 
-            ?>
             columns.push({
                 title: "Leave Status",
                 field: "leave_status",
@@ -990,17 +1021,21 @@ $decform = $results[0]['declarationform'];
                     var value = cell.getValue();
                     var cellEl = cell.getElement();
                     var row = cell.getRow();
-
                     if (value === 'yes') {
                         cellEl.disabled = true;
                         cellEl.classList.add('disabled-cell');
                         row.getElement().classList.add('green-row');
-                        return 'Yes';
+                        return 'Approved';
                     } else if (value === 'no') {
                         cellEl.disabled = true;
                         cellEl.classList.add('disabled-cell');
                         row.getElement().classList.add('red-row');
                         return 'Denied';
+                    } else if (value === 'pending') {
+                        cellEl.disabled = true;
+                        cellEl.classList.add('disabled-cell');
+                        row.getElement().classList.add('red-row');
+                        return 'Please Contact to Admin';
                     } else {
                         <?php if ($usertype == 'hr') : ?>
                             var dropdown = document.createElement('select');
@@ -1009,44 +1044,41 @@ $decform = $results[0]['declarationform'];
                                         <option value="">Select</option>
                                         <option value="yes">Approved</option>
                                         <option value="no">Dissapproved</option>
-                                        <option value="no">Contact to Admin</option>
+                                        <option value="pending">Contact to Admin</option>
                                     `;
                             // Add event listener to the dropdown
                             dropdown.addEventListener('change', function(event) {
                                 var selectedValue = event.target.value;
                                 var cellData = cell.getData();
-                                var username = cellData.username;
-                                var userId = cellData.userId;
-                                var pid = cellData.pid;
-
-                                // Update the addedcartInfo with the new value
-                                updatestatus(pid, userId, selectedValue, username);
+                                var username = cellData.name;
+                                var sid = cellData.sid;
+                                var lid = cellData.leaveid;
+                                console.log(lid, selectedValue, sid, username);
+                                updatestatus(lid, selectedValue, sid, username);
                             });
 
                             return dropdown;
                         <?php else : ?>
-                            return ''; // Or any placeholder text if user is not hr
+                            return '';
                         <?php endif; ?>
                     }
                 }
             });
-            <?php //endif; 
-            ?>
 
-            // function of the updatestatus start here 
-            function updatestatus(lid, userId, newValue) {
-                console.log(lid, userId, newValue);
+            // function for updating the leave status start here 
+            function updatestatus(lid, selectedValue, sid, username) {
+                console.log(lid, selectedValue, sid, username);
                 fetch('formsubmit.php/leaveapproved', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
                         },
 
-                        body: 'lid=' + encodeURIComponent(lid) + '&status=' + encodeURIComponent(newValue)
+                        body: 'lid=' + encodeURIComponent(lid) + '&status=' + encodeURIComponent(selectedValue)
                     })
                     .then(response => response.json())
                     .then(data => {
-                        alert("Product Status Updated Successfully")
+                        alert("Leave Status Updated Successfully")
                         //   console.log('Database update successful:', data);
                     })
                     .catch(error => {
@@ -1060,10 +1092,10 @@ $decform = $results[0]['declarationform'];
                 data: results,
                 layout: "fitColumns",
                 columns: columns,
-                pagination: "local", // Enable local pagination
-                paginationSize: pageSize, // Number of rows per page
+                pagination: "local",
+                paginationSize: pageSize,
                 paginationSizeSelector: [10, 15, 30],
-                paginationInitialPage: currentPage, // Initial page
+                paginationInitialPage: currentPage,
             });
             // Add the following code to initialize pagination buttons
             var prevPageBtn = document.querySelector('.pagination-btn:first-of-type');
@@ -1078,20 +1110,6 @@ $decform = $results[0]['declarationform'];
                     table.nextPage();
                 });
             }
-
-            function updateTableData() {
-                // Fetch updated data from the server
-                fetch('fetch_data.php') // Create a new PHP file (fetch_data.php) to handle fetching data
-                    .then(response => response.json())
-                    .then(data => {
-                        // Update Tabulator table with the latest data
-                        table.setData(data);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching data:', error);
-                    });
-            }
-
         } else {
             console.error('Tabulator library not defined or not loaded.');
         }
@@ -1120,33 +1138,13 @@ $decform = $results[0]['declarationform'];
                     // visible: <?php echo ($usertype == 'user') ? 'true' : 'true'; ?>,
                 },
                 {
+                    title: "Email",
+                    field: "email",
+                    headerFilter: true
+                },
+                {
                     title: "Contact No",
                     field: "contact",
-                    headerFilter: true
-                },
-                {
-                    title: "Total Cl",
-                    field: "cl",
-                    headerFilter: true,
-                },
-                {
-                    title: "Remaining Cl",
-                    field: "remainingcl",
-                    headerFilter: true
-                },
-                {
-                    title: "Total RH",
-                    field: "rh",
-                    headerFilter: true
-                },
-                {
-                    title: "Remaining RH",
-                    field: "remainingrh",
-                    headerFilter: true
-                },
-                {
-                    title: "Leave Reason",
-                    field: "reason",
                     headerFilter: true
                 },
                 {
@@ -1166,41 +1164,47 @@ $decform = $results[0]['declarationform'];
                 },
             ];
 
-            // code for updating the user leave status start here 
-            <?php //if ($usertype != 'user') : 
-            ?>
-            columns.push({
-                title: "Leave Status",
-                field: "leave_status",
-                headerFilter: true,
-                editor: <?php echo ($usertype == 'hr') ? "'input'" : "false"; ?>,
-                cellEdited: function(cell) {
-                    console.log(cell);
-                    var userId = cell.getData().sid;
-                    var lid = cell.getData().leaveid;
-                    var newValue = cell.getValue();
-                    cell.setValue(newValue);
-                    updatestatus(lid, userId, newValue);
-                },
-            });
-            <?php // endif; 
-            ?>
-
-            // function of the updatestatus start here 
-            function updatestatus(lid, userId, newValue) {
-                console.log(lid, userId, newValue);
-                fetch('updateproductstatus.php', {
+            <?php if ($usertype == 'hr') : ?>
+                columns.push({
+                    title: "Approved/Disapproved User",
+                    field: "userapproved",
+                    headerFilter: true,
+                    formatter: function(cell, formatterParams, onRendered) {
+                        var value = cell.getValue();
+                        var buttonText = value === 'yes' ? 'Approved' : 'Disapproved';
+                        var buttonColor = value === 'yes' ? 'btn-success' : 'btn-danger';
+                        var buttonHTML = '<button type="button" class="btn ' + buttonColor + '" style="width: 100%;">' + buttonText + '</button>';
+                        return buttonHTML;
+                    },
+                    cellClick: function(e, cell) {
+                        var currentValue = cell.getValue();
+                        var newValue = currentValue === 'yes' ? 'no' : 'yes';
+                        cell.setValue(newValue);
+                        var userId = cell.getData().userid;
+                        // updateApprovalStatus(userId, newValue);
+                    }
+                });
+            <?php endif; ?>
+            // function for approved or disapproved user 
+            function updateApprovalStatus(userId, newValue) {
+                fetch('approved.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
                         },
-
-                        body: 'lid=' + encodeURIComponent(lid) + '&status=' + encodeURIComponent(newValue)
+                        body: 'userId=' + encodeURIComponent(userId) + '&status=' + encodeURIComponent(newValue)
                     })
                     .then(response => response.json())
                     .then(data => {
-                        alert("Product Status Updated Successfully")
-                        //   console.log('Database update successful:', data);
+                        var datavalue = data.data;
+                        console.log(datavalue);
+                        if (datavalue == 'no') {
+                            alert("User Successfully Disapproved");
+                            window.location.href = "index1.php";
+                        } else {
+                            alert("User Successfully Approved");
+                            window.location.href = "index1.php";
+                        }
                     })
                     .catch(error => {
                         console.error('Error updating database:', error);
@@ -1231,27 +1235,13 @@ $decform = $results[0]['declarationform'];
                     table.nextPage();
                 });
             }
-
-            function updateTableData() {
-                // Fetch updated data from the server
-                fetch('fetch_data.php') // Create a new PHP file (fetch_data.php) to handle fetching data
-                    .then(response => response.json())
-                    .then(data => {
-                        // Update Tabulator table with the latest data
-                        table.setData(data);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching data:', error);
-                    });
-            }
-
         } else {
             console.error('Tabulator library not defined or not loaded.');
         }
     </script>
 
 
-    <!-- code for displaying who  si applied for certificate  -->
+    <!-- code for displaying who applied for certificate  -->
     <script>
         var tabId;
 
@@ -1292,13 +1282,18 @@ $decform = $results[0]['declarationform'];
                     field: "start_date",
                     headerFilter: true
                 },
+                {
+                    title: "Work Done",
+                    field: "workdone",
+                    headerFilter: true
+                },
             ];
 
             // code for updating the user leave status start here 
             <?php //if ($usertype != 'user') : 
             ?>
             columns.push({
-                title: "Leave Status",
+                title: "Certificate Status",
                 field: "leave_status",
                 headerFilter: true,
                 editor: <?php echo ($usertype == 'hr') ? "'input'" : "false"; ?>,
@@ -1308,7 +1303,7 @@ $decform = $results[0]['declarationform'];
                     var lid = cell.getData().leaveid;
                     var newValue = cell.getValue();
                     cell.setValue(newValue);
-                    updatestatus(lid, userId, newValue);
+                    // updatestatus(lid, userId, newValue);
                 },
             });
             <?php // endif; 
@@ -1317,7 +1312,7 @@ $decform = $results[0]['declarationform'];
             // function of the updatestatus start here 
             function updatestatus(lid, userId, newValue) {
                 console.log(lid, userId, newValue);
-                fetch('updateproductstatus.php', {
+                fetch('', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
@@ -1490,22 +1485,51 @@ $decform = $results[0]['declarationform'];
                 },
             ];
 
-            // code for updating the user leave status start here 
-            <?php //if ($usertype != 'user') : 
-            ?>
+            /* code for upadating the resignation status start here */
             columns.push({
                 title: "Leave Status",
                 field: "leave_status",
                 headerFilter: true,
-                editor: <?php echo ($usertype == 'hr') ? "'input'" : "false"; ?>,
-                cellEdited: function(cell) {
-                    console.log(cell);
-                    var userId = cell.getData().sid;
-                    var lid = cell.getData().leaveid;
-                    var newValue = cell.getValue();
-                    cell.setValue(newValue);
-                    updatestatus(lid, userId, newValue);
-                },
+                formatter: function(cell, formatterParams, onRendered) {
+                    var value = cell.getValue();
+                    var cellEl = cell.getElement();
+                    var row = cell.getRow();
+                    if (value === 'yes') {
+                        cellEl.disabled = true;
+                        cellEl.classList.add('disabled-cell');
+                        row.getElement().classList.add('green-row');
+                        return 'Approved';
+                    } else if (value === 'no') {
+                        cellEl.disabled = true;
+                        cellEl.classList.add('disabled-cell');
+                        row.getElement().classList.add('red-row');
+                        return 'Denied';
+                    } else {
+                        <?php if ($usertype == 'hr') : ?>
+                            var dropdown = document.createElement('select');
+                            dropdown.classList.add('form-control');
+                            dropdown.innerHTML = `
+                                        <option value="">Select</option>
+                                        <option value="yes">Approved</option>
+                                        <option value="no">Dissapproved</option>
+                                    `;
+                            // Add event listener to the dropdown
+                            dropdown.addEventListener('change', function(event) {
+                                var selectedValue = event.target.value;
+                                var cellData = cell.getData();
+                                var username = cellData.name;
+                                var sid = cellData.sid;
+                                var lid = cellData.leaveid;
+                                console.log(lid, selectedValue, sid, username);
+                                // updatestatus(lid, selectedValue, sid, username);
+                            });
+
+                            return dropdown;
+                        <?php else : ?>
+                            return '';
+                        <?php endif; ?>
+                    }
+                }
             });
             <?php // endif; 
             ?>
@@ -1535,10 +1559,10 @@ $decform = $results[0]['declarationform'];
                 data: results,
                 layout: "fitData",
                 columns: columns,
-                pagination: "local", // Enable local pagination
-                paginationSize: pageSize, // Number of rows per page
+                pagination: "local",
+                paginationSize: pageSize,
                 paginationSizeSelector: [10, 15, 30],
-                paginationInitialPage: currentPage, // Initial page
+                paginationInitialPage: currentPage,
             });
             // Add the following code to initialize pagination buttons
             var prevPageBtn = document.querySelector('.pagination-btn:first-of-type');
@@ -1553,163 +1577,12 @@ $decform = $results[0]['declarationform'];
                     table.nextPage();
                 });
             }
-
-            function updateTableData() {
-                // Fetch updated data from the server
-                fetch('fetch_data.php') // Create a new PHP file (fetch_data.php) to handle fetching data
-                    .then(response => response.json())
-                    .then(data => {
-                        // Update Tabulator table with the latest data
-                        table.setData(data);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching data:', error);
-                    });
-            }
         } else {
             console.error('Tabulator library not defined or not loaded.');
         }
     </script>
 
 
-
-
-
-
-
-
-
-
-
-
-
-    <script>
-        // if (typeof Tabulator !== 'undefined') {
-        //     var results = <?php echo json_encode($results); ?>;
-        //     var columns = [{
-        //             title: "User Name",
-        //             field: "name",
-        //             headerFilter: true
-        //         },
-        //         {
-        //             title: "User Email",
-        //             field: "email",
-        //             headerFilter: true
-        //         },
-        //         {
-        //             title: "Contact No",
-        //             field: "phoneNo",
-        //             headerFilter: true
-
-        //         },
-        //         {
-        //             title: "Lab",
-        //             field: "lab",
-        //             headerFilter: true
-        //         },
-
-        //     ];
-        //     // code for approved/disapproved user
-        //     <?php if ($usertype != 'user') : ?>
-        //         columns.push({
-        //             title: "Approved/Disapproved User",
-        //             field: "userapproved",
-        //             headerFilter: true,
-        //             formatter: function(cell, formatterParams, onRendered) {
-        //                 var value = cell.getValue();
-        //                 // console.log(value);
-        //                 var buttonText = value === 'yes' ? 'Approved' : 'Disapproved';
-        //                 var buttonColor = value === 'yes' ? 'btn-success' : 'btn-danger';
-        //                 //   var buttonHTML = '<button type="button" class="btn ' + buttonColor + '">' + buttonText + '</button>';
-        //                 var buttonHTML = '<button type="button" class="btn ' + buttonColor + '" style="width: 100%;">' + buttonText + '</button>';
-        //                 return buttonHTML;
-        //             },
-        //             cellClick: function(e, cell) {
-        //                 // Toggle the value and update the database
-        //                 var currentValue = cell.getValue();
-        //                 // console.log(currentValue);
-        //                 var newValue = currentValue === 'yes' ? 'no' : 'yes';
-        //                 cell.setValue(newValue);
-        //                 // console.log(newValue);
-        //                 // Send an AJAX request to update the database
-        //                 var userId = cell.getData().userid; // Assuming you have a 'userid' field in your data
-        //                 // console.log(userId);
-        //                 updateApprovalStatus(userId, newValue);
-        //             }
-        //         });
-        //     <?php endif; ?>
-        //     // function for approved or disapproved user 
-        //     function updateApprovalStatus(userId, newValue) {
-        //         fetch('approved.php', {
-        //                 method: 'POST',
-        //                 headers: {
-        //                     'Content-Type': 'application/x-www-form-urlencoded'
-        //                 },
-        //                 body: 'userId=' + encodeURIComponent(userId) + '&status=' + encodeURIComponent(newValue)
-        //             })
-        //             .then(response => response.json())
-        //             .then(data => {
-        //                 var datavalue = data.data;
-        //                 console.log(datavalue);
-        //                 if (datavalue == 'no') {
-        //                     alert("User Successfully Disapproved");
-        //                     window.location.href = "index1.php";
-        //                 } else {
-        //                     alert("User Successfully Approved");
-        //                     window.location.href = "index1.php";
-        //                 }
-        //                 // Redirect if needed
-        //                 // window.location.href = "index1.php";
-        //                 // console.log('Database update successful:', data);
-        //             })
-        //             .catch(error => {
-        //                 console.error('Error updating database:', error);
-        //             });
-        //     }
-
-        //     var pageSize = 10; // Number of rows per page
-        //     var currentPage = 1; // Initial page
-
-        //     var table = new Tabulator("#usertable", {
-        //         data: results,
-        //         layout: "fitColumns",
-        //         columns: columns,
-        //         pagination: "local", // Enable local pagination
-        //         paginationSize: pageSize, // Number of rows per page
-        //         paginationSizeSelector: [10, 15, 30],
-        //         paginationInitialPage: currentPage, // Initial page
-        //     });
-        //     // Add the following code to initialize pagination buttons
-        //     var prevPageBtn = document.querySelector('.pagination-btn:first-of-type');
-        //     var nextPageBtn = document.querySelector('.pagination-btn:last-of-type');
-
-        //     if (prevPageBtn && nextPageBtn) {
-        //         prevPageBtn.addEventListener('click', function() {
-        //             table.previousPage();
-        //         });
-
-        //         nextPageBtn.addEventListener('click', function() {
-        //             table.nextPage();
-        //         });
-        //     }
-
-        //     function updateTableData() {
-        //         // Fetch updated data from the server
-        //         fetch('fetch_data.php') // Create a new PHP file (fetch_data.php) to handle fetching data
-        //             .then(response => response.json())
-        //             .then(data => {
-        //                 // Update Tabulator table with the latest data
-        //                 table.setData(data);
-        //             })
-        //             .catch(error => {
-        //                 console.error('Error fetching data:', error);
-        //             });
-        //     }
-
-        // } else {
-        //     console.error('Tabulator library not defined or not loaded.');
-        // }
-    </script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
