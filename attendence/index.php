@@ -15,13 +15,13 @@ if (isset($_SESSION['user_email'])) {
         if ($usertype == "staff") {
             // $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid, lt.`startdate`, lt.`enddate`, lt.`reason`, lt.`leave_status` 
             //         FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid where sg.sid=:sid ";
-            $sql = "SELECT sg.`sid`,sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid, lt.`startdate`, lt.`enddate`, lt.`reason`, lt.`leave_status`,de.declarationform,de.emp_roll,de.name,de.gender,de.localaddress,de.localpostal,de.permanentadd,de.permpostal, de.homecontact,de.emename1,de.emerelation,de.emeadd,de.emecontact,de.empostalcode,de.emesecondname,de.emesecrelation,de.medicalcondition,de.profilepic
+            $sql = "SELECT sg.`sid`,sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid, lt.`startdate`, lt.`enddate`, lt.`reason`, lt.`leave_status`,de.declarationform,de.emp_roll,de.`univesity`,de.name,de.gender,de.localaddress,de.localpostal,de.permanentadd,de.permpostal, de.homecontact,de.emename1,de.emerelation,de.emeadd,de.emecontact,de.empostalcode,de.emesecondname,de.emesecrelation,de.medicalcondition,de.profilepic
              FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid LEFT JOIN declarationform as de on de.sid = sg.sid where sg.sid=:sid ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':sid', $sid);
             $stmt->execute();
         } elseif ($usertype == "intern") {
-            $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.declarationform, de.`declarationform`, de.`name`, de.`emp_roll`, de.`gender`, de.`localaddress`, de.`localpostal`, de.`permanentadd`, de.`permpostal`, de.`homecontact`, de.`emename1`, de.`emerelation`, de.`emeadd`, de.`emecontact`, de.`empostalcode`, de.`emesecondname`, de.`emesecrelation`, de.`medicalcondition`, de.`term`, de.`profilepic`
+            $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.declarationform, de.`declarationform`, de.`name`, de.`emp_roll`,de.`univesity`, de.`gender`, de.`localaddress`, de.`localpostal`, de.`permanentadd`, de.`permpostal`, de.`homecontact`, de.`emename1`, de.`emerelation`, de.`emeadd`, de.`emecontact`, de.`empostalcode`, de.`emesecondname`, de.`emesecrelation`, de.`medicalcondition`, de.`term`, de.`profilepic`
              FROM `sigin` as sg LEFT JOIN declarationform as de on de.sid = sg.sid where sg.sid=:sid ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':sid', $sid);
@@ -43,7 +43,7 @@ if (isset($_SESSION['user_email'])) {
     exit();
 }
 
-$sql = "SELECT `sid`, `name`, `email`, `password`, `usertype`, `contact`, `cl`, `rh`, `remainingcl`, `remainingrh`, `year`, `declarationform`, `resign` FROM `sigin`";
+$sql = "SELECT `sid`, `name`, `email`, `password`,`userstatus`, `usertype`,`startdate`,`enddate`, `contact`, `cl`, `rh`, `remainingcl`, `remainingrh`, `year`, `declarationform`, `resign` FROM `sigin`";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 $userdetails = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -54,7 +54,7 @@ $stmt->execute();
 $certificate = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
-$sql = "SELECT `rid`, `sid`, `pi_name`, `start_date`, `terminationdate`, `startingposition`, `endingpostion`, `reason_leaving`, `planafterleaving`, `imporove_suggestion`, `what_mostlike`, `what_leastlike`, `taking_anotherjob`, `new_place_job`, `improvement`, `Drawer_yesno`, `CupboardKeys_yesno`, `labbookyesno`, `hardwareno`, `anyothersno` FROM `resigndata`";
+$sql = "SELECT `rid`, `sid`, `pi_name`, `start_date`, `terminationdate`, `startingposition`, `endingpostion`, `reason_leaving`, `planafterleaving`, `imporove_suggestion`, `what_mostlike`, `what_leastlike`, `taking_anotherjob`, `new_place_job`, `improvement`, `Drawer_yesno`, `CupboardKeys_yesno`, `labbookyesno`, `hardwareno`,`otherremarks`, `anyothersno` FROM `resigndata`";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 $resign = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -127,10 +127,17 @@ $decform = $results[0]['declarationform'];
         }
     </style>
     <script>
-        // all code for laerting the user tht user has done something 
         <?php if (isset($_SESSION['form_submitted']) && $_SESSION['form_submitted']) : ?>
             alert("Record inserted successfully");
             <?php unset($_SESSION['form_submitted']); ?>
+        <?php endif; ?>
+        <?php if (isset($_SESSION['sid_exist']) && $_SESSION['sid_exist']) : ?>
+            alert("You have alreday applied for Certificate");
+            <?php unset($_SESSION['sid_exist']); ?>
+        <?php endif; ?>
+        <?php if (isset($_SESSION['resign_sid_exist']) && $_SESSION['resign_sid_exist']) : ?>
+            alert("You have alreday resign");
+            <?php unset($_SESSION['resign_sid_exist']); ?>
         <?php endif; ?>
         <?php if (isset($_SESSION['resign_form']) && $_SESSION['resign_form']) : ?>
             alert("Successfully Submitted");
@@ -211,6 +218,10 @@ $decform = $results[0]['declarationform'];
                             <div class="form-group">
                                 <label for="emp_roll">Employee No/Student Roll No:</label>
                                 <input type="number" class="form-control" id="emp_roll" name="emproll" required>
+                            </div><br>
+                            <div class="form-group">
+                                <label for="emp_roll">University:</label>
+                                <input type="text" class="form-control" id="university" name="univesity" required>
                             </div><br>
                             <div class="form-group">
                                 <label for="month">Gender:</label>
@@ -359,7 +370,7 @@ $decform = $results[0]['declarationform'];
                         <div class="profile-details">
                             <h1 class="username">Vishal Kumar Upadhyay</h1>
                             <p>Designation: Project Research Assistant</p>
-                            <p>University: <span class="text-display"><?php echo $results[0]['university']; ?></span><input class="input-display" type="text" name="university" value="<?php echo $results[0]['university']; ?>"></p>
+                            <p>University: <span class="text-display"><?php echo $results[0]['univesity']; ?></span><input class="input-display" type="text" name="university" value="<?php echo $results[0]['university']; ?>"></p>
                             <p>Contact: <span class="text-display"><?php echo $results[0]['contact']; ?></span><input class="input-display" type="text" name="contact" value="<?php echo $results[0]['contact']; ?>"></p>
                             <p>Email: <span class="text-display"><?php echo $results[0]['email']; ?></span><input class="input-display" type="email" name="email" value="<?php echo $results[0]['email']; ?>"></p>
                         </div>
@@ -417,7 +428,7 @@ $decform = $results[0]['declarationform'];
                             <br>
                         </div>
                         <br>
-                        <form method="post" action="leaveupload.php" class="form_data">
+                        <form method="post" action="formsubmit.php/leaveapply" class="form_data">
                             <div class="form-group">
                                 <label for="start_date">Start Date:</label>
                                 <input type="date" class="form-control" id="start_date" name="start_date" required>
@@ -490,47 +501,6 @@ $decform = $results[0]['declarationform'];
                     <div class="container col-md-6 mt-3">
                         <h2 class="all_heading">RESIGNATION FORM</h2>
                         <form method="post" action="formsubmit.php/resign">
-                            <!-- <div class="form-group">
-                                <label for="start_date">Start Date:</label>
-                                <input type="date" class="form-control" id="start_date" name="start_date" required>
-                            </div><br>
-
-                            <div class="form-group">
-                                <label for="end_date">Termination Date:</label>
-                                <input type="date" class="form-control" id="end_date" name="termination_date" required>
-                            </div><br>
-
-                            <?php foreach ($text_inputs as $input) { ?>
-                                <div class="mb-3 mt-3">
-                                    <label for="<?= $input['id'] ?>"><?= $input['label'] ?></label>
-                                    <input type="text" class="form-control" id="<?= $input['id'] ?>" placeholder="<?= $input['placeholder'] ?>" name="<?= $input['name'] ?>">
-                                </div>
-                            <?php } ?>
-
-                            <div class="mb-3">
-                                <label for="reason_leaving">REASONS FOR LEAVING:</label>
-                                <select class="form-control" id="reason_leaving" name="reason_leaving">
-                                    <?php foreach ($reasons_for_leaving as $reason) { ?>
-                                        <option value="<?= $reason ?>"><?= $reason ?></option>
-                                    <?php } ?>
-                                </select>
-                            </div>
-
-                            <h2>We are interested in what our employees have to say about their work experience. Please share your experience.</h2>
-
-                            <?php foreach ($item_returns as $item) { ?>
-                                <div class="form-check">
-                                    <label class="form-check-label" for="<?= $item['name'] ?>"><?= $item['label'] ?></label>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="<?= $item['name'] ?>" id="<?= $item['name'] ?>_yes" value="yes">
-                                        <label class="form-check-label" for="<?= $item['name'] ?>_yes">Yes</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="<?= $item['name'] ?>" id="<?= $item['name'] ?>_no" value="no">
-                                        <label class="form-check-label" for="<?= $item['name'] ?>_no">No</label>
-                                    </div>
-                                </div>
-                            <?php } ?> -->
                             <input type="hidden" name="sid" value="<?php echo $decform = $results[0]['sid']; ?>">
                             <!-- <div class="mb-3 mt-3">
                                 <label for="name">Name:</label>
@@ -542,7 +512,7 @@ $decform = $results[0]['declarationform'];
                             </div> -->
                             <div class="mb-3 mt-3">
                                 <label for="pi">Principal Investigator (PI):</label>
-                                <input type="text" class="form-control" id="pi" name="principle" placeholder="Enter name">
+                                <input type="text" class="form-control" id="pi" name="principle" placeholder="PI name" required>
                             </div>
 
                             <div class="form-group">
@@ -557,12 +527,12 @@ $decform = $results[0]['declarationform'];
 
                             <div class="mb-3 mt-3">
                                 <label for="startposition">Starting Position:</label>
-                                <input type="text" class="form-control" id="name" placeholder="Enter name" name="start_postion">
+                                <input type="text" class="form-control" id="name" placeholder="Enter your designation" name="start_postion">
                             </div>
 
                             <div class="mb-3 mt-3">
                                 <label for="endingposition">Ending Position:</label>
-                                <input type="text" class="form-control" id="name" placeholder="Enter name" name="ending_postion">
+                                <input type="text" class="form-control" id="name" placeholder="Enter you ending designation" name="ending_postion">
                             </div>
 
                             <div class="mb-3">
@@ -585,12 +555,12 @@ $decform = $results[0]['declarationform'];
 
                             <div class="mb-3 mt-3">
                                 <label for="PlansAfterLeaving">Plans After Leaving:</label>
-                                <input type="text" class="form-control" id="planafterleaving" placeholder="Enter name" name="planafterleaving">
+                                <input type="text" class="form-control" id="planafterleaving" placeholder="Plans after leaving" name="planafterleaving">
                             </div>
 
                             <div class="mb-3 mt-3">
                                 <label for="imporove_suggestion">COMMENTS/SUGGESTIONS FOR IMPROVEMENT:</label>
-                                <input type="text" class="form-control" id="imporove_suggestion" placeholder="Enter name" name="imporove_suggestion">
+                                <input type="text" class="form-control" id="imporove_suggestion" placeholder="Suggest us what to imporove" name="imporove_suggestion">
                             </div>
 
                             <h2>
@@ -598,23 +568,27 @@ $decform = $results[0]['declarationform'];
                             </h2>
                             <div class="mb-3 mt-3">
                                 <label for="what_mostlike">What did you like most about your job?:</label>
-                                <input type="text" class="form-control" id="what_mostlike" placeholder="Enter name" name="what_mostlike">
+                                <input type="text" class="form-control" id="what_mostlike" placeholder="What you like here most" name="what_mostlike">
                             </div>
                             <div class="mb-3 mt-3">
                                 <label for="what_leastlike">What did you like least about your job?:</label>
-                                <input type="text" class="form-control" id="what_leastlike" placeholder="Enter name" name="what_leastlike">
+                                <input type="text" class="form-control" id="what_leastlike" placeholder="What you like least here" name="what_leastlike">
                             </div>
                             <div class="mb-3 mt-3">
                                 <label for="taking_anotherjob"> If you are taking another job, what kind of work will you be doing? :</label>
-                                <input type="text" class="form-control" id="taking_anotherjob" placeholder="Enter name" name="taking_anotherjob">
+                                <input type="text" class="form-control" id="taking_anotherjob" placeholder="Describe your next Job" name="taking_anotherjob">
                             </div>
                             <div class="mb-3 mt-3">
                                 <label for="new_place_job">What has your new place of employment offered you that is more attractive than your present job? :</label>
-                                <input type="text" class="form-control" id="new_place_job" placeholder="Enter name" name="new_place_job">
+                                <input type="text" class="form-control" id="new_place_job" placeholder="New job place" name="new_place_job">
                             </div>
                             <div class="mb-3 mt-3">
                                 <label for="improvement">Could the Centre have made any improvements that might have influenced you to work better?:</label>
-                                <input type="text" class="form-control" id="improvement" placeholder="Enter name" name="improvement">
+                                <input type="text" class="form-control" id="improvement" placeholder="Enter your improvement" name="improvement">
+                            </div>
+                            <div class="mb-3 mt-3">
+                                <label for="otherremark">Other Remakrs:</label>
+                                <input type="text" class="form-control" id="otherremarks" placeholder="Other Remarks" name="otherremarks">
                             </div>
 
                             <div class="mb-3 mt-3">
@@ -716,12 +690,12 @@ $decform = $results[0]['declarationform'];
                             <input type="hidden" name="sid" value="<?php echo $decform = $results[0]['sid']; ?>">
                             <div class="mb-3 mt-3">
                                 <label for="profname">Professor Name:</label>
-                                <input type="text" class="form-control" id="profname" name="profname" placeholder="Enter name Professor Name">
+                                <input type="text" class="form-control" id="profname" name="profname" placeholder="Enter name Professor Name" required>
                             </div>
 
                             <div class="mb-3 mt-3">
                                 <label for="name">Name:</label>
-                                <input type="text" class="form-control" id="pi" name="name" placeholder="Enter  your name">
+                                <input type="text" class="form-control" id="pi" name="name" placeholder="Enter Your Certificate Name" required>
                             </div>
                             <div class="form-group">
                                 <label for="collegename">College Name:</label>
@@ -740,7 +714,7 @@ $decform = $results[0]['declarationform'];
 
                             <div class="mb-3 mt-3">
                                 <label for="point_internship">4-5 points about the project/work done during the Internship:</label>
-                                <input type="text" class="form-control" id="point_internship" name="point_internship">
+                                <input type="text" class="form-control" id="point_internship" name="point_internship" placeholder="Enter what you have learned during your internship ">
                             </div>
 
                             <button type="submit" name="submit" class="btn btn-primary">Submit</button>
@@ -792,9 +766,6 @@ $decform = $results[0]['declarationform'];
         </div>
 
     <?php  } ?>
-
-
-
 
 
     <!-- code for edit the data and send it to the database  -->
@@ -890,15 +861,6 @@ $decform = $results[0]['declarationform'];
 
 
 
-
-
-
-
-
-
-
-
-
     <script>
         /* code for displaying multipage form start here  */
         function nextPage(pageNumber) {
@@ -949,7 +911,7 @@ $decform = $results[0]['declarationform'];
     </script>
     <!---- javascript code start here  ---->
     <script src="js/index.js"></script>
-    <!-- code for leave status data start here -->
+    <!-- code for leave status start here -->
     <script>
         var tabId;
 
@@ -1116,7 +1078,7 @@ $decform = $results[0]['declarationform'];
     </script>
 
 
-    <!-- code for dsiaplying list fo user start here  -->
+    <!-- code for dsiaplying list fo userdetails start here  -->
     <script>
         var tabId;
 
@@ -1135,11 +1097,15 @@ $decform = $results[0]['declarationform'];
                     title: "User Name",
                     field: "name",
                     headerFilter: true
-                    // visible: <?php echo ($usertype == 'user') ? 'true' : 'true'; ?>,
                 },
                 {
                     title: "Email",
                     field: "email",
+                    headerFilter: true
+                },
+                {
+                    title: "Staff / Intern",
+                    field: "usertype",
                     headerFilter: true
                 },
                 {
@@ -1148,7 +1114,7 @@ $decform = $results[0]['declarationform'];
                     headerFilter: true
                 },
                 {
-                    title: "Start Date",
+                    title: "Joining Date",
                     field: "startdate",
                     headerFilter: true
                 },
@@ -1162,12 +1128,17 @@ $decform = $results[0]['declarationform'];
                     field: "declarationform",
                     headerFilter: true
                 },
+                {
+                    title: "Resign",
+                    field: "resign",
+                    headerFilter: true
+                },
             ];
 
             <?php if ($usertype == 'hr') : ?>
                 columns.push({
                     title: "Approved/Disapproved User",
-                    field: "userapproved",
+                    field: "userstatus",
                     headerFilter: true,
                     formatter: function(cell, formatterParams, onRendered) {
                         var value = cell.getValue();
@@ -1180,14 +1151,15 @@ $decform = $results[0]['declarationform'];
                         var currentValue = cell.getValue();
                         var newValue = currentValue === 'yes' ? 'no' : 'yes';
                         cell.setValue(newValue);
-                        var userId = cell.getData().userid;
-                        // updateApprovalStatus(userId, newValue);
+                        var userId = cell.getData().sid;
+                        console.log(newValue, userId)
+                        updateApprovalStatus(userId, newValue);
                     }
                 });
             <?php endif; ?>
             // function for approved or disapproved user 
             function updateApprovalStatus(userId, newValue) {
-                fetch('approved.php', {
+                fetch('formsubmit.php/userapproved', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
@@ -1200,10 +1172,10 @@ $decform = $results[0]['declarationform'];
                         console.log(datavalue);
                         if (datavalue == 'no') {
                             alert("User Successfully Disapproved");
-                            window.location.href = "index1.php";
+                            // window.location.href = "../index1.php";
                         } else {
                             alert("User Successfully Approved");
-                            window.location.href = "index1.php";
+                            // window.location.href = "index1.php";
                         }
                     })
                     .catch(error => {
@@ -1479,6 +1451,11 @@ $decform = $results[0]['declarationform'];
                     headerFilter: true
                 },
                 {
+                    title: "Otherremark",
+                    field: "otherremarks",
+                    headerFilter: true
+                },
+                {
                     title: "others",
                     field: "anyothersno",
                     headerFilter: true
@@ -1509,9 +1486,9 @@ $decform = $results[0]['declarationform'];
                             var dropdown = document.createElement('select');
                             dropdown.classList.add('form-control');
                             dropdown.innerHTML = `
-                                        <option value="">Select</option>
-                                        <option value="yes">Approved</option>
-                                        <option value="no">Dissapproved</option>
+                                    <option value="">Select</option>
+                                    <option value="yes">Approved</option>
+                                    <option value="no">Dissapproved</option>
                                     `;
                             // Add event listener to the dropdown
                             dropdown.addEventListener('change', function(event) {

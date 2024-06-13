@@ -22,6 +22,7 @@ switch ($endpoint) {
             $sid = $_SESSION['userid'] ?? '';
             $name = $_POST['name'] ?? '';
             $emproll = $_POST['emproll'] ?? '';
+            $univesity = $_POST['univesity'] ?? '';
             $gender = $_POST['gender'] ?? '';
             $localadd = $_POST['localadd'] ?? '';
             $localpostalcode = $_POST['localpostalcode'] ?? '';
@@ -49,8 +50,8 @@ switch ($endpoint) {
 
             $uploadedFilePath = $uploadDirectory . basename($video['name']);
             if (move_uploaded_file($video['tmp_name'], $uploadedFilePath)) {
-                $insertQuery = "INSERT INTO `declarationform`(`sid`,`declarationform`, `name`, `emp_roll`, `gender`, `localaddress`, `localpostal`, `permanentadd`, `permpostal`, `homecontact`, `emename1`, `emerelation`, `emeadd`, `emecontact`, `empostalcode`, `emesecondname`, `emesecrelation`, `medicalcondition`, `term`,`profilepic`) 
-                                VALUES ('$sid','yes','$name','$emproll','$gender','$localadd','$localpostalcode','$permadd','$permapostalcode','$homephone','$emergencyname1','$relationship1',
+                $insertQuery = "INSERT INTO `declarationform`(`sid`,`declarationform`, `name`, `emp_roll`,`univesity`, `gender`, `localaddress`, `localpostal`, `permanentadd`, `permpostal`, `homecontact`, `emename1`, `emerelation`, `emeadd`, `emecontact`, `empostalcode`, `emesecondname`, `emesecrelation`, `medicalcondition`, `term`,`profilepic`) 
+                                VALUES ('$sid','yes','$name','$emproll','$univesity','$gender','$localadd','$localpostalcode','$permadd','$permapostalcode','$homephone','$emergencyname1','$relationship1',
                                 '$localadd_emergency1','$emecontact1','$localpostalcode_emergency1','$emergencyname2','$relationship2','$medicalcondition','$termsCheck','$uploadedFilePath')";
                 if ($conn->query($insertQuery) == TRUE) {
 
@@ -94,23 +95,37 @@ switch ($endpoint) {
             $labbookyesno = $_POST['labbookyesno'];
             $hardwareno = $_POST['hardwareno'];
             $toolsno = $_POST['toolsno'];
+            $otheremarks = $_POST['otherremarks'];
             $anyothersno = $_POST['anyothersno'];
 
-            $insertQuery = "INSERT INTO `resigndata`(`sid`, `pi_name`, `start_date`, `terminationdate`, `startingposition`, `endingpostion`, `reason_leaving`, `planafterleaving`, `imporove_suggestion`, `what_mostlike`, `what_leastlike`, `taking_anotherjob`, `new_place_job`, `improvement`, `Drawer_yesno`, `CupboardKeys_yesno`, `labbookyesno`, `hardwareno`, `anyothersno`) 
-            VALUES ('$sid','$principle','$startdate','$terminationdate','$startingposition','$ending_postion','$reason_leaving','$planafterleaving','$imporove_suggestion','$what_mostlike','$what_leastlike','$taking_anotherjob','$new_place_job','$improvement','$Drawer_yesno','$CupboardKeys_yesno','$labbookyesno','$hardwareno','$anyothersno')";
+            $stmt = $conn->prepare("SELECT `sid` FROM `resigndata` WHERE `sid` = :sid");
+            $stmt->bindParam(':sid', $sid);
+            $stmt->execute();
 
-            if ($conn->query($insertQuery) == TRUE) {
-                // $stmt = $conn->prepare("UPDATE `sigin` SET `resign`='yes' WHERE sid = :sid");
-                // $stmt->bindParam(":sid", $sid);
-                // $stmt->execute();
-                // $response = array("status" => "success", "message" => "Record inserted successfully");
-                // echo '<script>alert("Successfully Submitted"); window.location.href = "index.php";</script>';
-                $_SESSION['resign_form'] = true;
+            if ($stmt->rowCount() > 0) {
+                $_SESSION['resign_sid_exist'] = true;
                 header("Location: ../index.php");
-                exit();
+                $response = array("status" => "error", "message" => "SID already exists in the table.");
+                echo json_encode($response);
             } else {
-                $response = array("status" => "error", "message" => "Error: " . $insertQuery . "<br>" . $conn->$error);
-                echo "failed";
+
+                $insertQuery = "INSERT INTO `resigndata`(`sid`, `pi_name`, `start_date`, `terminationdate`, `startingposition`, `endingpostion`, `reason_leaving`, `planafterleaving`, `imporove_suggestion`, `what_mostlike`, `what_leastlike`, `taking_anotherjob`, `new_place_job`, `improvement`, `Drawer_yesno`, `CupboardKeys_yesno`, `labbookyesno`, `hardwareno`, `anyothersno`,`otherremarks`) 
+            VALUES ('$sid','$principle','$startdate','$terminationdate','$startingposition','$ending_postion','$reason_leaving','$planafterleaving','$imporove_suggestion','$what_mostlike','$what_leastlike','$taking_anotherjob','$new_place_job','$improvement','$Drawer_yesno','$CupboardKeys_yesno','$labbookyesno','$hardwareno','$anyothersno','$otheremarks')";
+
+                if ($conn->query($insertQuery) == TRUE) {
+                    $todaydate = date("Y-m-d");
+                    $stmt = $conn->prepare("UPDATE `sigin` SET `enddate`='$todaydate' WHERE sid = :sid");
+                    $stmt->bindParam(":sid", $sid);
+                    $stmt->execute();
+                    // $response = array("status" => "success", "message" => "Record inserted successfully");
+                    // echo '<script>alert("Successfully Submitted"); window.location.href = "index.php";</script>';
+                    $_SESSION['resign_form'] = true;
+                    header("Location: ../index.php");
+                    exit();
+                } else {
+                    $response = array("status" => "error", "message" => "Error: " . $insertQuery . "<br>" . $conn->$error);
+                    echo "failed";
+                }
             }
         }
         break;
@@ -124,19 +139,38 @@ switch ($endpoint) {
             $internshipdate = $_POST['internshipdate'];
             $internshipdateend = $_POST['internshipdateend'];
             $point_internship = $_POST['point_internship'];
-            $insertquery = "INSERT INTO `certificate`( `sid`, `piname`, `username`, `collegename`, `start_date`, `end_date`, `workdone`) 
-            VALUES ('$sid','$profname','$name','$collegename','$internshipdate','$internshipdateend',' $point_internship')";
-            if ($conn->query($insertquery) == TRUE) {
-                $response = array("status" => "success", "message" => "Record inserted successfully");
-                // echo '<script>alert("Record inserted successfully");</script>';
-                // echo '<script>console.log("Record inserted successfully");</script>';
-                $_SESSION['form_submitted'] = true;
+
+            $stmt = $conn->prepare("SELECT `cid`, `sid` FROM `certificate` WHERE `sid` = :sid");
+            $stmt->bindParam(':sid', $sid);
+            $stmt->execute();
+
+            // Check if the sid already exists
+            if ($stmt->rowCount() > 0) {
+                $_SESSION['sid_exist'] = true;
                 header("Location: ../index.php");
-                exit();
-                // echo '<script>alert("Your application has been sent to Admin"); window.location.href = "index.php";</script>';
+                $response = array("status" => "error", "message" => "SID already exists in the table.");
+                echo json_encode($response);
             } else {
-                $response = array("status" => "error", "message" => "Error: " . $insertQuery . "<br>" . $conn->$error);
-                echo "failed";
+                $insertquery = "INSERT INTO `certificate` (`sid`, `piname`, `username`, `collegename`, `start_date`, `end_date`, `workdone`) 
+                                VALUES (:sid, :profname, :name, :collegename, :internshipdate, :internshipdateend, :point_internship)";
+                $stmt = $conn->prepare($insertquery);
+                $stmt->bindParam(':sid', $sid);
+                $stmt->bindParam(':profname', $profname);
+                $stmt->bindParam(':name', $name);
+                $stmt->bindParam(':collegename', $collegename);
+                $stmt->bindParam(':internshipdate', $internshipdate);
+                $stmt->bindParam(':internshipdateend', $internshipdateend);
+                $stmt->bindParam(':point_internship', $point_internship);
+
+                if ($stmt->execute()) {
+                    $response = array("status" => "success", "message" => "Record inserted successfully");
+                    $_SESSION['form_submitted'] = true;
+                    header("Location: ../index.php");
+                    exit();
+                } else {
+                    $response = array("status" => "error", "message" => "Error: " . $stmt->errorInfo()[2]);
+                    echo json_encode($response);
+                }
             }
         }
         break;
@@ -245,7 +279,54 @@ switch ($endpoint) {
             echo json_encode(['status' => 'error', 'message' => 'Invalid request']);
         }
         break;
+    case 'userapproved':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            try {
+                $sid = $_POST['userId'];
+                $approvestatus = $_POST['status'];
+                $stmt = $conn->prepare(" UPDATE `sigin` SET `userstatus`=:userstatus WHERE sid = :sid");
+                $stmt->bindParam(':sid', $sid);
+                $stmt->bindParam(':userstatus', $approvestatus);
+                $stmt->execute();
+                if ($stmt->errorCode() === '00000') {
+                    $response = ['status' => 'success', 'message' => 'Database update successful', 'data' => ['lid' => $sid, 'status' => $approvestatus]];
+                    echo json_encode($response);
+                } else {
+                    $errors = $stmt->errorInfo();
+                    echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $errors]);
+                }
+            } catch (PDOException $e) {
+                echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $e->getMessage()]);
+            }
+        } else {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'Invalid request']);
+        }
+        break;
+    case "leaveapply":
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            try {
+                if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+                    $startdate = $_POST['start_date'];
+                    $end_date = $_POST['end_date'];
+                    $reason = $_POST['reason'];
+                    $sid = $_POST['userid'];
+                    $cl = $_POST['cl'];
+                    $rh = $_POST['rh'];
+                    // $cl_el = $_POST['cl_el'];
+                    // $no_cl_el = $_POST['noof_cl_el'];
+                    $status = 'pending';
 
+                    echo $startdate . "," . $end_date . "," . $reason . "," . $sid . "," . $cl . "," . $rh;
+                }
+            } catch (PDOException $e) {
+                echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $e->getMessage()]);
+            }
+        } else {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'Invalid request']);
+        }
+        break;
     default:
         break;
 }

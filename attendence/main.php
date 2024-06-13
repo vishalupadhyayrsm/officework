@@ -5,7 +5,6 @@ include 'dbconfig.php';
 // require 'PHPMailer/src/PHPMailer.php';
 // require 'PHPMailer/src/SMTP.php';
 // require 'PHPMailer/src/Exception.php';
-
 // Create a new PHPMailer instance
 // use PHPMailer\PHPMailer\PHPMailer;
 // use PHPMailer\PHPMailer\SMTP;
@@ -35,8 +34,8 @@ if (isset($_POST['register'])) {
         echo json_encode($response);
     } else {
         $hash_password = password_hash($password, PASSWORD_BCRYPT);
-        $insertQuery = "INSERT INTO sigin (`name`, `email`, `password`, `usertype`,`cl`,`rh`,`contact`) 
-        VALUES ('$name', '$email','$hash_password','user','$cl','2','$phoneNo')";
+        $insertQuery = "INSERT INTO sigin (`name`, `email`, `password`, `usertype`,`userstatus`,`cl`,`rh`,`contact`) 
+        VALUES ('$name', '$email','$hash_password','user',`yes`,'$cl','2','$phoneNo')";
 
         if ($conn->query($insertQuery) == TRUE) {
             // code for sending the mail to the user whenever new useer registe
@@ -52,7 +51,7 @@ if (isset($_POST['register'])) {
     $password = $_POST['password'];
     try {
         // SELECT `sid`, `name`, `email`, `password`, `usertype`, `contact` FROM `sigin` WHERE email = 'vishalm.rsm@gmail.com';
-        $stmt = $conn->prepare("SELECT `sid`, `name`, `email`, `password`, `usertype`, `contact`, `declarationform`,`resign` FROM `sigin` WHERE email = :username");
+        $stmt = $conn->prepare("SELECT `sid`, `name`, `email`, `password`, `usertype`,`userstatus`, `contact`, `declarationform`,`resign` FROM `sigin` WHERE email = :username");
         $stmt->bindParam(':username', $username);
         $stmt->execute();
 
@@ -64,10 +63,10 @@ if (isset($_POST['register'])) {
         }
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         echo $response['resign'];
-        $resign = $result['resign'];
+        $userstatus = $result['userstatus'];
         /* code for checking that if user is resigned or not  */
-        if ($resign == 'yes') {
-            echo "<script>alert('Your Account is deactivated'); window.location.href = 'login.php';</script>";
+        if ($userstatus == 'no') {
+            echo "<script>alert('Your Account is deactivated Please Contact to Admin'); window.location.href = 'login.php';</script>";
         } else {
             if ($result) {
                 $hashedPassword = $result['password'];
