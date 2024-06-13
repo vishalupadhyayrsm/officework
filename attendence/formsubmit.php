@@ -235,8 +235,6 @@ switch ($endpoint) {
 
                 $stmt->execute();
 
-
-
                 $response = array(
                     'status' => 'Success',
                     "data" => $profilepic,
@@ -313,11 +311,52 @@ switch ($endpoint) {
                     $sid = $_POST['userid'];
                     $cl = $_POST['cl'];
                     $rh = $_POST['rh'];
-                    // $cl_el = $_POST['cl_el'];
-                    // $no_cl_el = $_POST['noof_cl_el'];
                     $status = 'pending';
+                    $currentyear = date("Y");
 
-                    echo $startdate . "," . $end_date . "," . $reason . "," . $sid . "," . $cl . "," . $rh;
+                    if ($currentyear) {
+                        /* code for selecting  teh total cl and el from teh database */
+                        $selectQuery = "SELECT `remainingcl`, `remainingrh` FROM `sigin` WHERE sid = :sid";
+                        $stmt = $conn->prepare($selectQuery);
+                        $stmt->bindParam(':sid', $sid);
+                        $stmt->execute();
+                        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                        print_r($result['remainingcl']) . '<br>';
+                        echo $cl;
+                        $newremainingcl = $result['remainingcl'] - $cl;
+                        $newremainingrh = $result['remainingrh'] - $rh;
+                        echo $newremainingrh;
+                        echo $newremainingcl;
+                        if ($newremainingcl < 0) {
+                            $_SESSION['remainingcl'] = true;
+                            header("Location: ../index.php");
+                        } elseif ($newremainingrh < 0) {
+                            // echo "No remaining rh";
+                            $_SESSION['remainingrh'] = true;
+                            header("Location: ../index.php");
+                        } else {
+                            // echo "apply";
+                            $selectQuery = "UPDATE `sigin` SET `remainingcl` = :newremainingcl, `remainingrh` = :newremainingrh WHERE sid = :sid";
+                            $stmt = $conn->prepare($selectQuery);
+                            $stmt->bindParam(':newremainingcl', $newremainingcl);
+                            $stmt->bindParam(':newremainingrh', $newremainingrh);
+                            $stmt->bindParam(':sid', $sid);
+                            $stmt->execute();
+
+                            /* code for applying the new leave every time  */
+                            $insertQuery = "INSERT INTO leavetable (sid, startdate, enddate, reason,leave_status) 
+                                VALUES (:sid, :startdate, :end_date, :reason, :status)";
+                            $stmt = $conn->prepare($insertQuery);
+                            $stmt->bindParam(':sid', $sid);
+                            $stmt->bindParam(':startdate', $startdate);
+                            $stmt->bindParam(':end_date', $end_date);
+                            $stmt->bindParam(':reason', $reason);
+                            $stmt->bindParam(':status', $status);
+                            $stmt->execute();
+                            $_SESSION['leave_success'] = true;
+                            header("Location: ../index.php");
+                        }
+                    }
                 }
             } catch (PDOException $e) {
                 echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $e->getMessage()]);
@@ -326,6 +365,35 @@ switch ($endpoint) {
             http_response_code(400);
             echo json_encode(['status' => 'error', 'message' => 'Invalid request']);
         }
+        break;
+
+    case "updatecl_ruh":
+        $data = file_get_contents("php://input");
+        $decoded_data = json_decode($data, true);
+        if ($decoded_data === null) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Invalid JSON received'
+            ]);
+            exit;
+        }
+        $year = $decoded_data['year'] ?? null;
+        if ($year === null) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Year not provided'
+            ]);
+            exit;
+        }
+        header('Content-Type: application/json');
+        echo json_encode([
+            'status' => 'success',
+            'data' => [
+                'received_year' => $year
+            ]
+        ]);
         break;
     default:
         break;

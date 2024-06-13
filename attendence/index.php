@@ -147,6 +147,18 @@ $decform = $results[0]['declarationform'];
             alert("Successfully Submitted Decleration form");
             <?php unset($_SESSION['dec_form']); ?>
         <?php endif; ?>
+        <?php if (isset($_SESSION['leave_success']) && $_SESSION['leave_success']) : ?>
+            alert("Leave Applied Successfully");
+            <?php unset($_SESSION['leave_success']); ?>
+        <?php endif; ?>
+        <?php if (isset($_SESSION['remainingrh']) && $_SESSION['remainingrh']) : ?>
+            alert("No Rh Remaining");
+            <?php unset($_SESSION['remainingrh']); ?>
+        <?php endif; ?>
+        <?php if (isset($_SESSION['remainingcl']) && $_SESSION['remainingcl']) : ?>
+            alert("No CL Remaining");
+            <?php unset($_SESSION['remainingcl']); ?>
+        <?php endif; ?>
     </script>
 </head>
 
@@ -163,346 +175,350 @@ $decform = $results[0]['declarationform'];
                 <a href="logout.php" class="logout">Logout</a>
             </div>
         </nav>
+
     </header>
-    <br>
-    <!---- code for checking the if usertype == staff or intern ----->
-    <?php
-    if ($decform  == 'yes') {
-    ?>
-        <div class="tabs">
-            <?php
-            if ($usertype == "staff") {
-            ?>
-                <button onclick="showTab('tab1')" class="btn btn-primary order_status_button click_here_button">User Profile</button>
-                <button onclick="showTab('tab2')" class="btn btn-primary order_status_button click_here_button">Apply Leave</button>
-                <button onclick="showTab('tab3')" class="btn btn-primary order_status_button click_here_button">Leave Status</button>
-                <button onclick="showTab('tab5')" class="btn btn-primary order_status_button click_here_button">RESIGNATION FORM</button>
-            <?php
-            } elseif ($usertype == 'intern') {
-            ?>
-                <button onclick="showTab('tab1')" class="btn btn-primary order_status_button click_here_button">User Profile</button>
-                <button onclick="showTab('tab6')" class="btn btn-primary order_status_button click_here_button">Certificate Form</button>
-                <button onclick="showTab('tab5')" class="btn btn-primary order_status_button click_here_button">RESIGNATION FORM</button>
-            <?php
-            } else {
-            ?>
-                <button onclick="showTab('tab3')" class="btn btn-primary order_status_button click_here_button">Leave Status</button>
-                <button onclick="showTab('tab4')" class="btn btn-primary order_status_button click_here_button">User Details</button>
-                <button onclick="showTab('tab7')" class="btn btn-primary order_status_button click_here_button">Certificate Request</button>
-                <button onclick="showTab('tab8')" class="btn btn-primary order_status_button click_here_button">Resignation List</button>
-            <?php
-            }
-            ?>
+    <!-- code for disaplying the button details -->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 col-md-2" style="border-right:1px solid black;">
+                <!-- code for checking the if usertype == staff or intern -->
+                <?php
+                if ($decform  == 'yes') {
+                ?>
+                    <div class="d-flex flex-column">
+                        <?php
+                        if ($usertype == "staff") {
+                        ?>
+                            <button onclick="showTab('tab1')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">User Profile</button>
+                            <button onclick="showTab('tab2')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">Apply Leave</button>
+                            <button onclick="showTab('tab3')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">Leave Status</button>
+                            <button onclick="showTab('tab5')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">RESIGNATION FORM</button>
+                        <?php
+                        } elseif ($usertype == 'intern') {
+                        ?>
+                            <button onclick="showTab('tab1')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">User Profile</button>
+                            <button onclick="showTab('tab6')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">Certificate Form</button>
+                            <button onclick="showTab('tab5')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">RESIGNATION FORM</button>
+                        <?php
+                        } else {
+                        ?>
+                            <button onclick="showTab('tab3')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">Leave Status</button>
+                            <button onclick="showTab('tab4')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">User Details</button>
+                            <button onclick="showTab('tab7')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">Certificate Request</button>
+                            <button onclick="showTab('tab8')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">Resignation List</button>
+                            <button onclick="showTab('tab9')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">Resume</button>
+                        <?php
+                        }
+                        ?>
+                    </div>
+                <?php
+                }
+                ?>
+                <br>
+            </div>
+            <!-- code for displaying teh  data in this div start here  -->
+            <div class="col-12 col-md-10">
+                <!-----code for dispalying the deceleration form  start here  ------>
+                <?php
+                if ($decform  !== 'yes') {
+                ?>
+                    <div id="" class="container tab-content active-tab">
+                        <div class="row">
+                            <div class="col-md-6 offset-md-3">
+                                <!--- code for multpage form start here ---->
+                                <form id="multiPageForm" method="post" action="formsubmit.php/deceleration" class="form_data" enctype="multipart/form-data">
+                                    <div class="form-page active" id="page1">
+                                        <h2 style="text-align:center;">MIP Deceleraton Form</h2>
+                                        <div class="form-group">
+                                            <label for="name">Name:</label>
+                                            <input type="text" class="form-control" id="name" name="name" required>
+                                        </div><br>
+                                        <div class="form-group">
+                                            <label for="emp_roll">Employee No/Student Roll No:</label>
+                                            <input type="number" class="form-control" id="emp_roll" name="emproll" required>
+                                        </div><br>
+                                        <div class="form-group">
+                                            <label for="emp_roll">University:</label>
+                                            <input type="text" class="form-control" id="university" name="univesity" required>
+                                        </div><br>
+                                        <div class="form-group">
+                                            <label for="month">Gender:</label>
+                                            <select class="form-control" name="gender" required>
+                                                <option value="">Select</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                                <option value="Others">Others</option>
+                                            </select>
+                                        </div><br>
+                                        <div class="form-group">
+                                            <label for="end_date">Local Address (In case of IIT Bombay Student please provide your hostel details here):</label>
+                                            <input type="text" class="form-control" id="localadd" name="localadd" required>
+                                            <br>
+                                            <label for="Postal">Postal Code:</label>
+                                            <input type="number" class="form-control" id="localadd" name="localpostalcode" required minlength="6" maxlength="6" pattern="\d{6}">
+                                            <div id="error-message" style="color: red; display: none;">Please enter a 6-digit postal code.</div>
+                                        </div><br>
+                                        <div class="form-group">
+                                            <label for="end_date">Permanent Address:</label>
+                                            <input type="text" class="form-control" id="localadd" name="permadd" required><br>
+                                            <label for="Postal">Postal Code:</label>
+                                            <input type="number" class="form-control" id="permaadd" name="permapostalcode" required minlength="6" maxlength="6" pattern="\d{6}">
+                                            <div id="error-message" style="color: red; display: none;">Please enter a 6-digit postal code.</div>
+                                        </div><br>
+                                        <div class="form-group">
+                                            <label for="localadd">Home Contact No:</label>
+                                            <input type="number" class="form-control" id="localadd" name="phone" required pattern="\d{10}" title="Please enter a 10-digit phone number">
+                                            <span id="phone-error" style="color:red; display:none;">Invalid phone number. Please enter a 10-digit phone number.</span>
+                                        </div><br>
+                                        <div class="form-group">
+                                            <label for="localadd">Upload Image:</label>
+                                            <input type="file" class="form-control" id="image" name="profileimage">
+                                        </div><br>
 
-        </div>
-    <?php
-    }
-    ?>
-    <br>
+                                        <button type="button" onclick="nextPage(2)" class="btn btn-primary">Next</button>
+                                    </div>
+                                    <!-- second page start here -->
+                                    <div class="form-page" id="page2">
+                                        <h2>Emergency Contact Details (First Person)</h2>
+                                        <div class="form-group">
+                                            <label for="name">Name:</label>
+                                            <input type="text" class="form-control" id="emergencyname1" name="emergencyname1" required>
+                                        </div><br>
+                                        <div class="form-group">
+                                            <label for="relationship1">Relationsip:</label>
+                                            <input type="text" class="form-control" id="relationship1" name="relationship1" required>
+                                        </div><br>
+                                        <div class="form-group">
+                                            <label for="emecontact">Contact No:</label>
+                                            <input type="number" class="form-control" id="localadd" name="emephone1" required pattern="\d{10}" title="Please enter a 10-digit phone number">
+                                            <br>
+                                            <span id="phone-error" style="color:red; display:none;">Invalid phone number. Please enter a 10-digit phone number.</span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="localadd_emergency1">Contact address if different from above:</label>
+                                            <input type="text" class="form-control" id="localadd_emergency1" name="localadd_emergency1" required>
+                                            <br>
+                                            <label for="localpostalcode_emergency1">Postal Code:</label>
+                                            <input type="number" class="form-control" id="localpostalcode_emergency1" name="localpostalcode_emergency1" required minlength="6" maxlength="6" pattern="\d{6}">
+                                            <div id="error-message" style="color: red; display: none;">Please enter a 6-digit postal code.</div>
+                                        </div><br>
 
-    <!-----code for dispalying the deceleration form  start here  ------>
-    <?php
-    if ($decform  !== 'yes') {
-    ?>
-        <div id="" class="container tab-content active-tab">
-            <div class="row">
-                <div class="col-md-6 offset-md-3">
-                    <!--- code for multpage form start here ---->
-                    <form id="multiPageForm" method="post" action="formsubmit.php/deceleration" class="form_data" enctype="multipart/form-data">
-                        <div class="form-page active" id="page1">
-                            <h2 style="text-align:center;">MIP Deceleraton Form</h2>
-                            <div class="form-group">
-                                <label for="name">Name:</label>
-                                <input type="text" class="form-control" id="name" name="name" required>
-                            </div><br>
-                            <div class="form-group">
-                                <label for="emp_roll">Employee No/Student Roll No:</label>
-                                <input type="number" class="form-control" id="emp_roll" name="emproll" required>
-                            </div><br>
-                            <div class="form-group">
-                                <label for="emp_roll">University:</label>
-                                <input type="text" class="form-control" id="university" name="univesity" required>
-                            </div><br>
-                            <div class="form-group">
-                                <label for="month">Gender:</label>
-                                <select class="form-control" name="gender" required>
-                                    <option value="">Select</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                    <option value="Others">Others</option>
-                                </select>
-                            </div><br>
-                            <div class="form-group">
-                                <label for="end_date">Local Address (In case of IIT Bombay Student please provide your hostel details here):</label>
-                                <input type="text" class="form-control" id="localadd" name="localadd" required>
-                                <br>
-                                <label for="Postal">Postal Code:</label>
-                                <input type="number" class="form-control" id="localadd" name="localpostalcode" required minlength="6" maxlength="6" pattern="\d{6}">
-                                <div id="error-message" style="color: red; display: none;">Please enter a 6-digit postal code.</div>
-                            </div><br>
-                            <div class="form-group">
-                                <label for="end_date">Permanent Address:</label>
-                                <input type="text" class="form-control" id="localadd" name="permadd" required><br>
-                                <label for="Postal">Postal Code:</label>
-                                <input type="number" class="form-control" id="permaadd" name="permapostalcode" required minlength="6" maxlength="6" pattern="\d{6}">
-                                <div id="error-message" style="color: red; display: none;">Please enter a 6-digit postal code.</div>
-                            </div><br>
-                            <div class="form-group">
-                                <label for="localadd">Home Contact No:</label>
-                                <input type="number" class="form-control" id="localadd" name="phone" required pattern="\d{10}" title="Please enter a 10-digit phone number">
-                                <span id="phone-error" style="color:red; display:none;">Invalid phone number. Please enter a 10-digit phone number.</span>
-                            </div><br>
-                            <div class="form-group">
-                                <label for="localadd">Upload Image:</label>
-                                <input type="file" class="form-control" id="image" name="profileimage">
-                            </div><br>
+                                        <h2>Emergency Contact Details (Second Person)</h2>
+                                        <div class="form-group">
+                                            <label for="emergencyname2">Name:</label>
+                                            <input type="text" class="form-control" id="emergencyname2" name="emergencyname2" required>
+                                        </div><br>
+                                        <div class="form-group">
+                                            <label for="relationship2">Relationsip:</label>
+                                            <input type="text" class="form-control" id="relationship2" name="relationship2" required>
+                                        </div><br>
+                                        <div class="form-group">
+                                            <label for="emergencyname">Are there any medical conditions we should know about in the case of an emergency:</label>
+                                            <input type="text" class="form-control" id="relationship" name="medicalcondition">
+                                        </div><br>
 
-                            <button type="button" onclick="nextPage(2)" class="btn btn-primary">Next</button>
-                        </div>
-                        <!-- second page start here -->
-                        <div class="form-page" id="page2">
-                            <h2>Emergency Contact Details (First Person)</h2>
-                            <div class="form-group">
-                                <label for="name">Name:</label>
-                                <input type="text" class="form-control" id="emergencyname1" name="emergencyname1" required>
-                            </div><br>
-                            <div class="form-group">
-                                <label for="relationship1">Relationsip:</label>
-                                <input type="text" class="form-control" id="relationship1" name="relationship1" required>
-                            </div><br>
-                            <div class="form-group">
-                                <label for="emecontact">Contact No:</label>
-                                <input type="number" class="form-control" id="localadd" name="emephone1" required pattern="\d{10}" title="Please enter a 10-digit phone number">
-                                <br>
-                                <span id="phone-error" style="color:red; display:none;">Invalid phone number. Please enter a 10-digit phone number.</span>
+                                        <button type="button" onclick="previousPage(1)" class="btn btn-primary">Previous</button>
+                                        <button type="button" onclick="nextPage(3)" class="btn btn-primary">Next</button>
+                                    </div>
+                                    <!-- Third page start here  -->
+                                    <div class="form-page" id="page3">
+                                        <div class="form-group">
+                                            <ol>
+                                                <li>I will not, directly or indirectly, divulge any information connected with the project to any person(s) other than those
+                                                    authorized by the principle investigator.
+                                                </li><br>
+                                                <li>
+                                                    I shall keep and maintain systematic records of all data, results supplied by the client or generated in teh course of the project etc. and
+                                                    will not divulge these to third party.
+                                                </li><br>
+                                                <li>
+                                                    I shall not make / keep additional copies of any data / results / reports pertaining to the project without teh express permission of teh principle investigator.
+                                                </li><br>
+                                                <li>
+                                                    I agree that all data generated in the project, paper/ drawings / computer software and other records in my possession pertaining to the project will
+                                                    be the property of Indian Instittue of Technology Bombay and I shall have no claim on teh same and I will hand over all these documents to the project
+                                                    investigator before I resign from or leave the project.
+                                                </li><br>
+                                                <li>
+                                                    Even after my leaveing the institute / resignation / termination of appoinmanet, I will not disclose my confidential information pertainng to teh project
+                                                    or otherwise made available to me during my tenure, to any third party.
+                                                </li><br>
+                                                <li>
+                                                    I agree that all intellectual property generated through the project will be deemed assigned exclusively to National Center for Aerospace Innovation and Research,
+                                                    Indian Institute of Technology Bombay for use / dissemination / transfer or licence for payment of royalty or transfer fee, as it may deem fit.
+                                                </li><br>
+                                            </ol>
+                                            <br>
+                                            <div class="form-group">
+                                                <p>I have read teh above aggreement carefully and accept that this is a legally valid and binding obligation and hereby agree to the above.</p>
+                                                <input type="checkbox" class="form-check-input" id="termsCheck" name="termcheck" required>
+                                                <label class="form-check-label" for="termsCheck">
+                                                    I agree to the above terms and conditions.
+                                                </label>
+                                            </div>
+
+
+
+                                            <button type="button" onclick="previousPage(2)" class="btn btn-primary">Previous</button>
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
-                            <div class="form-group">
-                                <label for="localadd_emergency1">Contact address if different from above:</label>
-                                <input type="text" class="form-control" id="localadd_emergency1" name="localadd_emergency1" required>
-                                <br>
-                                <label for="localpostalcode_emergency1">Postal Code:</label>
-                                <input type="number" class="form-control" id="localpostalcode_emergency1" name="localpostalcode_emergency1" required minlength="6" maxlength="6" pattern="\d{6}">
-                                <div id="error-message" style="color: red; display: none;">Please enter a 6-digit postal code.</div>
-                            </div><br>
-
-                            <h2>Emergency Contact Details (Second Person)</h2>
-                            <div class="form-group">
-                                <label for="emergencyname2">Name:</label>
-                                <input type="text" class="form-control" id="emergencyname2" name="emergencyname2" required>
-                            </div><br>
-                            <div class="form-group">
-                                <label for="relationship2">Relationsip:</label>
-                                <input type="text" class="form-control" id="relationship2" name="relationship2" required>
-                            </div><br>
-                            <div class="form-group">
-                                <label for="emergencyname">Are there any medical conditions we should know about in the case of an emergency:</label>
-                                <input type="text" class="form-control" id="relationship" name="medicalcondition">
-                            </div><br>
-
-                            <button type="button" onclick="previousPage(1)" class="btn btn-primary">Previous</button>
-                            <button type="button" onclick="nextPage(3)" class="btn btn-primary">Next</button>
                         </div>
-                        <!-- Third page start here  -->
-                        <div class="form-page" id="page3">
-                            <div class="form-group">
-                                <ol>
-                                    <li>I will not, directly or indirectly, divulge any information connected with the project to any person(s) other than those
-                                        authorized by the principle investigator.
-                                    </li><br>
-                                    <li>
-                                        I shall keep and maintain systematic records of all data, results supplied by the client or generated in teh course of the project etc. and
-                                        will not divulge these to third party.
-                                    </li><br>
-                                    <li>
-                                        I shall not make / keep additional copies of any data / results / reports pertaining to the project without teh express permission of teh principle investigator.
-                                    </li><br>
-                                    <li>
-                                        I agree that all data generated in the project, paper/ drawings / computer software and other records in my possession pertaining to the project will
-                                        be the property of Indian Instittue of Technology Bombay and I shall have no claim on teh same and I will hand over all these documents to the project
-                                        investigator before I resign from or leave the project.
-                                    </li><br>
-                                    <li>
-                                        Even after my leaveing the institute / resignation / termination of appoinmanet, I will not disclose my confidential information pertainng to teh project
-                                        or otherwise made available to me during my tenure, to any third party.
-                                    </li><br>
-                                    <li>
-                                        I agree that all intellectual property generated through the project will be deemed assigned exclusively to National Center for Aerospace Innovation and Research,
-                                        Indian Institute of Technology Bombay for use / dissemination / transfer or licence for payment of royalty or transfer fee, as it may deem fit.
-                                    </li><br>
-                                </ol>
-                                <br>
-                                <div class="form-group">
-                                    <p>I have read teh above aggreement carefully and accept that this is a legally valid and binding obligation and hereby agree to the above.</p>
-                                    <input type="checkbox" class="form-check-input" id="termsCheck" name="termcheck" required>
-                                    <label class="form-check-label" for="termsCheck">
-                                        I agree to the above terms and conditions.
-                                    </label>
+                    </div>
+                <?php
+                }
+                ?>
+
+                <!-- code for dispaly the intern decelartion form that user has filled  -->
+                <?php
+                if (($usertype != "hr") && $decform  == 'yes') {
+                ?>
+                    <div id="tab1" class="container tab-content active-tab">
+                        <div class="row">
+                            <div class="col-md-6 offset-md-3">
+                                <div class="resume-container">
+                                    <input type="hidden" id="sid" name="sid" value="<?php echo $results[0]['sid']; ?>">
+                                    <div class="profile-picture">
+                                        <img id="profile-img" src="<?php echo $results[0]['profilepic']; ?>" alt="user_profile">
+                                        <span id="edit-icon" class="edit-icon">edit</span>
+                                        <input id="profile-pic-input" type="file" name="profilepic" style="display: none;">
+                                    </div>
+                                    <div class="profile-details">
+                                        <h1 class="username">Vishal Kumar Upadhyay</h1>
+                                        <p>Designation: Project Research Assistant</p>
+                                        <p>University: <span class="text-display"><?php echo $results[0]['univesity']; ?></span><input class="input-display" type="text" name="university" value="<?php echo $results[0]['university']; ?>"></p>
+                                        <p>Contact: <span class="text-display"><?php echo $results[0]['contact']; ?></span><input class="input-display" type="text" name="contact" value="<?php echo $results[0]['contact']; ?>"></p>
+                                        <p>Email: <span class="text-display"><?php echo $results[0]['email']; ?></span><input class="input-display" type="email" name="email" value="<?php echo $results[0]['email']; ?>"></p>
+                                    </div>
                                 </div>
 
-
-
-                                <button type="button" onclick="previousPage(2)" class="btn btn-primary">Previous</button>
-                                <button type="submit" class="btn btn-primary">Submit</button>
+                                <div class="additional-details">
+                                    <p>Roll Number/Emp Code: <span class="text-display"><?php echo $results[0]['emp_roll']; ?></span><input class="input-display" type="text" name="emp_roll" value="<?php echo $results[0]['emp_roll']; ?>" disabled></p>
+                                    <p>Gender: <span class="text-display"><?php echo $results[0]['gender']; ?></span><input class="input-display" type="text" name="gender" value="<?php echo $results[0]['gender']; ?>"></p>
+                                    <p>Home Contact: <span class="text-display"><?php echo $results[0]['homecontact']; ?></span><input class="input-display" type="text" name="homecontact" value="<?php echo $results[0]['homecontact']; ?>"></p>
+                                    <p>Local Address: <span class="text-display"><?php echo $results[0]['localaddress']; ?></span><input class="input-display" type="text" name="localaddress" value="<?php echo $results[0]['localaddress']; ?>"></p>
+                                    <p>Medical Condition: <span class="text-display"><?php echo $results[0]['medicalcondition']; ?></span><input class="input-display" type="text" name="medicalcondition" value="<?php echo $results[0]['medicalcondition']; ?>"></p>
+                                    <br>
+                                    <h2 class="emergency_details">Emergency Contact Details (First Person)</h2>
+                                    <p>Person Name: <span class="text-display"><?php echo $results[0]['emename1']; ?></span><input class="input-display" type="text" name="emename1" value="<?php echo $results[0]['emename1']; ?>"></p>
+                                    <p>Relation: <span class="text-display"><?php echo $results[0]['emerelation']; ?></span><input class="input-display" type="text" name="emerelation" value="<?php echo $results[0]['emerelation']; ?>"></p>
+                                    <p>Contact No: <span class="text-display"><?php echo $results[0]['emecontact']; ?></span><input class="input-display" type="text" name="emecontact" value="<?php echo $results[0]['emecontact']; ?>"></p>
+                                    <p>Address: <span class="text-display"><?php echo $results[0]['emeadd']; ?></span><input class="input-display" type="text" name="emeadd" value="<?php echo $results[0]['emeadd']; ?>"></p>
+                                </div>
+                                <div class="additional-details">
+                                    <h2 class="emergency_details">Emergency Contact Details (Second Person)</h2>
+                                    <p>Person Name: <span class="text-display"><?php echo $results[0]['emesecondname']; ?></span><input class="input-display" type="text" name="emesecondname" value="<?php echo $results[0]['emesecondname']; ?>"></p>
+                                    <p>Relation: <span class="text-display"><?php echo $results[0]['emesecrelation']; ?></span><input class="input-display" type="text" name="emesecrelation" value="<?php echo $results[0]['emesecrelation']; ?>"></p>
+                                </div>
+                                <button id="edit-btn" class="btn btn-primary" style="margin-left:25px;">Edit</button>
+                                <button id="save-btn" class="btn btn-success" style="display: none;">Save</button>
                             </div>
                         </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    <?php
-    }
-    ?>
-
-    <!-- code for dispaly the intern decelartion form that user has filled  -->
-    <?php
-    if (($usertype != "hr") && $decform  == 'yes') {
-    ?>
-        <div id="tab1" class="container tab-content active-tab">
-            <div class="row">
-                <div class="col-md-6 offset-md-3">
-                    <div class="resume-container">
-                        <input type="hidden" id="sid" name="sid" value="<?php echo $results[0]['sid']; ?>">
-                        <div class="profile-picture">
-                            <img id="profile-img" src="<?php echo $results[0]['profilepic']; ?>" alt="user_profile">
-                            <span id="edit-icon" class="edit-icon">edit</span>
-                            <input id="profile-pic-input" type="file" name="profilepic" style="display: none;">
-                        </div>
-                        <div class="profile-details">
-                            <h1 class="username">Vishal Kumar Upadhyay</h1>
-                            <p>Designation: Project Research Assistant</p>
-                            <p>University: <span class="text-display"><?php echo $results[0]['univesity']; ?></span><input class="input-display" type="text" name="university" value="<?php echo $results[0]['university']; ?>"></p>
-                            <p>Contact: <span class="text-display"><?php echo $results[0]['contact']; ?></span><input class="input-display" type="text" name="contact" value="<?php echo $results[0]['contact']; ?>"></p>
-                            <p>Email: <span class="text-display"><?php echo $results[0]['email']; ?></span><input class="input-display" type="email" name="email" value="<?php echo $results[0]['email']; ?>"></p>
-                        </div>
                     </div>
+                <?php
+                }
+                ?>
 
-                    <div class="additional-details">
-                        <p>Roll Number/Emp Code: <span class="text-display"><?php echo $results[0]['emp_roll']; ?></span><input class="input-display" type="text" name="emp_roll" value="<?php echo $results[0]['emp_roll']; ?>" disabled></p>
-                        <p>Gender: <span class="text-display"><?php echo $results[0]['gender']; ?></span><input class="input-display" type="text" name="gender" value="<?php echo $results[0]['gender']; ?>"></p>
-                        <p>Home Contact: <span class="text-display"><?php echo $results[0]['homecontact']; ?></span><input class="input-display" type="text" name="homecontact" value="<?php echo $results[0]['homecontact']; ?>"></p>
-                        <p>Local Address: <span class="text-display"><?php echo $results[0]['localaddress']; ?></span><input class="input-display" type="text" name="localaddress" value="<?php echo $results[0]['localaddress']; ?>"></p>
-                        <p>Medical Condition: <span class="text-display"><?php echo $results[0]['medicalcondition']; ?></span><input class="input-display" type="text" name="medicalcondition" value="<?php echo $results[0]['medicalcondition']; ?>"></p>
-                        <br>
-                        <h2 class="emergency_details">Emergency Contact Details (First Person)</h2>
-                        <p>Person Name: <span class="text-display"><?php echo $results[0]['emename1']; ?></span><input class="input-display" type="text" name="emename1" value="<?php echo $results[0]['emename1']; ?>"></p>
-                        <p>Relation: <span class="text-display"><?php echo $results[0]['emerelation']; ?></span><input class="input-display" type="text" name="emerelation" value="<?php echo $results[0]['emerelation']; ?>"></p>
-                        <p>Contact No: <span class="text-display"><?php echo $results[0]['emecontact']; ?></span><input class="input-display" type="text" name="emecontact" value="<?php echo $results[0]['emecontact']; ?>"></p>
-                        <p>Address: <span class="text-display"><?php echo $results[0]['emeadd']; ?></span><input class="input-display" type="text" name="emeadd" value="<?php echo $results[0]['emeadd']; ?>"></p>
-                    </div>
-                    <div class="additional-details">
-                        <h2 class="emergency_details">Emergency Contact Details (Second Person)</h2>
-                        <p>Person Name: <span class="text-display"><?php echo $results[0]['emesecondname']; ?></span><input class="input-display" type="text" name="emesecondname" value="<?php echo $results[0]['emesecondname']; ?>"></p>
-                        <p>Relation: <span class="text-display"><?php echo $results[0]['emesecrelation']; ?></span><input class="input-display" type="text" name="emesecrelation" value="<?php echo $results[0]['emesecrelation']; ?>"></p>
-                    </div>
-                    <button id="edit-btn" class="btn btn-primary" style="margin-left:25px;">Edit</button>
-                    <button id="save-btn" class="btn btn-success" style="display: none;">Save</button>
-                </div>
-            </div>
-        </div>
-    <?php
-    }
-    ?>
-
-    <!-- code for dispalying the staff data to the user start here  -->
-    <?php
-    if ($usertype == 'staff' && $decform == 'yes') {
-    ?>
-        <!--- disaplying the form for applying leave start here ----->
-        <div id="tab2" class="container tab-content">
-            <div class="row">
-                <!---- code for registering the leave from the user start here --->
-                <div class="col-md-6 offset-md-3">
-                    <h2 class="all_heading" style="text-align:center;">Leave Application Form</h2>
-                    <br>
-                    <?php
-                    if ($usertype == "staff") {
-                        $row = $results[0];
-                    ?>
-                        <div class="col-md-4">
-                            <h2 class="mb-4 list_cl">Total CL:<span style="color:red;"> <?php echo htmlspecialchars($row['cl']); ?></span></h2>
-                            <h2 class="mb-4 list_cl">Total RH: <span style="color:red;"><?php echo htmlspecialchars($row['rh']); ?></span></h2>
-                        </div>
-                        <div class="col-md-4">
-                            <h2 class="mb-4 list_cl">Remainig CL: <?php echo htmlspecialchars($row['remainingcl']); ?></h2>
-                            <h2 class="mb-4 list_cl">Reamining RH: <?php echo htmlspecialchars($row['remainingrh']); ?></h2>
-                            <br>
-                        </div>
-                        <br>
-                        <form method="post" action="formsubmit.php/leaveapply" class="form_data">
-                            <div class="form-group">
-                                <label for="start_date">Start Date:</label>
-                                <input type="date" class="form-control" id="start_date" name="start_date" required>
-                            </div><br>
-                            <div class="form-group">
-                                <label for="end_date">End Date:</label>
-                                <input type="date" class="form-control" id="end_date" name="end_date" required>
-                            </div><br>
-                            <div class="form-group">
-                                <label for="end_date">No. Of CL:</label>
-                                <input type="number" class="form-control" id="end_date" name="cl" min="0" max="8" required>
-                            </div><br>
-                            <div class="form-group">
-                                <label for="end_date">No. Of RH:</label>
-                                <input type="number" class="form-control" id="end_date" name="rh" min="0" max="2" required>
-                            </div><br>
-                            <div class="form-group">
-                                <label for="reason">Reason:</label>
-                                <input type="text" class="form-control" id="reason" name="reason" required>
+                <!-- code for dispalying the staff data to the user start here  -->
+                <?php
+                if ($usertype == 'staff' && $decform == 'yes') {
+                ?>
+                    <!--- disaplying the form for applying leave start here ----->
+                    <div id="tab2" class="container tab-content">
+                        <div class="row">
+                            <!---- code for registering the leave from the user start here --->
+                            <div class="col-md-6 offset-md-3">
+                                <h2 class="all_heading" style="text-align:center;">Leave Application Form</h2>
+                                <br>
+                                <?php
+                                if ($usertype == "staff") {
+                                    $row = $results[0];
+                                ?>
+                                    <div class="col-md-4">
+                                        <h2 class="mb-4 list_cl">Total CL:<span style="color:red;"> <?php echo htmlspecialchars($row['cl']); ?></span></h2>
+                                        <h2 class="mb-4 list_cl">Total RH: <span style="color:red;"><?php echo htmlspecialchars($row['rh']); ?></span></h2>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h2 class="mb-4 list_cl">Remainig CL: <?php echo htmlspecialchars($row['remainingcl']); ?></h2>
+                                        <h2 class="mb-4 list_cl">Reamining RH: <?php echo htmlspecialchars($row['remainingrh']); ?></h2>
+                                        <br>
+                                    </div>
+                                    <br>
+                                    <form method="post" action="formsubmit.php/leaveapply" class="form_data">
+                                        <div class="form-group">
+                                            <label for="start_date">Start Date:</label>
+                                            <input type="date" class="form-control" id="start_date" name="start_date" required>
+                                        </div><br>
+                                        <div class="form-group">
+                                            <label for="end_date">End Date:</label>
+                                            <input type="date" class="form-control" id="end_date" name="end_date" required>
+                                        </div><br>
+                                        <div class="form-group">
+                                            <label for="end_date">No. Of CL:</label>
+                                            <input type="number" class="form-control" id="end_date" name="cl" min="0" max="8" required>
+                                        </div><br>
+                                        <div class="form-group">
+                                            <label for="end_date">No. Of RH:</label>
+                                            <input type="number" class="form-control" id="end_date" name="rh" min="0" max="2" required>
+                                        </div><br>
+                                        <div class="form-group">
+                                            <label for="reason">Reason:</label>
+                                            <input type="text" class="form-control" id="reason" name="reason" required>
+                                        </div>
+                                        <input type="hidden" name="userid" value="<?php echo $_SESSION['userid']; ?>" />
+                                        <br>
+                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                    </form>
+                                <?php
+                                }
+                                ?>
                             </div>
-                            <input type="hidden" name="userid" value="<?php echo $_SESSION['userid']; ?>" />
-                            <br>
-                            <button type="submit" class="btn btn-primary">Submit</button>
-                        </form>
-                    <?php
-                    }
-                    ?>
-                </div>
-            </div>
-        </div>
-        <!------ code for dispalying the all the data to the user based on user type ------->
-        <div id="tab3" class="container tab-content">
-            <div class="row">
-                <div class="col-md-12 ">
-                    <h2 class="mb-4" style="text-align:center;">Leave Status</h2>
-                    <div id="tabulator-table"></div>
-                    <!--<div class="pagination-btn" onclick="table.previousPage()">Previous</div>-->
-                    <!--<div class="pagination-btn" onclick="table.nextPage()">Next</div>-->
-                </div>
-            </div>
-        </div>
+                        </div>
+                    </div>
+                    <!------ code for dispalying the all the data to the user based on user type ------->
+                    <div id="tab3" class="container tab-content">
+                        <div class="row">
+                            <div class="col-md-12 ">
+                                <h2 class="mb-4" style="text-align:center;">Leave Status</h2>
+                                <div id="tabulator-table"></div>
+                                <!--<div class="pagination-btn" onclick="table.previousPage()">Previous</div>-->
+                                <!--<div class="pagination-btn" onclick="table.nextPage()">Next</div>-->
+                            </div>
+                        </div>
+                    </div>
+                <?php
+                } elseif ($usertype == 'hr') {
+                ?>
+                    <div id="tab3" class="container tab-content active-tab">
+                        <div class="row">
+                            <div class="col-md-12 ">
+                                <h2 class="mb-4 all_heading">Leave Status</h2>
+                                <div id="tabulator-table"></div>
+                                <!--<div class="pagination-btn" onclick="table.previousPage()">Previous</div>-->
+                                <!--<div class="pagination-btn" onclick="table.nextPage()">Next</div>-->
+                            </div>
+                        </div>
+                    </div>
 
 
-    <?php
-    } elseif ($usertype == 'hr') {
-    ?>
-        <div id="tab3" class="container tab-content active-tab">
-            <div class="row">
-                <div class="col-md-12 ">
-                    <h2 class="mb-4 all_heading">Leave Status</h2>
-                    <div id="tabulator-table"></div>
-                    <!--<div class="pagination-btn" onclick="table.previousPage()">Previous</div>-->
-                    <!--<div class="pagination-btn" onclick="table.nextPage()">Next</div>-->
-                </div>
-            </div>
-        </div>
+                <?php
+                }
+                ?>
 
-
-    <?php
-    }
-    ?>
-
-    <!-- code for dispalying the resigantion form for everyone -->
-    <?php
-    if ($usertype == 'staff' || $usertype == 'intern') {
-    ?>
-        <div id="tab5" class="container tab-content">
-            <div class="row">
-                <div class="col-md-12 ">
-                    <div class="container col-md-6 mt-3">
-                        <h2 class="all_heading">RESIGNATION FORM</h2>
-                        <form method="post" action="formsubmit.php/resign">
-                            <input type="hidden" name="sid" value="<?php echo $decform = $results[0]['sid']; ?>">
-                            <!-- <div class="mb-3 mt-3">
+                <!-- code for dispalying the resigantion form for everyone -->
+                <?php
+                if ($usertype == 'staff' || $usertype == 'intern') {
+                ?>
+                    <div id="tab5" class="container tab-content">
+                        <div class="row">
+                            <div class="col-md-12 ">
+                                <div class="container col-md-6 mt-3">
+                                    <h2 class="all_heading">RESIGNATION FORM</h2>
+                                    <form method="post" action="formsubmit.php/resign">
+                                        <input type="hidden" name="sid" value="<?php echo $decform = $results[0]['sid']; ?>">
+                                        <!-- <div class="mb-3 mt-3">
                                 <label for="name">Name:</label>
                                 <input type="text" class="form-control" id="name" placeholder="Enter name" name="name">
                             </div>
@@ -510,262 +526,265 @@ $decform = $results[0]['declarationform'];
                                 <label for="emp_roll">Emp/Roll No:</label>
                                 <input type="text" class="form-control" id="emp_roll" placeholder="Enter Employee" name="emp_roll">
                             </div> -->
-                            <div class="mb-3 mt-3">
-                                <label for="pi">Principal Investigator (PI):</label>
-                                <input type="text" class="form-control" id="pi" name="principle" placeholder="PI name" required>
-                            </div>
+                                        <div class="mb-3 mt-3">
+                                            <label for="pi">Principal Investigator (PI):</label>
+                                            <input type="text" class="form-control" id="pi" name="principle" placeholder="PI name" required>
+                                        </div>
 
-                            <div class="form-group">
-                                <label for="start_date">Start Date:</label>
-                                <input type="date" class="form-control" id="start_date" name="start_date" required>
-                            </div><br>
+                                        <div class="form-group">
+                                            <label for="start_date">Start Date:</label>
+                                            <input type="date" class="form-control" id="start_date" name="start_date" required>
+                                        </div><br>
 
-                            <div class="form-group">
-                                <label for="end_date">Termination Date:</label>
-                                <input type="date" class="form-control" id="end_date" name="termination_date" required>
-                            </div><br>
+                                        <div class="form-group">
+                                            <label for="end_date">Termination Date:</label>
+                                            <input type="date" class="form-control" id="end_date" name="termination_date" required>
+                                        </div><br>
 
-                            <div class="mb-3 mt-3">
-                                <label for="startposition">Starting Position:</label>
-                                <input type="text" class="form-control" id="name" placeholder="Enter your designation" name="start_postion">
-                            </div>
+                                        <div class="mb-3 mt-3">
+                                            <label for="startposition">Starting Position:</label>
+                                            <input type="text" class="form-control" id="name" placeholder="Enter your designation" name="start_postion">
+                                        </div>
 
-                            <div class="mb-3 mt-3">
-                                <label for="endingposition">Ending Position:</label>
-                                <input type="text" class="form-control" id="name" placeholder="Enter you ending designation" name="ending_postion">
-                            </div>
+                                        <div class="mb-3 mt-3">
+                                            <label for="endingposition">Ending Position:</label>
+                                            <input type="text" class="form-control" id="name" placeholder="Enter you ending designation" name="ending_postion">
+                                        </div>
 
-                            <div class="mb-3">
-                                <label for="reason_leaving">REASONS FOR LEAVING:</label>
-                                <select class="form-control" id="reason_leaving" name="reason_leaving">
-                                    <option value="Took another position">Took another position </option>
-                                    <option value="Dissatisfaction with salary">Dissatisfaction with salary</option>
-                                    <option value="Pregnancy/home/family needs">Pregnancy/home/family needs</option>
-                                    <option value="Dissatisfaction with type of work">Dissatisfaction with type of work</option>
-                                    <option value="Poor health/physical disability">Poor health/physical disability</option>
-                                    <option value="Dissatisfaction with supervisor">Dissatisfaction with supervisor</option>
-                                    <option value="Relocation to another city">Relocation to another city</option>
-                                    <option value="Dissatisfaction with co-workers">Dissatisfaction with co-workers</option>
-                                    <option value="Travel difficulties">Travel difficulties</option>
-                                    <option value="Dissatisfaction with working conditions">Dissatisfaction with working conditions</option>
-                                    <option value="To attend school">To attend school</option>
-                                    <option value="Dissatisfaction with benefits">Dissatisfaction with benefits</option>
-                                </select>
-                            </div>
+                                        <div class="mb-3">
+                                            <label for="reason_leaving">REASONS FOR LEAVING:</label>
+                                            <select class="form-control" id="reason_leaving" name="reason_leaving">
+                                                <option value="Took another position">Took another position </option>
+                                                <option value="Dissatisfaction with salary">Dissatisfaction with salary</option>
+                                                <option value="Pregnancy/home/family needs">Pregnancy/home/family needs</option>
+                                                <option value="Dissatisfaction with type of work">Dissatisfaction with type of work</option>
+                                                <option value="Poor health/physical disability">Poor health/physical disability</option>
+                                                <option value="Dissatisfaction with supervisor">Dissatisfaction with supervisor</option>
+                                                <option value="Relocation to another city">Relocation to another city</option>
+                                                <option value="Dissatisfaction with co-workers">Dissatisfaction with co-workers</option>
+                                                <option value="Travel difficulties">Travel difficulties</option>
+                                                <option value="Dissatisfaction with working conditions">Dissatisfaction with working conditions</option>
+                                                <option value="To attend school">To attend school</option>
+                                                <option value="Dissatisfaction with benefits">Dissatisfaction with benefits</option>
+                                            </select>
+                                        </div>
 
-                            <div class="mb-3 mt-3">
-                                <label for="PlansAfterLeaving">Plans After Leaving:</label>
-                                <input type="text" class="form-control" id="planafterleaving" placeholder="Plans after leaving" name="planafterleaving">
-                            </div>
+                                        <div class="mb-3 mt-3">
+                                            <label for="PlansAfterLeaving">Plans After Leaving:</label>
+                                            <input type="text" class="form-control" id="planafterleaving" placeholder="Plans after leaving" name="planafterleaving">
+                                        </div>
 
-                            <div class="mb-3 mt-3">
-                                <label for="imporove_suggestion">COMMENTS/SUGGESTIONS FOR IMPROVEMENT:</label>
-                                <input type="text" class="form-control" id="imporove_suggestion" placeholder="Suggest us what to imporove" name="imporove_suggestion">
-                            </div>
+                                        <div class="mb-3 mt-3">
+                                            <label for="imporove_suggestion">COMMENTS/SUGGESTIONS FOR IMPROVEMENT:</label>
+                                            <input type="text" class="form-control" id="imporove_suggestion" placeholder="Suggest us what to imporove" name="imporove_suggestion">
+                                        </div>
 
-                            <h2>
-                                We are interested in what our employees have to say about their work experience with Please Share your Experienace
-                            </h2>
-                            <div class="mb-3 mt-3">
-                                <label for="what_mostlike">What did you like most about your job?:</label>
-                                <input type="text" class="form-control" id="what_mostlike" placeholder="What you like here most" name="what_mostlike">
-                            </div>
-                            <div class="mb-3 mt-3">
-                                <label for="what_leastlike">What did you like least about your job?:</label>
-                                <input type="text" class="form-control" id="what_leastlike" placeholder="What you like least here" name="what_leastlike">
-                            </div>
-                            <div class="mb-3 mt-3">
-                                <label for="taking_anotherjob"> If you are taking another job, what kind of work will you be doing? :</label>
-                                <input type="text" class="form-control" id="taking_anotherjob" placeholder="Describe your next Job" name="taking_anotherjob">
-                            </div>
-                            <div class="mb-3 mt-3">
-                                <label for="new_place_job">What has your new place of employment offered you that is more attractive than your present job? :</label>
-                                <input type="text" class="form-control" id="new_place_job" placeholder="New job place" name="new_place_job">
-                            </div>
-                            <div class="mb-3 mt-3">
-                                <label for="improvement">Could the Centre have made any improvements that might have influenced you to work better?:</label>
-                                <input type="text" class="form-control" id="improvement" placeholder="Enter your improvement" name="improvement">
-                            </div>
-                            <div class="mb-3 mt-3">
-                                <label for="otherremark">Other Remakrs:</label>
-                                <input type="text" class="form-control" id="otherremarks" placeholder="Other Remarks" name="otherremarks">
-                            </div>
+                                        <h2>
+                                            We are interested in what our employees have to say about their work experience with Please Share your Experienace
+                                        </h2>
+                                        <div class="mb-3 mt-3">
+                                            <label for="what_mostlike">What did you like most about your job?:</label>
+                                            <input type="text" class="form-control" id="what_mostlike" placeholder="What you like here most" name="what_mostlike">
+                                        </div>
+                                        <div class="mb-3 mt-3">
+                                            <label for="what_leastlike">What did you like least about your job?:</label>
+                                            <input type="text" class="form-control" id="what_leastlike" placeholder="What you like least here" name="what_leastlike">
+                                        </div>
+                                        <div class="mb-3 mt-3">
+                                            <label for="taking_anotherjob"> If you are taking another job, what kind of work will you be doing? :</label>
+                                            <input type="text" class="form-control" id="taking_anotherjob" placeholder="Describe your next Job" name="taking_anotherjob">
+                                        </div>
+                                        <div class="mb-3 mt-3">
+                                            <label for="new_place_job">What has your new place of employment offered you that is more attractive than your present job? :</label>
+                                            <input type="text" class="form-control" id="new_place_job" placeholder="New job place" name="new_place_job">
+                                        </div>
+                                        <div class="mb-3 mt-3">
+                                            <label for="improvement">Could the Centre have made any improvements that might have influenced you to work better?:</label>
+                                            <input type="text" class="form-control" id="improvement" placeholder="Enter your improvement" name="improvement">
+                                        </div>
+                                        <div class="mb-3 mt-3">
+                                            <label for="otherremark">Other Remakrs:</label>
+                                            <input type="text" class="form-control" id="otherremarks" placeholder="Other Remarks" name="otherremarks">
+                                        </div>
 
-                            <div class="mb-3 mt-3">
-                                <label for="improvement">Have you returned the following to the Centre (Tick as appropriate):</label>
+                                        <div class="mb-3 mt-3">
+                                            <label for="improvement">Have you returned the following to the Centre (Tick as appropriate):</label>
 
-                                <div class="form-check">
-                                    <label class="form-check-label" for="Drawer">Drawer keys</label>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="Drawer_yesno" id="Drawer_yes" value="yes">
-                                        <label class="form-check-label" for="Drawer_yes">Yes</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="Drawer_yesno" id="Drawer_no" value="no">
-                                        <label class="form-check-label" for="Drawer_no">No</label>
-                                    </div>
+                                            <div class="form-check">
+                                                <label class="form-check-label" for="Drawer">Drawer keys</label>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="Drawer_yesno" id="Drawer_yes" value="yes">
+                                                    <label class="form-check-label" for="Drawer_yes">Yes</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="Drawer_yesno" id="Drawer_no" value="no">
+                                                    <label class="form-check-label" for="Drawer_no">No</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <label class="form-check-label" for="Cupboard Keys">Cupboard Keys</label>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="CupboardKeys_yesno" id="Cupboard Keys_yes" value="yes">
+                                                    <label class="form-check-label" for="Cupboard Keys_yes">Yes</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="CupboardKeys_yesno" id="Cupboard Keys_no" value="no">
+                                                    <label class="form-check-label" for="Cupboard Keys_no">No</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <label class="form-check-label" for="labbook">Lab books returned</label>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="labbookyesno" id="labbookyes" value="yes">
+                                                    <label class="form-check-label" for="labbookyes">Yes</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="labbookyesno" id="labbookno" value="no">
+                                                    <label class="form-check-label" for="labbookno">No</label>
+                                                </div>
+                                            </div>
+                                            <div class="form-check">
+                                                <label class="form-check-label" for="hardware">Laptop, hard drive, pendrive, etc</label>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="hardwareno" id="hardware" value="yes">
+                                                    <label class="form-check-label" for="hardware">Yes</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="hardwareno" id="labbookno" value="no">
+                                                    <label class="form-check-label" for="labbookno">No</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <label class="form-check-label" for="tools">Tools used/unused</label>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="toolsno" id="tools" value="yes">
+                                                    <label class="form-check-label" for="tools">Yes</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="toolsno" id="labbookno" value="no">
+                                                    <label class="form-check-label" for="labbookno">No</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-check">
+                                                <label class="form-check-label" for="anyothers">Any other office hardware</label>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="anyothersno" id="anyothers" value="yes">
+                                                    <label class="form-check-label" for="anyothers">Yes</label>
+                                                </div>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input" type="radio" name="anyothersno" id="labbookno" value="no">
+                                                    <label class="form-check-label" for="labbookno">No</label>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                <?php } ?>
+
+
+                <!-- code for applying certficate for the intern -->
+                <?php
+                if ($usertype == 'intern') {
+                ?>
+                    <div id="tab6" class="container tab-content">
+                        <div class="row">
+                            <div class="col-md-12 ">
+                                <div class="container col-md-6 mt-3">
+                                    <h2 class="all_heading">Certificate Form</h2>
+                                    <form method="post" action="formsubmit.php/certificate">
+                                        <input type="hidden" name="sid" value="<?php echo $decform = $results[0]['sid']; ?>">
+                                        <div class="mb-3 mt-3">
+                                            <label for="profname">Professor Name:</label>
+                                            <input type="text" class="form-control" id="profname" name="profname" placeholder="Enter name Professor Name" required>
+                                        </div>
+
+                                        <div class="mb-3 mt-3">
+                                            <label for="name">Name:</label>
+                                            <input type="text" class="form-control" id="pi" name="name" placeholder="Enter Your Certificate Name" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="collegename">College Name:</label>
+                                            <input type="text" class="form-control" id="start_date" name="collegename" placeholder="University/College Name" required>
+                                        </div><br>
+
+                                        <div class="form-group">
+                                            <label for="internshipdate">Start Date of Internship:</label>
+                                            <input type="date" class="form-control" id="internshipdate" name="internshipdate" required>
+                                        </div><br>
+
+                                        <div class="form-group">
+                                            <label for="internshipdateend">End Date of Internship:</label>
+                                            <input type="date" class="form-control" id="internshipdate" name="internshipdateend" required>
+                                        </div><br>
+
+                                        <div class="mb-3 mt-3">
+                                            <label for="point_internship">4-5 points about the project/work done during the Internship:</label>
+                                            <input type="text" class="form-control" id="point_internship" name="point_internship" placeholder="Enter what you have learned during your internship ">
+                                        </div>
+
+                                        <button type="submit" name="submit" class="btn btn-primary">Submit</button>
                                 </div>
 
-                                <div class="form-check">
-                                    <label class="form-check-label" for="Cupboard Keys">Cupboard Keys</label>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="CupboardKeys_yesno" id="Cupboard Keys_yes" value="yes">
-                                        <label class="form-check-label" for="Cupboard Keys_yes">Yes</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="CupboardKeys_yesno" id="Cupboard Keys_no" value="no">
-                                        <label class="form-check-label" for="Cupboard Keys_no">No</label>
-                                    </div>
-                                </div>
 
-                                <div class="form-check">
-                                    <label class="form-check-label" for="labbook">Lab books returned</label>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="labbookyesno" id="labbookyes" value="yes">
-                                        <label class="form-check-label" for="labbookyes">Yes</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="labbookyesno" id="labbookno" value="no">
-                                        <label class="form-check-label" for="labbookno">No</label>
-                                    </div>
-                                </div>
-                                <div class="form-check">
-                                    <label class="form-check-label" for="hardware">Laptop, hard drive, pendrive, etc</label>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="hardwareno" id="hardware" value="yes">
-                                        <label class="form-check-label" for="hardware">Yes</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="hardwareno" id="labbookno" value="no">
-                                        <label class="form-check-label" for="labbookno">No</label>
-                                    </div>
-                                </div>
-
-                                <div class="form-check">
-                                    <label class="form-check-label" for="tools">Tools used/unused</label>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="toolsno" id="tools" value="yes">
-                                        <label class="form-check-label" for="tools">Yes</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="toolsno" id="labbookno" value="no">
-                                        <label class="form-check-label" for="labbookno">No</label>
-                                    </div>
-                                </div>
-
-                                <div class="form-check">
-                                    <label class="form-check-label" for="anyothers">Any other office hardware</label>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="anyothersno" id="anyothers" value="yes">
-                                        <label class="form-check-label" for="anyothers">Yes</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="anyothersno" id="labbookno" value="no">
-                                        <label class="form-check-label" for="labbookno">No</label>
-                                    </div>
-                                </div>
-
+                                </form>
                             </div>
+                        </div>
+                    </div>
+            </div>
+        <?php } ?>
 
-                            <button type="submit" name="submit" class="btn btn-primary">Submit</button>
-                        </form>
+
+        <?php if ($usertype == 'hr') { ?>
+            <!--  this code is for updating the details of user for the hr team  -->
+            <div id="tab4" class="container tab-content">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <h2 class="mb-4 all_heading" style="text-align:center;">User Details</h2>
+                        <div id="userdetails"></div>
                     </div>
                 </div>
             </div>
-        </div>
 
-    <?php } ?>
-
-
-    <!-- code for applying certficate for the intern -->
-    <?php
-    if ($usertype == 'intern') {
-    ?>
-        <div id="tab6" class="container tab-content">
-            <div class="row">
-                <div class="col-md-12 ">
-                    <div class="container col-md-6 mt-3">
-                        <h2 class="all_heading">Certificate Form</h2>
-                        <form method="post" action="formsubmit.php/certificate">
-                            <input type="hidden" name="sid" value="<?php echo $decform = $results[0]['sid']; ?>">
-                            <div class="mb-3 mt-3">
-                                <label for="profname">Professor Name:</label>
-                                <input type="text" class="form-control" id="profname" name="profname" placeholder="Enter name Professor Name" required>
-                            </div>
-
-                            <div class="mb-3 mt-3">
-                                <label for="name">Name:</label>
-                                <input type="text" class="form-control" id="pi" name="name" placeholder="Enter Your Certificate Name" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="collegename">College Name:</label>
-                                <input type="text" class="form-control" id="start_date" name="collegename" placeholder="University/College Name" required>
-                            </div><br>
-
-                            <div class="form-group">
-                                <label for="internshipdate">Start Date of Internship:</label>
-                                <input type="date" class="form-control" id="internshipdate" name="internshipdate" required>
-                            </div><br>
-
-                            <div class="form-group">
-                                <label for="internshipdateend">End Date of Internship:</label>
-                                <input type="date" class="form-control" id="internshipdate" name="internshipdateend" required>
-                            </div><br>
-
-                            <div class="mb-3 mt-3">
-                                <label for="point_internship">4-5 points about the project/work done during the Internship:</label>
-                                <input type="text" class="form-control" id="point_internship" name="point_internship" placeholder="Enter what you have learned during your internship ">
-                            </div>
-
-                            <button type="submit" name="submit" class="btn btn-primary">Submit</button>
-                    </div>
-
-
-                    </form>
-                </div>
-            </div>
-        </div>
-        </div>
-    <?php } ?>
-
-
-    <?php if ($usertype == 'hr') { ?>
-        <!--  this code is for updating the details of user for the hr team  -->
-        <div id="tab4" class="container tab-content">
-            <div class="row">
-                <div class="col-md-12 ">
-                    <h2 class="mb-4 all_heading" style="text-align:center;">User Details</h2>
-                    <div id="userdetails"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- code for displaying the data of certifiate form teh user  -->
-        <div id="tab7" class="container tab-content">
-            <div class="row">
-                <div class="col-md-12 ">
-                    <div class="container col-md-12 mt-3">
-                        <h2 class="all_heading">Certificate Request</h2>
-                        <div id="certificate"></div>
+            <!-- code for displaying the data of certifiate form teh user  -->
+            <div id="tab7" class="container tab-content">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div class="container col-md-12 mt-3">
+                            <h2 class="all_heading">Certificate Request</h2>
+                            <div id="certificate"></div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
 
-        <!-- code for list of user resign -->
-        <div id="tab8" class="container tab-content">
-            <div class="row">
-                <div class="col-md-12 ">
-                    <div class="container col-md-12 mt-3">
-                        <h2 class="all_heading">Resignation of User</h2>
-                        <div id="resign"></div>
+            <!-- code for list of user resign -->
+            <div id="tab8" class="container tab-content">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <div class="container col-md-12 mt-3">
+                            <h2 class="all_heading">Resignation of User</h2>
+                            <div id="resign"></div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-    <?php  } ?>
+        <?php  } ?>
+        </div>
+    </div>
+    </div>
 
 
     <!-- code for edit the data and send it to the database  -->
@@ -857,6 +876,43 @@ $decform = $results[0]['declarationform'];
                 console.error('There was a problem with the fetch operation:', error.message);
             }
         });
+
+
+        /* code for cheking is year is changed or not  */
+        function yearchanged() {
+            var yearchanged = 2025;
+            try {
+                fetch('formsubmit.php/updatecl_ruh', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            year: yearchanged
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log(data);
+                        if (data.status === "success") {
+                            // console.log("Data received successfully:", data.data);
+                        } else {
+                            console.error("Error:", data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('There was a problem with the fetch operation:', error.message);
+                    });
+            } catch (error) {
+                console.error('There was a problem with the fetch operation:', error.message);
+            }
+        }
+        setInterval(yearchanged, 1000);
     </script>
 
 
@@ -993,11 +1049,6 @@ $decform = $results[0]['declarationform'];
                         cellEl.classList.add('disabled-cell');
                         row.getElement().classList.add('red-row');
                         return 'Denied';
-                    } else if (value === 'pending') {
-                        cellEl.disabled = true;
-                        cellEl.classList.add('disabled-cell');
-                        row.getElement().classList.add('red-row');
-                        return 'Please Contact to Admin';
                     } else {
                         <?php if ($usertype == 'hr') : ?>
                             var dropdown = document.createElement('select');
@@ -1006,7 +1057,6 @@ $decform = $results[0]['declarationform'];
                                         <option value="">Select</option>
                                         <option value="yes">Approved</option>
                                         <option value="no">Dissapproved</option>
-                                        <option value="pending">Contact to Admin</option>
                                     `;
                             // Add event listener to the dropdown
                             dropdown.addEventListener('change', function(event) {
