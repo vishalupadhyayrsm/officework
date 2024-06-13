@@ -165,5 +165,9 @@ button:hover {
 .input-display {
     display: none;
 }
-/* code for updating the ro based on color */
-
+/* code for updating the notice start here  */
+.allimp_notice{
+    color: red;
+    font-size: 22px;
+    font-family: system-ui;
+}

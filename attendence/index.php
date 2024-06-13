@@ -428,6 +428,9 @@ $decform = $results[0]['declarationform'];
                     <!--- disaplying the form for applying leave start here ----->
                     <div id="tab2" class="container tab-content">
                         <div class="row">
+                            <marquee behavior="scroll" direction="left" scrollamount="5" class="allimp_notice" style="color:red;">
+                                If you are applying the EL teh kindly visit Drona <a href="https://drona.ircc.iitb.ac.in/ircc/index.jsp?LogOut=You%20have%20been%20logged%20Off%20!">Click Here</a>
+                            </marquee>
                             <!---- code for registering the leave from the user start here --->
                             <div class="col-md-6 offset-md-3">
                                 <h2 class="all_heading" style="text-align:center;">Leave Application Form</h2>
@@ -513,6 +516,9 @@ $decform = $results[0]['declarationform'];
                 ?>
                     <div id="tab5" class="container tab-content">
                         <div class="row">
+                            <marquee behavior="scroll" direction="left" scrollamount="5" class="allimp_notice" style="color:red;">
+                                Please fill all the details very carefully.
+                            </marquee>
                             <div class="col-md-12 ">
                                 <div class="container col-md-6 mt-3">
                                     <h2 class="all_heading">RESIGNATION FORM</h2>
@@ -699,6 +705,9 @@ $decform = $results[0]['declarationform'];
                 ?>
                     <div id="tab6" class="container tab-content">
                         <div class="row">
+                            <marquee behavior="scroll" direction="left" scrollamount="5" class="allimp_notice" style="color:red;">
+                                Please fill all the details very carefully.
+                            </marquee>
                             <div class="col-md-12 ">
                                 <div class="container col-md-6 mt-3">
                                     <h2 class="all_heading">Certificate Form</h2>

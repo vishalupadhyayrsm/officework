@@ -2,13 +2,13 @@
 session_start();
 include 'dbconfig.php';
 
-// require 'PHPMailer/src/PHPMailer.php';
-// require 'PHPMailer/src/SMTP.php';
-// require 'PHPMailer/src/Exception.php';
+require 'PHPMailer/src/PHPMailer.php';
+require 'PHPMailer/src/SMTP.php';
+require 'PHPMailer/src/Exception.php';
 // Create a new PHPMailer instance
-// use PHPMailer\PHPMailer\PHPMailer;
-// use PHPMailer\PHPMailer\SMTP;
-// use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 
 if (isset($_POST['register'])) {
     $name = $_POST['name'];
@@ -26,17 +26,18 @@ if (isset($_POST['register'])) {
     } else {
         $cl = 2;
     }
-    // echo $name;
+    echo $name;
     $checkUsernameQuery = "SELECT * FROM sigin WHERE email = '$email'";
     $result = $conn->query($checkUsernameQuery);
     if ($result->$num_rows > 0) {
         $response = array("status" => "error", "message" => "Username Already Exists");
         echo json_encode($response);
     } else {
+        echo "hello";
         $hash_password = password_hash($password, PASSWORD_BCRYPT);
         $insertQuery = "INSERT INTO sigin (`name`, `email`, `password`, `usertype`,`userstatus`,`cl`,`rh`,`contact`) 
-        VALUES ('$name', '$email','$hash_password','user',`yes`,'$cl','2','$phoneNo')";
-
+        VALUES ('$name', '$email','$hash_password','user','yes','$cl','2','$phoneNo')";
+        // print_r($insertQuery);
         if ($conn->query($insertQuery) == TRUE) {
             // code for sending the mail to the user whenever new useer registe
             $response = array("status" => "success", "message" => "Record inserted successfully");
@@ -102,54 +103,54 @@ if (isset($_POST['register'])) {
 
 
 // code for sedning the php mail satrt here
-// function send_email($emailid, $subject, $message, $name)
-// {
-//     // echo $subject . '<br />' . $message;
-//     $emailid = "vishalm.rsm@gmail.com";
+function send_email($emailid, $subject, $message, $name)
+{
+    // echo $subject . '<br />' . $message;
+    $emailid = "vishalm.rsm@gmail.com";
 
-//     require 'mailer/Exception.php';
-//     require 'mailer/PHPMailer.php';
-//     require 'mailer/SMTP.php';
-//     require 'config.php';
-//     // $mail = new PHPMailer(true);
+    require 'mailer/Exception.php';
+    require 'mailer/PHPMailer.php';
+    require 'mailer/SMTP.php';
+    require 'config.php';
+    // $mail = new PHPMailer(true);
 
 
-//     $mail_host = mail_host;
-//     $mail_username = mail_username;
-//     $mail_password = mail_password;
+    $mail_host = mail_host;
+    $mail_username = mail_username;
+    $mail_password = mail_password;
 
-//     $mail = new PHPMailer(true);
+    $mail = new PHPMailer(true);
 
-//     try {
-//         $mail->SMTPOptions = array(
-//             'ssl' => array(
-//                 'verify_peer' => false,
-//                 'verify_peer_name' => false,
-//                 'allow_self_signed' => true
-//             )
-//         );
+    try {
+        $mail->SMTPOptions = array(
+            'ssl' => array(
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
+            )
+        );
 
-//         $mail->SMTPDebug = false; // Enable verbose debug output (set to 2 for detailed debugging)
-//         $mail->isSMTP(); // Send using SMTP
-//         $mail->Host = $mail_host; // Set the SMTP server to send through
-//         $mail->SMTPAuth = true; // Enable SMTP authentication
-//         $mail->Username = $mail_username;
-//         $mail->Password = $mail_password;
-//         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-//         $mail->Port = 587;
+        $mail->SMTPDebug = false; // Enable verbose debug output (set to 2 for detailed debugging)
+        $mail->isSMTP(); // Send using SMTP
+        $mail->Host = $mail_host; // Set the SMTP server to send through
+        $mail->SMTPAuth = true; // Enable SMTP authentication
+        $mail->Username = $mail_username;
+        $mail->Password = $mail_password;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port = 587;
 
-//         // Recipients
-//         $mail->setFrom($mail_username, 'MIP');
-//         $mail->addAddress($emailid);
-//         $mail->addReplyTo($mail_username, 'MIP');
-//         // Content
-//         // echo "hello";
-//         $mail->isHTML(true);
-//         $mail->Subject = $subject;
-//         $mail->Body = $message;
-//         $mail->send();
-//         echo 'Message has been sent';
-//     } catch (Exception $e) {
-//         echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-//     }
-// }
+        // Recipients
+        $mail->setFrom($mail_username, 'MIP');
+        $mail->addAddress($emailid);
+        $mail->addReplyTo($mail_username, 'MIP');
+        // Content
+        // echo "hello";
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body = $message;
+        $mail->send();
+        echo 'Message has been sent';
+    } catch (Exception $e) {
+        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+    }
+}
