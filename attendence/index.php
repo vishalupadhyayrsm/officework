@@ -15,13 +15,13 @@ if (isset($_SESSION['user_email'])) {
         if ($usertype == "staff") {
             // $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid, lt.`startdate`, lt.`enddate`, lt.`reason`, lt.`leave_status` 
             //         FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid where sg.sid=:sid ";
-            $sql = "SELECT sg.`sid`,sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid, lt.`startdate`, lt.`enddate`, lt.`reason`, lt.`leave_status`,de.declarationform,de.emp_roll,de.`univesity`,de.name,de.gender,de.localaddress,de.localpostal,de.permanentadd,de.permpostal, de.homecontact,de.emename1,de.emerelation,de.emeadd,de.emecontact,de.empostalcode,de.emesecondname,de.emesecrelation,de.medicalcondition,de.profilepic
+            $sql = "SELECT sg.`sid`,sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid, lt.`startdate`, lt.`enddate`, lt.`reason`, lt.`leave_status`,de.declarationform,de.emp_roll,de.`univesity`,de.name,de.iitbemail,de.aadhar,de.gender,de.localaddress,de.localpostal,de.permanentadd,de.permpostal, de.homecontact,de.emename1,de.emerelation,de.emeadd,de.emecontact,de.empostalcode,de.emesecondname,de.emesecrelation,de.medicalcondition,de.profilepic
              FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid LEFT JOIN declarationform as de on de.sid = sg.sid where sg.sid=:sid ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':sid', $sid);
             $stmt->execute();
         } elseif ($usertype == "intern") {
-            $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.declarationform, de.`declarationform`, de.`name`, de.`emp_roll`,de.`univesity`, de.`gender`, de.`localaddress`, de.`localpostal`, de.`permanentadd`, de.`permpostal`, de.`homecontact`, de.`emename1`, de.`emerelation`, de.`emeadd`, de.`emecontact`, de.`empostalcode`, de.`emesecondname`, de.`emesecrelation`, de.`medicalcondition`, de.`term`, de.`profilepic`
+            $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.declarationform, de.`declarationform`, de.`name`,de.iitbemail,de.aadhar, de.`emp_roll`,de.`univesity`, de.`gender`, de.`localaddress`, de.`localpostal`, de.`permanentadd`, de.`permpostal`, de.`homecontact`, de.`emename1`, de.`emerelation`, de.`emeadd`, de.`emecontact`, de.`empostalcode`, de.`emesecondname`, de.`emesecrelation`, de.`medicalcondition`, de.`term`, de.`profilepic`
              FROM `sigin` as sg LEFT JOIN declarationform as de on de.sid = sg.sid where sg.sid=:sid ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':sid', $sid);
@@ -43,7 +43,7 @@ if (isset($_SESSION['user_email'])) {
     exit();
 }
 
-$sql = "SELECT `sid`, `name`, `email`, `password`,`userstatus`, `usertype`,`startdate`,`enddate`, `contact`, `cl`, `rh`, `remainingcl`, `remainingrh`, `year`, `declarationform`, `resign` FROM `sigin`";
+$sql = "SELECT `sid`, `name`, `email`,`empcode`,`password`,`userstatus`,`tenureenddate`, `usertype`,`startdate`,`enddate`, `contact`, `cl`, `rh`, `remainingcl`, `remainingrh`, `year`, `declarationform`, `resign` FROM `sigin`";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 $userdetails = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -234,6 +234,10 @@ $decform = $results[0]['declarationform'];
                                             <input type="text" class="form-control" id="name" name="name" required>
                                         </div><br>
                                         <div class="form-group">
+                                            <label for="name">IITB Email (if available):</label>
+                                            <input type="email" class="form-control" id="name" name="iitbmail">
+                                        </div><br>
+                                        <div class="form-group">
                                             <label for="emp_roll">Employee No/Student Roll No:</label>
                                             <input type="number" class="form-control" id="emp_roll" name="emproll">
                                         </div><br>
@@ -395,12 +399,14 @@ $decform = $results[0]['declarationform'];
                                         <p>University: <span class="text-display"><?php echo $results[0]['univesity']; ?></span><input class="input-display" type="text" name="university" value="<?php echo $results[0]['university']; ?>"></p>
                                         <p>Contact: <span class="text-display"><?php echo $results[0]['contact']; ?></span><input class="input-display" type="text" name="contact" value="<?php echo $results[0]['contact']; ?>"></p>
                                         <p>Email: <span class="text-display"><?php echo $results[0]['email']; ?></span><input class="input-display" type="email" name="email" value="<?php echo $results[0]['email']; ?>"></p>
+                                        <p>Email: <span class="text-display"><?php echo $results[0]['iitbemail']; ?></span><input class="input-display" type="email" name="iitbemail" value="<?php echo $results[0]['iitbemail']; ?>"></p>
                                     </div>
                                 </div>
 
                                 <div class="additional-details">
                                     <p>Roll Number/Emp Code: <span class="text-display"><?php echo $results[0]['emp_roll']; ?></span><input class="input-display" type="text" name="emp_roll" value="<?php echo $results[0]['emp_roll']; ?>" disabled></p>
                                     <p>Gender: <span class="text-display"><?php echo $results[0]['gender']; ?></span><input class="input-display" type="text" name="gender" value="<?php echo $results[0]['gender']; ?>"></p>
+                                    <p>Aadhar: <span class="text-display"><?php echo $results[0]['aadhar']; ?></span><input class="input-display" type="text" name="aadhar" value="<?php echo $results[0]['aadhar']; ?>"></p>
                                     <p>Home Contact: <span class="text-display"><?php echo $results[0]['homecontact']; ?></span><input class="input-display" type="text" name="homecontact" value="<?php echo $results[0]['homecontact']; ?>"></p>
                                     <p>Local Address: <span class="text-display"><?php echo $results[0]['localaddress']; ?></span><input class="input-display" type="text" name="localaddress" value="<?php echo $results[0]['localaddress']; ?>"></p>
                                     <p>Medical Condition: <span class="text-display"><?php echo $results[0]['medicalcondition']; ?></span><input class="input-display" type="text" name="medicalcondition" value="<?php echo $results[0]['medicalcondition']; ?>"></p>
@@ -928,8 +934,6 @@ $decform = $results[0]['declarationform'];
         setInterval(yearchanged, 1000);
     </script>
 
-
-
     <script>
         /* code for displaying multipage form start here  */
         function nextPage(pageNumber) {
@@ -1167,6 +1171,11 @@ $decform = $results[0]['declarationform'];
                     headerFilter: true
                 },
                 {
+                    title: "Email",
+                    field: "email",
+                    headerFilter: true
+                },
+                {
                     title: "Staff / Intern",
                     field: "usertype",
                     headerFilter: true
@@ -1182,7 +1191,7 @@ $decform = $results[0]['declarationform'];
                     headerFilter: true
                 },
                 {
-                    title: "End Date",
+                    title: "Resign Date",
                     field: "enddate",
                     headerFilter: true
                 },
@@ -1192,11 +1201,31 @@ $decform = $results[0]['declarationform'];
                     headerFilter: true
                 },
                 {
-                    title: "Resign",
-                    field: "resign",
-                    headerFilter: true
+                    title: "Employee Code",
+                    field: "empcode",
+                    headerFilter: true,
+                    editor: <?php echo ($usertype == 'hr' || $usertype == 'admin') ? "'input'" : "false"; ?>,
+                    cellEdited: function(cell) {
+                        var userId = cell.getData().sid;
+                        var newValue = cell.getValue();
+                        console.log(userId, newValue);
+                        updateempcode(userId, newValue);
+                    }
                 },
+                {
+                    title: "Tenure End Date",
+                    field: "tenureenddate",
+                    headerFilter: true,
+                    editor: <?php echo ($usertype == 'hr' || $usertype == 'admin') ? "'input'" : "false"; ?>,
+                    cellEdited: function(cell) {
+                        var userId = cell.getData().sid;
+                        var newValue = cell.getValue();
+                        console.log(userId, newValue);
+                        updateemptenure(userId, newValue)
+                    }
+                }
             ];
+
 
             <?php if ($usertype == 'hr') : ?>
                 columns.push({
@@ -1245,6 +1274,52 @@ $decform = $results[0]['declarationform'];
                         console.error('Error updating database:', error);
                     });
             }
+
+            /* code for sending the update empcode */
+            function updateempcode(userId, newValue) {
+                fetch('formsubmit.php/updateempcode', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: 'userId=' + encodeURIComponent(userId) + '&status=' + encodeURIComponent(newValue)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        var datavalue = data.data;
+                        console.log(datavalue);
+                        if (datavalue == 'no') {
+                            alert("User Successfully Disapproved");
+                            // window.location.href = "../index1.php";
+                        } else {
+                            alert("User Successfully Approved");
+                            // window.location.href = "index1.php";
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error updating database:', error);
+                    });
+            }
+            /* code for updating the tenure in th database by admin */
+            function updateemptenure(userId, newValue) {
+                fetch('formsubmit.php/updateemptenure', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: 'userId=' + encodeURIComponent(userId) + '&status=' + encodeURIComponent(newValue)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        var datavalue = data.data;
+                        console.log(datavalue);
+                    })
+                    .catch(error => {
+                        console.error('Error updating database:', error);
+                    });
+            }
+
+
 
             var pageSize = 10;
             var currentPage = 1;

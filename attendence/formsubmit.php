@@ -21,6 +21,7 @@ switch ($endpoint) {
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $sid = $_SESSION['userid'] ?? '';
             $name = $_POST['name'] ?? '';
+            $iitbmail = $_POST['iitbmail'] ?? '';
             $emproll = $_POST['emproll'] ?? '';
             $univesity = $_POST['univesity'] ?? '';
             $adhar = $_POST['adhar'] ?? '';
@@ -51,8 +52,8 @@ switch ($endpoint) {
 
             $uploadedFilePath = $uploadDirectory . basename($video['name']);
             if (move_uploaded_file($video['tmp_name'], $uploadedFilePath)) {
-                $insertQuery = "INSERT INTO `declarationform`(`sid`,`declarationform`, `name`, `emp_roll`,`univesity`,`aadhar`, `gender`, `localaddress`, `localpostal`, `permanentadd`, `permpostal`, `homecontact`, `emename1`, `emerelation`, `emeadd`, `emecontact`, `empostalcode`, `emesecondname`, `emesecrelation`, `medicalcondition`, `term`,`profilepic`) 
-                                VALUES ('$sid','yes','$name','$emproll','$univesity','$adhar','$gender','$localadd','$localpostalcode','$permadd','$permapostalcode','$homephone','$emergencyname1','$relationship1',
+                $insertQuery = "INSERT INTO `declarationform`(`sid`,`declarationform`, `name`,`iitbemail`, `emp_roll`,`univesity`,`aadhar`, `gender`, `localaddress`, `localpostal`, `permanentadd`, `permpostal`, `homecontact`, `emename1`, `emerelation`, `emeadd`, `emecontact`, `empostalcode`, `emesecondname`, `emesecrelation`, `medicalcondition`, `term`,`profilepic`) 
+                                VALUES ('$sid','yes','$name','$iitbmail','$emproll','$univesity','$adhar','$gender','$localadd','$localpostalcode','$permadd','$permapostalcode','$homephone','$emergencyname1','$relationship1',
                                 '$localadd_emergency1','$emecontact1','$localpostalcode_emergency1','$emergencyname2','$relationship2','$medicalcondition','$termsCheck','$uploadedFilePath')";
                 if ($conn->query($insertQuery) == TRUE) {
 
@@ -368,6 +369,7 @@ switch ($endpoint) {
         }
         break;
 
+        /* code for updating the cl and rh */
     case "updatecl_ruh":
         $data = file_get_contents("php://input");
         $decoded_data = json_decode($data, true);
@@ -395,6 +397,62 @@ switch ($endpoint) {
                 'received_year' => $year
             ]
         ]);
+        break;
+
+        /* code for updating the emp code start here */
+
+    case 'updateempcode':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // echo "helo";
+            try {
+                $sid = $_POST['userId'];
+                $newValue = $_POST['status'];
+                $stmt = $conn->prepare("UPDATE `sigin` SET `empcode` = :empcode WHERE sid = :sid");
+                $stmt->bindParam(':sid', $sid);
+                $stmt->bindParam(':empcode', $newValue);
+                $stmt->execute();
+
+                if ($stmt->errorCode() === '00000') {
+                    $response = ['status' => 'success', 'message' => 'Database update successful'];
+                    echo json_encode($response);
+                } else {
+                    $errors = $stmt->errorInfo();
+                    echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $errors]);
+                }
+            } catch (PDOException $e) {
+                echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $e->getMessage()]);
+            }
+        } else {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'Invalid request']);
+        }
+        break;
+
+    case 'updateemptenure':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // echo "helo";
+            try {
+                $sid = $_POST['userId'];
+                $newValue = $_POST['status'];
+                $stmt = $conn->prepare("UPDATE `sigin` SET `tenureenddate` = :tenureenddate WHERE sid = :sid");
+                $stmt->bindParam(':sid', $sid);
+                $stmt->bindParam(':tenureenddate', $newValue);
+                $stmt->execute();
+
+                if ($stmt->errorCode() === '00000') {
+                    $response = ['status' => 'success', 'message' => 'Database update successful'];
+                    echo json_encode($response);
+                } else {
+                    $errors = $stmt->errorInfo();
+                    echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $errors]);
+                }
+            } catch (PDOException $e) {
+                echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $e->getMessage()]);
+            }
+        } else {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'Invalid request']);
+        }
         break;
     default:
         break;
