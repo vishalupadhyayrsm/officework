@@ -235,11 +235,15 @@ $decform = $results[0]['declarationform'];
                                         </div><br>
                                         <div class="form-group">
                                             <label for="emp_roll">Employee No/Student Roll No:</label>
-                                            <input type="number" class="form-control" id="emp_roll" name="emproll" required>
+                                            <input type="number" class="form-control" id="emp_roll" name="emproll">
                                         </div><br>
                                         <div class="form-group">
                                             <label for="emp_roll">University:</label>
                                             <input type="text" class="form-control" id="university" name="univesity" required>
+                                        </div><br>
+                                        <div class="form-group">
+                                            <label for="Aadhar">Aadhar Card:</label>
+                                            <input type="text" class="form-control" id="aadahr" name="adhar" required>
                                         </div><br>
                                         <div class="form-group">
                                             <label for="month">Gender:</label>

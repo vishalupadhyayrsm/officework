@@ -23,6 +23,7 @@ switch ($endpoint) {
             $name = $_POST['name'] ?? '';
             $emproll = $_POST['emproll'] ?? '';
             $univesity = $_POST['univesity'] ?? '';
+            $adhar = $_POST['adhar'] ?? '';
             $gender = $_POST['gender'] ?? '';
             $localadd = $_POST['localadd'] ?? '';
             $localpostalcode = $_POST['localpostalcode'] ?? '';
@@ -50,8 +51,8 @@ switch ($endpoint) {
 
             $uploadedFilePath = $uploadDirectory . basename($video['name']);
             if (move_uploaded_file($video['tmp_name'], $uploadedFilePath)) {
-                $insertQuery = "INSERT INTO `declarationform`(`sid`,`declarationform`, `name`, `emp_roll`,`univesity`, `gender`, `localaddress`, `localpostal`, `permanentadd`, `permpostal`, `homecontact`, `emename1`, `emerelation`, `emeadd`, `emecontact`, `empostalcode`, `emesecondname`, `emesecrelation`, `medicalcondition`, `term`,`profilepic`) 
-                                VALUES ('$sid','yes','$name','$emproll','$univesity','$gender','$localadd','$localpostalcode','$permadd','$permapostalcode','$homephone','$emergencyname1','$relationship1',
+                $insertQuery = "INSERT INTO `declarationform`(`sid`,`declarationform`, `name`, `emp_roll`,`univesity`,`aadhar`, `gender`, `localaddress`, `localpostal`, `permanentadd`, `permpostal`, `homecontact`, `emename1`, `emerelation`, `emeadd`, `emecontact`, `empostalcode`, `emesecondname`, `emesecrelation`, `medicalcondition`, `term`,`profilepic`) 
+                                VALUES ('$sid','yes','$name','$emproll','$univesity','$adhar','$gender','$localadd','$localpostalcode','$permadd','$permapostalcode','$homephone','$emergencyname1','$relationship1',
                                 '$localadd_emergency1','$emecontact1','$localpostalcode_emergency1','$emergencyname2','$relationship2','$medicalcondition','$termsCheck','$uploadedFilePath')";
                 if ($conn->query($insertQuery) == TRUE) {
 
