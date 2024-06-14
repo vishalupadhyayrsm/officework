@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </nav>
     </header>
 
-    <div class="container col-md-6 mt-5">
+    <div class="container col-md-6 mt-5" style="height: 500px;">
         <h2 class="loginform">Login Here</h2>
         <form method="post" action="main.php">
             <div class="mb-3">
@@ -52,6 +52,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
         </form>
     </div>
+
+    <?php
+    include 'footerout.php';
+    ?>
+
 
 </body>
 

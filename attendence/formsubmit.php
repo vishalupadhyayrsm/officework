@@ -179,6 +179,7 @@ switch ($endpoint) {
     case "editprofile":
         try {
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                // Get the form values
                 $sid = isset($_POST['sid']) ? $_POST['sid'] : '';
                 $contact = isset($_POST['contact']) ? $_POST['contact'] : '';
                 $email = isset($_POST['email']) ? $_POST['email'] : '';
@@ -193,34 +194,45 @@ switch ($endpoint) {
                 $emesecondname = isset($_POST['emesecondname']) ? $_POST['emesecondname'] : '';
                 $emesecrelation = isset($_POST['emesecrelation']) ? $_POST['emesecrelation'] : '';
                 $profilepic = isset($_FILES['profilepic']) ? $_FILES['profilepic'] : '';
-                if (empty($profilepic['name'])) {
-                    die('No file selected for upload.');
+                echo $profilepic;
+                // Handle file upload if profile pic is uploaded
+                if ($profilepic && !empty($profilepic['profilepic'])) {
+                    $uploadDirectory = 'uploads/';
+                    if (!file_exists($uploadDirectory)) {
+                        mkdir($uploadDirectory, 0777, true);
+                    }
+                    $uploadedFilePath = $uploadDirectory . basename($profilepic['name']);
+                    if (!move_uploaded_file($profilepic['tmp_name'], $uploadedFilePath)) {
+                        throw new Exception('File upload failed.');
+                    }
+                    // Update profile pic only if uploaded
+                    $profilepic_updated = true;
+                } else {
+                    $uploadedFilePath = '';
+                    $profilepic_updated = false;
                 }
-                $uploadDirectory = 'uploads/';
-                if (!file_exists($uploadDirectory)) {
-                    mkdir($uploadDirectory, 0777, true);
-                }
-                $uploadedFilePath = $uploadDirectory . basename($profilepic['name']);
-                move_uploaded_file($profilepic['tmp_name'], $uploadedFilePath);
-                $stmt = $conn->prepare("UPDATE `sigin` SET `email` = :email, `contact` = :contact WHERE sid = :sid");
+
+                // Update the sigin table
+                $stmt = $conn->prepare("UPDATE `sigin` SET `email` = :email, `contact` = :contact WHERE `sid` = :sid");
                 $stmt->bindParam(":sid", $sid);
                 $stmt->bindParam(":email", $email);
                 $stmt->bindParam(":contact", $contact);
                 $stmt->execute();
 
+                // Update the declarationform table
                 $stmt = $conn->prepare("UPDATE `declarationform` SET 
-                `gender` = :gender,
-                `localaddress` = :localaddress,
-                `homecontact` = :homecontact,
-                `emename1` = :emename1,
-                `emerelation` = :emerelation,
-                `emeadd` = :emeadd,
-                `emecontact` = :emecontact,
-                `emesecondname` = :emesecondname,
-                `emesecrelation` = :emesecrelation,
-                `medicalcondition` = :medicalcondition,
-                `profilepic` = :profilepic
-                WHERE `sid` = :sid");
+                    `gender` = :gender,
+                    `localaddress` = :localaddress,
+                    `homecontact` = :homecontact,
+                    `emename1` = :emename1,
+                    `emerelation` = :emerelation,
+                    `emeadd` = :emeadd,
+                    `emecontact` = :emecontact,
+                    `emesecondname` = :emesecondname,
+                    `emesecrelation` = :emesecrelation,
+                    `medicalcondition` = :medicalcondition,
+                    `profilepic` = :profilepic
+                    WHERE `sid` = :sid");
 
                 $stmt->bindParam(':sid', $sid);
                 $stmt->bindParam(':gender', $gender);
@@ -237,9 +249,13 @@ switch ($endpoint) {
 
                 $stmt->execute();
 
+                // Response
                 $response = array(
-                    'status' => 'Success',
-                    "data" => $profilepic,
+                    'status' => 'success',
+                    'data' => [
+                        'profilepic' => $profilepic,
+                        'uploadedFilePath' => $uploadedFilePath
+                    ]
                 );
                 header('Content-Type: application/json');
                 echo json_encode($response);
@@ -250,8 +266,10 @@ switch ($endpoint) {
                 'status' => 'error',
                 'message' => 'Exception caught: ' . $e->getMessage(),
             );
+            header('Content-Type: application/json');
             echo json_encode($response);
         }
+
         break;
 
     case "leaveapproved":
@@ -313,6 +331,7 @@ switch ($endpoint) {
                     $sid = $_POST['userid'];
                     $cl = $_POST['cl'];
                     $rh = $_POST['rh'];
+                    $el = $_POST['el'];
                     $status = 'pending';
                     $currentyear = date("Y");
 
@@ -346,14 +365,15 @@ switch ($endpoint) {
                             $stmt->execute();
 
                             /* code for applying the new leave every time  */
-                            $insertQuery = "INSERT INTO leavetable (sid, startdate, enddate, reason,leave_status) 
-                                VALUES (:sid, :startdate, :end_date, :reason, :status)";
+                            $insertQuery = "INSERT INTO leavetable (sid, startdate, enddate, reason,leave_status,el) 
+                                VALUES (:sid, :startdate, :end_date, :reason, :status,:el)";
                             $stmt = $conn->prepare($insertQuery);
                             $stmt->bindParam(':sid', $sid);
                             $stmt->bindParam(':startdate', $startdate);
                             $stmt->bindParam(':end_date', $end_date);
                             $stmt->bindParam(':reason', $reason);
                             $stmt->bindParam(':status', $status);
+                            $stmt->bindParam(':el', $el);
                             $stmt->execute();
                             $_SESSION['leave_success'] = true;
                             header("Location: ../index.php");

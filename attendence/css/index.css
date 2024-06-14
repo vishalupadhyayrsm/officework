@@ -62,8 +62,13 @@ body,.username,p{
 .alert {
     margin-top: 20px;
 }
+label{
+    font-family: system-ui;
+}
 .loginform{
     text-align: center;
+    font-family: system-ui;
+    font-weight: 500;
 }
 .list_cl{
     float: left;
@@ -168,6 +173,13 @@ button:hover {
 /* code for updating the notice start here  */
 .allimp_notice{
     color: red;
-    font-size: 22px;
+    font-size: 16px;
     font-family: system-ui;
+}
+.list_cl {
+    display: flex;
+    justify-content: space-between;
+}
+.value {
+    color: red;
 }

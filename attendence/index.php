@@ -15,7 +15,7 @@ if (isset($_SESSION['user_email'])) {
         if ($usertype == "staff") {
             // $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid, lt.`startdate`, lt.`enddate`, lt.`reason`, lt.`leave_status` 
             //         FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid where sg.sid=:sid ";
-            $sql = "SELECT sg.`sid`,sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid, lt.`startdate`, lt.`enddate`, lt.`reason`, lt.`leave_status`,de.declarationform,de.emp_roll,de.`univesity`,de.name,de.iitbemail,de.aadhar,de.gender,de.localaddress,de.localpostal,de.permanentadd,de.permpostal, de.homecontact,de.emename1,de.emerelation,de.emeadd,de.emecontact,de.empostalcode,de.emesecondname,de.emesecrelation,de.medicalcondition,de.profilepic
+            $sql = "SELECT sg.`sid`,sg.`name`, sg.`email`, sg.`usertype`,sg.`tenureenddate`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid, lt.`startdate`, lt.`enddate`,lt.el, lt.`reason`, lt.`leave_status`,de.declarationform,de.emp_roll,de.`univesity`,de.name,de.iitbemail,de.aadhar,de.gender,de.localaddress,de.localpostal,de.permanentadd,de.permpostal, de.homecontact,de.emename1,de.emerelation,de.emeadd,de.emecontact,de.empostalcode,de.emesecondname,de.emesecrelation,de.medicalcondition,de.profilepic
              FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid LEFT JOIN declarationform as de on de.sid = sg.sid where sg.sid=:sid ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':sid', $sid);
@@ -399,10 +399,12 @@ $decform = $results[0]['declarationform'];
                                         <p>University: <span class="text-display"><?php echo $results[0]['univesity']; ?></span><input class="input-display" type="text" name="university" value="<?php echo $results[0]['university']; ?>"></p>
                                         <p>Contact: <span class="text-display"><?php echo $results[0]['contact']; ?></span><input class="input-display" type="text" name="contact" value="<?php echo $results[0]['contact']; ?>"></p>
                                         <p>Email: <span class="text-display"><?php echo $results[0]['email']; ?></span><input class="input-display" type="email" name="email" value="<?php echo $results[0]['email']; ?>"></p>
-                                        <p>Email: <span class="text-display"><?php echo $results[0]['iitbemail']; ?></span><input class="input-display" type="email" name="iitbemail" value="<?php echo $results[0]['iitbemail']; ?>"></p>
+                                        <p>Email: <span class="text-display"><?php echo $results[0]['iitbemail']; ?></span></p>
+                                        <?php if (($usertype == "staff")) { ?>
+                                            <p style="color:red;">Tenure End Date: <span class="text-display"><?php echo $results[0]['tenureenddate']; ?></span></p>
+                                        <?php } ?>
                                     </div>
                                 </div>
-
                                 <div class="additional-details">
                                     <p>Roll Number/Emp Code: <span class="text-display"><?php echo $results[0]['emp_roll']; ?></span><input class="input-display" type="text" name="emp_roll" value="<?php echo $results[0]['emp_roll']; ?>" disabled></p>
                                     <p>Gender: <span class="text-display"><?php echo $results[0]['gender']; ?></span><input class="input-display" type="text" name="gender" value="<?php echo $results[0]['gender']; ?>"></p>
@@ -438,26 +440,27 @@ $decform = $results[0]['declarationform'];
                     <!--- disaplying the form for applying leave start here ----->
                     <div id="tab2" class="container tab-content">
                         <div class="row">
-                            <marquee behavior="scroll" direction="left" scrollamount="5" class="allimp_notice" style="color:red;">
-                                If you are applying the EL teh kindly visit Drona <a href="https://drona.ircc.iitb.ac.in/ircc/index.jsp?LogOut=You%20have%20been%20logged%20Off%20!">Click Here</a>
-                            </marquee>
+
                             <!---- code for registering the leave from the user start here --->
                             <div class="col-md-6 offset-md-3">
                                 <h2 class="all_heading" style="text-align:center;">Leave Application Form</h2>
+                                <h3 class="allimp_notice">If you are applying the EL Kindaly apply here as well as Apply on Drona Also
+                                    <a href="https://drona.ircc.iitb.ac.in/ircc/index.jsp?LogOut=You%20have%20been%20logged%20Off%20!" target="_blank">Click Here</a>
+                                </h3>
                                 <br>
                                 <?php
                                 if ($usertype == "staff") {
                                     $row = $results[0];
                                 ?>
-                                    <div class="col-md-4">
-                                        <h2 class="mb-4 list_cl">Total CL:<span style="color:red;"> <?php echo htmlspecialchars($row['cl']); ?></span></h2>
-                                        <h2 class="mb-4 list_cl">Total RH: <span style="color:red;"><?php echo htmlspecialchars($row['rh']); ?></span></h2>
+                                    <div class="col-md-8">
+                                        <h2 class="mb-8 list_cl">Total CL:<span style="color:red;"> <?php echo htmlspecialchars($row['cl']); ?></span></h2>
+                                        <h2 class="mb-8 list_cl">Total RH: <span style="color:red;"><?php echo htmlspecialchars($row['rh']); ?></span></h2>
                                     </div>
-                                    <div class="col-md-4">
-                                        <h2 class="mb-4 list_cl">Remainig CL: <?php echo htmlspecialchars($row['remainingcl']); ?></h2>
-                                        <h2 class="mb-4 list_cl">Reamining RH: <?php echo htmlspecialchars($row['remainingrh']); ?></h2>
-                                        <br>
+                                    <div class="col-md-8">
+                                        <h2 class="mb-8 list_cl">Remainig CL: <?php echo htmlspecialchars($row['remainingcl']); ?></h2>
+                                        <h2 class="mb-8 list_cl">Reamining RH: <?php echo htmlspecialchars($row['remainingrh']); ?></h2>
                                     </div>
+                                    <br><br><br>
                                     <br>
                                     <form method="post" action="formsubmit.php/leaveapply" class="form_data">
                                         <div class="form-group">
@@ -475,6 +478,10 @@ $decform = $results[0]['declarationform'];
                                         <div class="form-group">
                                             <label for="end_date">No. Of RH:</label>
                                             <input type="number" class="form-control" id="end_date" name="rh" min="0" max="2" required>
+                                        </div><br>
+                                        <div class="form-group">
+                                            <label for="end_date">No. Of EL:</label>
+                                            <input type="number" class="form-control" id="end_date" name="el" required>
                                         </div><br>
                                         <div class="form-group">
                                             <label for="reason">Reason:</label>
@@ -804,6 +811,9 @@ $decform = $results[0]['declarationform'];
         </div>
     </div>
     </div>
+    <br><br><br><br>
+    <!-- code for footer start here -->
+    <?php include 'footer.php' ?>;
 
 
     <!-- code for edit the data and send it to the database  -->
@@ -811,6 +821,7 @@ $decform = $results[0]['declarationform'];
         document.getElementById('edit-btn').addEventListener('click', function() {
             var inputs = document.querySelectorAll('.input-display');
             var textDisplays = document.querySelectorAll('.text-display');
+
             inputs.forEach(function(input) {
                 if (input.name !== 'emp_roll') {
                     input.disabled = false;
@@ -820,6 +831,7 @@ $decform = $results[0]['declarationform'];
             textDisplays.forEach(function(text) {
                 text.style.display = 'none';
             });
+
             document.getElementById('edit-icon').style.display = 'inline';
             document.getElementById('edit-btn').style.display = 'none';
             document.getElementById('save-btn').style.display = 'inline-block';
@@ -841,16 +853,18 @@ $decform = $results[0]['declarationform'];
             var inputs = document.querySelectorAll('.input-display');
             var textDisplays = document.querySelectorAll('.text-display');
             var formData = new FormData();
-
             inputs.forEach(function(input) {
                 input.disabled = true;
                 input.style.display = 'none';
                 formData.append(input.name, input.value);
             });
-
             textDisplays.forEach(function(text, index) {
-                text.innerText = inputs[index].value;
-                text.style.display = 'inline';
+                if (inputs[index]) {
+                    text.innerText = inputs[index].value;
+                    text.style.display = 'inline';
+                } else {
+                    console.error('Input element not found for text span:', text);
+                }
             });
 
             document.getElementById('edit-icon').style.display = 'none';
@@ -858,17 +872,21 @@ $decform = $results[0]['declarationform'];
             document.getElementById('save-btn').style.display = 'none';
 
             var profilePicInput = document.getElementById('profile-pic-input');
-
             if (profilePicInput.files.length > 0) {
                 formData.append('profilepic', profilePicInput.files[0]);
+            } else {
+                var previousProfilePicUrl = document.getElementById('profile-img').src;
+                console.log(previousProfilePicUrl);
+                formData.append('previous_profilepic', previousProfilePicUrl);
             }
 
             // Append the sid value explicitly
             var sid = document.getElementById('sid').value;
             formData.append('sid', sid);
 
-            console.log([...formData.entries()]); // Debug: Log all formData entries
-
+            // Log all form data entries
+            console.log([...formData.entries()]);
+            /* code for sending teh data to database */
             try {
                 fetch('formsubmit.php/editprofile', {
                         method: 'POST',
@@ -931,7 +949,7 @@ $decform = $results[0]['declarationform'];
                 console.error('There was a problem with the fetch operation:', error.message);
             }
         }
-        setInterval(yearchanged, 1000);
+        // setInterval(yearchanged, 1000);
     </script>
 
     <script>
@@ -1033,6 +1051,11 @@ $decform = $results[0]['declarationform'];
                 {
                     title: "Leave Reason",
                     field: "reason",
+                    headerFilter: true
+                },
+                {
+                    title: "Total EL ",
+                    field: "el",
                     headerFilter: true
                 },
                 {
