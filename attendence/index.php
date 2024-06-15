@@ -63,8 +63,6 @@ $resign = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $decform = $results[0]['declarationform'];
 // echo $decform;
 // $decform = "yes";
-// print_r($results);
-// echo $usertype;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -80,6 +78,7 @@ $decform = $results[0]['declarationform'];
     <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/popup.css">
     <style>
         .form-page {
             display: none;
@@ -161,7 +160,6 @@ $decform = $results[0]['declarationform'];
         <?php endif; ?>
     </script>
 </head>
-
 
 <body>
     <header>
@@ -440,11 +438,10 @@ $decform = $results[0]['declarationform'];
                     <!--- disaplying the form for applying leave start here ----->
                     <div id="tab2" class="container tab-content">
                         <div class="row">
-
                             <!---- code for registering the leave from the user start here --->
                             <div class="col-md-6 offset-md-3">
                                 <h2 class="all_heading" style="text-align:center;">Leave Application Form</h2>
-                                <h3 class="allimp_notice">If you are applying the EL Kindaly apply here as well as Apply on Drona Also
+                                <h3 class="allimp_notice">If you are applying the EL kindly apply here as well as Apply on Drona Also
                                     <a href="https://drona.ircc.iitb.ac.in/ircc/index.jsp?LogOut=You%20have%20been%20logged%20Off%20!" target="_blank">Click Here</a>
                                 </h3>
                                 <br>
@@ -464,11 +461,11 @@ $decform = $results[0]['declarationform'];
                                     <br>
                                     <form method="post" action="formsubmit.php/leaveapply" class="form_data">
                                         <div class="form-group">
-                                            <label for="start_date">Start Date:</label>
+                                            <label for="start_date">CL Start Date:</label>
                                             <input type="date" class="form-control" id="start_date" name="start_date" required>
                                         </div><br>
                                         <div class="form-group">
-                                            <label for="end_date">End Date:</label>
+                                            <label for="end_date">CL End Date:</label>
                                             <input type="date" class="form-control" id="end_date" name="end_date" required>
                                         </div><br>
                                         <div class="form-group">
@@ -476,8 +473,24 @@ $decform = $results[0]['declarationform'];
                                             <input type="number" class="form-control" id="end_date" name="cl" min="0" max="8" required>
                                         </div><br>
                                         <div class="form-group">
+                                            <label for="start_date">RH Start Date:</label>
+                                            <input type="date" class="form-control" id="start_date" name="start_date" required>
+                                        </div><br>
+                                        <div class="form-group">
+                                            <label for="end_date">RH End Date:</label>
+                                            <input type="date" class="form-control" id="end_date" name="end_date" required>
+                                        </div><br>
+                                        <div class="form-group">
                                             <label for="end_date">No. Of RH:</label>
                                             <input type="number" class="form-control" id="end_date" name="rh" min="0" max="2" required>
+                                        </div><br>
+                                        <div class="form-group">
+                                            <label for="start_date">EL Start Date:</label>
+                                            <input type="date" class="form-control" id="start_date" name="start_date" required>
+                                        </div><br>
+                                        <div class="form-group">
+                                            <label for="end_date">EL End Date:</label>
+                                            <input type="date" class="form-control" id="end_date" name="end_date" required>
                                         </div><br>
                                         <div class="form-group">
                                             <label for="end_date">No. Of EL:</label>
@@ -521,8 +534,6 @@ $decform = $results[0]['declarationform'];
                             </div>
                         </div>
                     </div>
-
-
                 <?php
                 }
                 ?>
@@ -786,9 +797,29 @@ $decform = $results[0]['declarationform'];
             <div id="tab7" class="container tab-content">
                 <div class="row">
                     <div class="col-md-12 ">
+                        <button id="openPopupBtn">Send Certificate</button>
                         <div class="container col-md-12 mt-3">
                             <h2 class="all_heading">Certificate Request</h2>
                             <div id="certificate"></div>
+                        </div>
+
+                        <!----code for sending the certificate to intern  --->
+                        <div id="popupForm" class="popup">
+                            <div class="popup-content">
+                                <span class="close">&times;</span>
+                                <form id="certificateForm">
+                                    <label for="name">Name:</label>
+                                    <input type="text" id="name" name="name" required>
+
+                                    <label for="email">Email:</label>
+                                    <input type="email" id="email" name="email" required>
+
+                                    <label for="pdf">Select PDF:</label>
+                                    <input type="file" id="pdf" name="pdf" accept="application/pdf" required>
+
+                                    <button type="submit">Send</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -814,7 +845,6 @@ $decform = $results[0]['declarationform'];
     <br><br><br><br>
     <!-- code for footer start here -->
     <?php include 'footer.php' ?>;
-
 
     <!-- code for edit the data and send it to the database  -->
     <script>
@@ -1002,6 +1032,7 @@ $decform = $results[0]['declarationform'];
     </script>
     <!---- javascript code start here  ---->
     <script src="js/index.js"></script>
+    <script src="js/certificate.js"></script>
     <!-- code for leave status start here -->
     <script>
         var tabId;
@@ -1024,25 +1055,21 @@ $decform = $results[0]['declarationform'];
                     // visible: <?php echo ($usertype == 'user') ? 'true' : 'true'; ?>,
                 },
                 {
-                    title: "Contact No",
-                    field: "contact",
-                    headerFilter: true
-                },
-                {
-                    title: "Total Cl",
+                    title: "Total CL",
                     field: "cl",
                     headerFilter: true,
-                },
-                {
-                    title: "Remaining Cl",
-                    field: "remainingcl",
-                    headerFilter: true
                 },
                 {
                     title: "Total RH",
                     field: "rh",
                     headerFilter: true
                 },
+                {
+                    title: "Remaining CL",
+                    field: "remainingcl",
+                    headerFilter: true
+                },
+
                 {
                     title: "Remaining RH",
                     field: "remainingrh",
@@ -1194,12 +1221,12 @@ $decform = $results[0]['declarationform'];
                     headerFilter: true
                 },
                 {
-                    title: "Email",
+                    title: "IITB Email",
                     field: "email",
                     headerFilter: true
                 },
                 {
-                    title: "Staff / Intern",
+                    title: "Staff / Intern / Student",
                     field: "usertype",
                     headerFilter: true
                 },
@@ -1211,11 +1238,6 @@ $decform = $results[0]['declarationform'];
                 {
                     title: "Joining Date",
                     field: "startdate",
-                    headerFilter: true
-                },
-                {
-                    title: "Resign Date",
-                    field: "enddate",
                     headerFilter: true
                 },
                 {
@@ -1246,7 +1268,12 @@ $decform = $results[0]['declarationform'];
                         console.log(userId, newValue);
                         updateemptenure(userId, newValue)
                     }
-                }
+                },
+                {
+                    title: "Resign Date",
+                    field: "enddate",
+                    headerFilter: true
+                },
             ];
 
 
@@ -1557,17 +1584,17 @@ $decform = $results[0]['declarationform'];
                     headerFilter: true
                 },
                 {
-                    title: "Suggestion",
+                    title: "Feedback",
                     field: "imporove_suggestion",
                     headerFilter: true
                 },
                 {
-                    title: "Most Likes",
+                    title: "Most Liked",
                     field: "what_mostlike",
                     headerFilter: true
                 },
                 {
-                    title: "Least Likes",
+                    title: "Least Liked",
                     field: "what_leastlike",
                     headerFilter: true
                 },
@@ -1616,16 +1643,11 @@ $decform = $results[0]['declarationform'];
                     field: "otherremarks",
                     headerFilter: true
                 },
-                {
-                    title: "others",
-                    field: "anyothersno",
-                    headerFilter: true
-                },
             ];
 
             /* code for upadating the resignation status start here */
             columns.push({
-                title: "Leave Status",
+                title: "Approve / Disapprove",
                 field: "leave_status",
                 headerFilter: true,
                 formatter: function(cell, formatterParams, onRendered) {
