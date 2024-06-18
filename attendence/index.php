@@ -15,7 +15,7 @@ if (isset($_SESSION['user_email'])) {
         if ($usertype == "staff") {
             // $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid, lt.`startdate`, lt.`enddate`, lt.`reason`, lt.`leave_status` 
             //         FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid where sg.sid=:sid ";
-            $sql = "SELECT sg.`sid`,sg.`name`, sg.`email`, sg.`usertype`,sg.`tenureenddate`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid, lt.`startdate`, lt.`enddate`,lt.el, lt.`reason`, lt.`leave_status`,de.declarationform,de.emp_roll,de.`univesity`,de.name,de.iitbemail,de.aadhar,de.gender,de.localaddress,de.localpostal,de.permanentadd,de.permpostal, de.homecontact,de.emename1,de.emerelation,de.emeadd,de.emecontact,de.empostalcode,de.emesecondname,de.emesecrelation,de.medicalcondition,de.profilepic
+            $sql = "SELECT sg.`sid`,sg.`name`, sg.`email`, sg.`usertype`,sg.`tenureenddate`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid,  lt.`reason`, lt.`leave_status`,de.declarationform,de.emp_roll,de.`univesity`,de.name,de.iitbemail,de.aadhar,de.gender,de.localaddress,de.localpostal,de.permanentadd,de.permpostal, de.homecontact,de.emename1,de.emerelation,de.emeadd,de.emecontact,de.empostalcode,de.emesecondname,de.emesecrelation,de.medicalcondition,de.profilepic
              FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid LEFT JOIN declarationform as de on de.sid = sg.sid where sg.sid=:sid ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':sid', $sid);
@@ -43,12 +43,12 @@ if (isset($_SESSION['user_email'])) {
     exit();
 }
 
-$sql = "SELECT `sid`, `name`, `email`,`empcode`,`password`,`userstatus`,`tenureenddate`, `usertype`,`startdate`,`enddate`, `contact`, `cl`, `rh`, `remainingcl`, `remainingrh`, `year`, `declarationform`, `resign` FROM `sigin`";
+$sql = "SELECT `sid`, `name`, `email`,`empcode`,`password`,`userstatus`,`tenureenddate`, `usertype`, `contact`, `cl`, `rh`, `remainingcl`, `remainingrh`, `year`, `declarationform`, `resign` FROM `sigin`";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 $userdetails = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$sql = "SELECT `cid`, `sid`, `piname`, `username`, `collegename`, `start_date`, `end_date`, `workdone` FROM `certificate`";
+$sql = "SELECT `cid`, `sid`, `piname`, `username`, `collegename`, `workdone` FROM `certificate`";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 $certificate = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -157,6 +157,10 @@ $decform = $results[0]['declarationform'];
         <?php if (isset($_SESSION['remainingcl']) && $_SESSION['remainingcl']) : ?>
             alert("No CL Remaining");
             <?php unset($_SESSION['remainingcl']); ?>
+        <?php endif; ?>
+        <?php if (isset($_SESSION['remainingel']) && $_SESSION['remainingel']) : ?>
+            alert("No EL Remaining");
+            <?php unset($_SESSION['remainingel']); ?>
         <?php endif; ?>
     </script>
 </head>
@@ -461,40 +465,40 @@ $decform = $results[0]['declarationform'];
                                     <br>
                                     <form method="post" action="formsubmit.php/leaveapply" class="form_data">
                                         <div class="form-group">
-                                            <label for="start_date">CL Start Date:</label>
-                                            <input type="date" class="form-control" id="start_date" name="start_date" required>
+                                            <label for="cl_start_date">CL Start Date:</label>
+                                            <input type="date" class="form-control" id="cl_start_date" name="cl_start_date">
                                         </div><br>
                                         <div class="form-group">
-                                            <label for="end_date">CL End Date:</label>
-                                            <input type="date" class="form-control" id="end_date" name="end_date" required>
+                                            <label for="cl_end_date">CL End Date:</label>
+                                            <input type="date" class="form-control" id="cl_end_date" name="cl_end_date">
                                         </div><br>
                                         <div class="form-group">
-                                            <label for="end_date">No. Of CL:</label>
-                                            <input type="number" class="form-control" id="end_date" name="cl" min="0" max="8" required>
+                                            <label for="cl_days">No. Of CL:</label>
+                                            <input type="number" class="form-control" id="cl_days" name="cl" readonly>
                                         </div><br>
                                         <div class="form-group">
-                                            <label for="start_date">RH Start Date:</label>
-                                            <input type="date" class="form-control" id="start_date" name="start_date" required>
+                                            <label for="rh_start_date">RH Start Date:</label>
+                                            <input type="date" class="form-control" id="rh_start_date" name="rh_start_date">
                                         </div><br>
                                         <div class="form-group">
-                                            <label for="end_date">RH End Date:</label>
-                                            <input type="date" class="form-control" id="end_date" name="end_date" required>
+                                            <label for="rh_end_date">RH End Date:</label>
+                                            <input type="date" class="form-control" id="rh_end_date" name="rh_end_date">
                                         </div><br>
                                         <div class="form-group">
-                                            <label for="end_date">No. Of RH:</label>
-                                            <input type="number" class="form-control" id="end_date" name="rh" min="0" max="2" required>
+                                            <label for="rh_days">No. Of RH:</label>
+                                            <input type="number" class="form-control" id="rh_days" name="rh" readonly>
                                         </div><br>
                                         <div class="form-group">
-                                            <label for="start_date">EL Start Date:</label>
-                                            <input type="date" class="form-control" id="start_date" name="start_date" required>
+                                            <label for="el_start_date">EL Start Date:</label>
+                                            <input type="date" class="form-control" id="el_start_date" name="el_start_date">
                                         </div><br>
                                         <div class="form-group">
-                                            <label for="end_date">EL End Date:</label>
-                                            <input type="date" class="form-control" id="end_date" name="end_date" required>
+                                            <label for="el_end_date">EL End Date:</label>
+                                            <input type="date" class="form-control" id="el_end_date" name="el_end_date">
                                         </div><br>
                                         <div class="form-group">
-                                            <label for="end_date">No. Of EL:</label>
-                                            <input type="number" class="form-control" id="end_date" name="el" required>
+                                            <label for="el_days">No. Of EL:</label>
+                                            <input type="number" class="form-control" id="el_days" name="el" readonly>
                                         </div><br>
                                         <div class="form-group">
                                             <label for="reason">Reason:</label>
@@ -980,6 +984,51 @@ $decform = $results[0]['declarationform'];
             }
         }
         // setInterval(yearchanged, 1000);
+
+        /* code for vaildating the leave application form start here */
+        function calculateDays(startDateId, endDateId, daysId) {
+            const startDate = document.getElementById(startDateId).value;
+            const endDate = document.getElementById(endDateId).value;
+
+            if (startDate && endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                const timeDiff = end - start;
+                const days = timeDiff / (1000 * 3600 * 24) + 1; // +1 to include both start and end date
+                document.getElementById(daysId).value = days >= 0 ? days : 0;
+            } else {
+                document.getElementById(daysId).value = 0; // Set to 0 if dates are not selected
+            }
+        }
+
+        // Add event listeners for date changes
+        document.getElementById('cl_start_date').addEventListener('change', () => calculateDays('cl_start_date', 'cl_end_date', 'cl_days'));
+        document.getElementById('cl_end_date').addEventListener('change', () => calculateDays('cl_start_date', 'cl_end_date', 'cl_days'));
+
+        document.getElementById('rh_start_date').addEventListener('change', () => calculateDays('rh_start_date', 'rh_end_date', 'rh_days'));
+        document.getElementById('rh_end_date').addEventListener('change', () => calculateDays('rh_start_date', 'rh_end_date', 'rh_days'));
+
+        document.getElementById('el_start_date').addEventListener('change', () => calculateDays('el_start_date', 'el_end_date', 'el_days'));
+        document.getElementById('el_end_date').addEventListener('change', () => calculateDays('el_start_date', 'el_end_date', 'el_days'));
+
+        // Initial setting of days to zero
+        document.getElementById('cl_days').value = 0;
+        document.getElementById('rh_days').value = 0;
+        document.getElementById('el_days').value = 0;
+
+        // Function to set default dates if not selected
+        function setDefaultDates() {
+            const dateFields = ['cl_start_date', 'cl_end_date', 'rh_start_date', 'rh_end_date', 'el_start_date', 'el_end_date'];
+            dateFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (!field.value) {
+                    field.value = '0000-00-00';
+                }
+            });
+        }
+
+        // Add event listener for form submission
+        document.querySelector('.form_data').addEventListener('submit', setDefaultDates);
     </script>
 
     <script>

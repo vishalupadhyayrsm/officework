@@ -325,55 +325,80 @@ switch ($endpoint) {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-                    $startdate = $_POST['start_date'];
-                    $end_date = $_POST['end_date'];
+                    $clstartdate = $_POST['cl_start_date'];
+                    $clend_date = $_POST['cl_end_date'];
+                    $cl = $_POST['cl'];
+                    $rhstartdate = $_POST['rh_start_date'];
+                    $rhend_date = $_POST['rh_end_date'];
+                    $rh = $_POST['rh'];
+                    $elstartdate = $_POST['el_start_date'];
+                    $elend_date = $_POST['el_end_date'];
+                    $el = $_POST['el'];
                     $reason = $_POST['reason'];
                     $sid = $_POST['userid'];
-                    $cl = $_POST['cl'];
-                    $rh = $_POST['rh'];
-                    $el = $_POST['el'];
                     $status = 'pending';
                     $currentyear = date("Y");
+                    $defaultDate = '0000-00-00';
+
+                    $clstartdate = !empty($clstartdate) ? $clstartdate : $defaultDate;
+                    $clend_date = !empty($clend_date) ? $clend_date : $defaultDate;
+                    $rhstartdate = !empty($rhstartdate) ? $rhstartdate : $defaultDate;
+                    $rhend_date = !empty($rhend_date) ? $rhend_date : $defaultDate;
+                    $elstartdate = !empty($elstartdate) ? $elstartdate : $defaultDate;
+                    $elend_date = !empty($elend_date) ? $elend_date : $defaultDate;
+
+
+                    echo $clstartdate, $clend_date, $rhstartdate, $rhend_date, $elstartdate, $elend_date;
+
+
 
                     if ($currentyear) {
                         /* code for selecting  teh total cl and el from teh database */
-                        $selectQuery = "SELECT `remainingcl`, `remainingrh` FROM `sigin` WHERE sid = :sid";
+                        $selectQuery = "SELECT `remainingcl`, `remainingrh`, `remainingel` FROM `sigin` WHERE sid = :sid";
                         $stmt = $conn->prepare($selectQuery);
                         $stmt->bindParam(':sid', $sid);
                         $stmt->execute();
                         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-                        print_r($result['remainingcl']) . '<br>';
-                        echo $cl;
+                        // print_r($result) . '<br>';
                         $newremainingcl = $result['remainingcl'] - $cl;
                         $newremainingrh = $result['remainingrh'] - $rh;
-                        echo $newremainingrh;
-                        echo $newremainingcl;
+                        $newremainingel = $result['remainingel'] - $el;
+
                         if ($newremainingcl < 0) {
                             $_SESSION['remainingcl'] = true;
                             header("Location: ../index.php");
                         } elseif ($newremainingrh < 0) {
-                            // echo "No remaining rh";
                             $_SESSION['remainingrh'] = true;
                             header("Location: ../index.php");
+                        } elseif ($newremainingel < 0) {
+                            $_SESSION['remainingel'] = true;
+                            header("Location: ../index.php");
                         } else {
-                            // echo "apply";
-                            $selectQuery = "UPDATE `sigin` SET `remainingcl` = :newremainingcl, `remainingrh` = :newremainingrh WHERE sid = :sid";
-                            $stmt = $conn->prepare($selectQuery);
+                            $updateQuery = "UPDATE `sigin` SET `remainingcl` = :newremainingcl, `remainingrh` = :newremainingrh, `remainingel` = :newremainingel WHERE sid = :sid";
+                            $stmt = $conn->prepare($updateQuery);
                             $stmt->bindParam(':newremainingcl', $newremainingcl);
                             $stmt->bindParam(':newremainingrh', $newremainingrh);
+                            $stmt->bindParam(':newremainingel', $newremainingel);
                             $stmt->bindParam(':sid', $sid);
                             $stmt->execute();
 
-                            /* code for applying the new leave every time  */
-                            $insertQuery = "INSERT INTO leavetable (sid, startdate, enddate, reason,leave_status,el) 
-                                VALUES (:sid, :startdate, :end_date, :reason, :status,:el)";
+                            // Insert query
+                            $insertQuery = "INSERT INTO leavetable (sid, clstartdate, clenddate, reason, leave_status, rhstartdate, rhenddate, elstartdate, elenddate) 
+                            VALUES (:sid, :clstartdate, :clenddate, :reason, :status, :rhstartdate, :rhenddate, :elstartdate, :elenddate)";
+                            // print_r($insertQuery);
                             $stmt = $conn->prepare($insertQuery);
                             $stmt->bindParam(':sid', $sid);
-                            $stmt->bindParam(':startdate', $startdate);
-                            $stmt->bindParam(':end_date', $end_date);
+                            $stmt->bindParam(':clstartdate', $clstartdate);
+                            $stmt->bindParam(':clenddate', $clend_date);
                             $stmt->bindParam(':reason', $reason);
                             $stmt->bindParam(':status', $status);
-                            $stmt->bindParam(':el', $el);
+                            $stmt->bindParam(':rhstartdate', $rhstartdate);
+                            $stmt->bindParam(':rhenddate', $rhend_date);
+                            $stmt->bindParam(':elstartdate', $elstartdate);
+                            $stmt->bindParam(':elenddate', $elend_date);
+                            $stmt->execute();
+                            // $stmt->bindParam(':el', $el);
+
                             $stmt->execute();
                             $_SESSION['leave_success'] = true;
                             header("Location: ../index.php");
