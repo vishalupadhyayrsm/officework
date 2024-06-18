@@ -10,24 +10,27 @@ if (isset($_SESSION['user_email'])) {
     $sid = $_SESSION['userid'];
     $decform = $_SESSION['decform'];
     // echo $usertype;
+
+    if ($usertype == "system") {
+        header("Location: ../system");
+    }
     // code for checking that if the usertype is staff or not 
     try {
+
         if ($usertype == "staff") {
-            // $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid, lt.`startdate`, lt.`enddate`, lt.`reason`, lt.`leave_status` 
-            //         FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid where sg.sid=:sid ";
-            $sql = "SELECT sg.`sid`,sg.`name`, sg.`email`, sg.`usertype`,sg.`tenureenddate`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid,  lt.`reason`, lt.`leave_status`,de.declarationform,de.emp_roll,de.`univesity`,de.name,de.iitbemail,de.aadhar,de.gender,de.localaddress,de.localpostal,de.permanentadd,de.permpostal, de.homecontact,de.emename1,de.emerelation,de.emeadd,de.emecontact,de.empostalcode,de.emesecondname,de.emesecrelation,de.medicalcondition,de.profilepic
+            $sql = "SELECT sg.`sid`,sg.`name`, sg.`email`, sg.`usertype`,sg.`tenureenddate`, sg.`contact`, sg.`cl`, sg.`rh`,sg.`el`, sg.remainingcl, sg.remainingrh,sg.remainingel, sg.declarationform,lt.leaveid, lt.`clstartdate`, lt.`clenddate`,lt.`rhstartdate`, lt.`rhenddate`, lt.`elstartdate`, lt.`elenddate`,  lt.`reason`, lt.`leave_status`,de.declarationform,de.emp_roll,de.`univesity`,de.name,de.iitbemail,de.aadhar,de.gender,de.localaddress,de.localpostal,de.permanentadd,de.permpostal, de.homecontact,de.emename1,de.emerelation,de.emeadd,de.emecontact,de.empostalcode,de.emesecondname,de.emesecrelation,de.medicalcondition,de.profilepic
              FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid LEFT JOIN declarationform as de on de.sid = sg.sid where sg.sid=:sid ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':sid', $sid);
             $stmt->execute();
-        } elseif ($usertype == "intern") {
+        } elseif ($usertype == "intern" || $usertype == "student") {
             $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.declarationform, de.`declarationform`, de.`name`,de.iitbemail,de.aadhar, de.`emp_roll`,de.`univesity`, de.`gender`, de.`localaddress`, de.`localpostal`, de.`permanentadd`, de.`permpostal`, de.`homecontact`, de.`emename1`, de.`emerelation`, de.`emeadd`, de.`emecontact`, de.`empostalcode`, de.`emesecondname`, de.`emesecrelation`, de.`medicalcondition`, de.`term`, de.`profilepic`
              FROM `sigin` as sg LEFT JOIN declarationform as de on de.sid = sg.sid where sg.sid=:sid ";
             $stmt = $conn->prepare($sql);
             $stmt->bindParam(':sid', $sid);
             $stmt->execute();
         } elseif ($usertype == "hr") {
-            $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`, sg.remainingcl, sg.remainingrh,sg.declarationform,lt.leaveid,lt.`startdate`, lt.`enddate`, lt.`reason`, lt.`leave_status` 
+            $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`,sg.`el`, sg.remainingcl, sg.remainingrh,sg.remainingel, sg.declarationform,lt.leaveid,lt.`reason`,lt.`clstartdate`, lt.`clenddate`,lt.`rhstartdate`, lt.`rhenddate`, lt.`elstartdate`, lt.`elenddate`, lt.`leave_status` 
                     FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid";
             $stmt = $conn->prepare($sql);
             // $stmt->bindParam(':sid', $sid);
@@ -43,7 +46,7 @@ if (isset($_SESSION['user_email'])) {
     exit();
 }
 
-$sql = "SELECT `sid`, `name`, `email`,`empcode`,`password`,`userstatus`,`tenureenddate`, `usertype`, `contact`, `cl`, `rh`, `remainingcl`, `remainingrh`, `year`, `declarationform`, `resign` FROM `sigin`";
+$sql = "SELECT `sid`, `name`, `email`,`empcode`,`password`,`startdate`,`enddate`,`userstatus`,`tenureenddate`, `usertype`, `contact`, `cl`, `rh`, `remainingcl`, `remainingrh`, `year`, `declarationform`, `resign` FROM `sigin`";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 $userdetails = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -53,13 +56,27 @@ $stmt = $conn->prepare($sql);
 $stmt->execute();
 $certificate = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-
 $sql = "SELECT `rid`, `sid`, `pi_name`, `start_date`, `terminationdate`, `startingposition`, `endingpostion`, `reason_leaving`, `planafterleaving`, `imporove_suggestion`, `what_mostlike`, `what_leastlike`, `taking_anotherjob`, `new_place_job`, `improvement`, `Drawer_yesno`, `CupboardKeys_yesno`, `labbookyesno`, `hardwareno`,`otherremarks`, `anyothersno` FROM `resigndata`";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 $resign = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+if ($usertype == 'hr') {
+    $sql = "SELECT `sid`, `name`, `mobile`, `startdate`, `enddate`, `gender`, `purpose` FROM `gatepass`";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $gatepass = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    $sql = "SELECT `sid`, `name`, `mobile`, `startdate`, `enddate`, `gender`, `purpose` FROM `gatepass` where sid=:sid ";
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':sid', $sid);
+    $stmt->execute();
+    $gatepass = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
 // $$decform  = "ye";
+// print_r($results);
 $decform = $results[0]['declarationform'];
 // echo $decform;
 // $decform = "yes";
@@ -158,9 +175,13 @@ $decform = $results[0]['declarationform'];
             alert("No CL Remaining");
             <?php unset($_SESSION['remainingcl']); ?>
         <?php endif; ?>
-        <?php if (isset($_SESSION['remainingel']) && $_SESSION['remainingel']) : ?>
-            alert("No EL Remaining");
-            <?php unset($_SESSION['remainingel']); ?>
+        <?php if (isset($_SESSION['gatepass']) && $_SESSION['gatepass']) : ?>
+            alert("Your Gate Pass Request Successfully Applied");
+            <?php unset($_SESSION['gatepass']); ?>
+        <?php endif; ?>
+        <?php if (isset($_SESSION['certificate']) && $_SESSION['certificate']) : ?>
+            alert("Certificate Send to user Successfully");
+            <?php unset($_SESSION['certificate']); ?>
         <?php endif; ?>
     </script>
 </head>
@@ -195,20 +216,27 @@ $decform = $results[0]['declarationform'];
                             <button onclick="showTab('tab2')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">Apply Leave</button>
                             <button onclick="showTab('tab3')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">Leave Status</button>
                             <button onclick="showTab('tab5')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">RESIGNATION FORM</button>
+                            <button onclick="showTab('tab10')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">Gate Pass</button>
+                            <button onclick="showTab('tab11')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">Gate Pass Status</button>
                         <?php
-                        } elseif ($usertype == 'intern') {
+                        } elseif ($usertype == 'intern' || $usertype == 'student') {
                         ?>
                             <button onclick="showTab('tab1')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">User Profile</button>
                             <button onclick="showTab('tab6')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">Certificate Form</button>
                             <button onclick="showTab('tab5')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">RESIGNATION FORM</button>
+                            <button onclick="showTab('tab10')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">Gate Pass</button>
+                            <?php if ($usertype == "intern") { ?>
+                                <button onclick="showTab('tab11')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">Gate Pass Status</button>
+                            <?php } ?>
                         <?php
                         } else {
                         ?>
-                            <button onclick="showTab('tab3')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">Leave Status</button>
                             <button onclick="showTab('tab4')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">User Details</button>
+                            <button onclick="showTab('tab3')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">Leave Status</button>
                             <button onclick="showTab('tab7')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">Certificate Request</button>
                             <button onclick="showTab('tab8')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">Resignation List</button>
                             <button onclick="showTab('tab9')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">Resume</button>
+                            <button onclick="showTab('tab11')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">Gate Pass Status</button>
                         <?php
                         }
                         ?>
@@ -528,7 +556,7 @@ $decform = $results[0]['declarationform'];
                 <?php
                 } elseif ($usertype == 'hr') {
                 ?>
-                    <div id="tab3" class="container tab-content active-tab">
+                    <div id="tab3" class="container tab-content ">
                         <div class="row">
                             <div class="col-md-12 ">
                                 <h2 class="mb-4 all_heading">Leave Status</h2>
@@ -544,7 +572,7 @@ $decform = $results[0]['declarationform'];
 
                 <!-- code for dispalying the resigantion form for everyone -->
                 <?php
-                if ($usertype == 'staff' || $usertype == 'intern') {
+                if ($usertype == 'staff' || $usertype == 'intern' || $usertype == 'student') {
                 ?>
                     <div id="tab5" class="container tab-content">
                         <div class="row">
@@ -728,12 +756,62 @@ $decform = $results[0]['declarationform'];
                         </div>
                     </div>
 
+                    <div id="tab10" class="container tab-content">
+                        <div class="row">
+                            <div class="col-md-12 ">
+                                <div class="container col-md-6 mt-3">
+                                    <h2 class="all_heading">Apply for Gate Pass</h2>
+                                    <form method="post" action="formsubmit.php/gatepass">
+                                        <input type="hidden" name="sid" value="<?php echo $results[0]['sid']; ?>">
+                                        <div class="mb-3 mt-3">
+                                            <label for="name">Name:</label>
+                                            <input type="text" class="form-control" id="name" name="name" placeholder="Enter name" required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="start_date">Start Date:</label>
+                                            <input type="date" class="form-control" id="start_date" name="start_date" required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="end_date">End Date:</label>
+                                            <input type="date" class="form-control" id="end_date" name="end_date" required>
+                                        </div>
+
+                                        <div class="mb-3 mt-3">
+                                            <label for="contact">Contact:</label>
+                                            <input type="number" class="form-control" id="contact" name="contact" placeholder="Contact Number" required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="gender">Gender:</label>
+                                            <select class="form-control" id="gender" name="gender" required>
+                                                <option value="">Select</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                                <option value="Others">Others</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="mb-3 mt-3">
+                                            <label for="purpose">Purpose:</label>
+                                            <input type="text" class="form-control" id="purpose" name="purpose" placeholder="Purpose" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                        <!-- <button type="submit" name="submit" class="btn btn-primary">Submit</button> -->
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 <?php } ?>
 
 
                 <!-- code for applying certficate for the intern -->
                 <?php
-                if ($usertype == 'intern') {
+                if ($usertype == 'intern' || $usertype == 'student') {
                 ?>
                     <div id="tab6" class="container tab-content">
                         <div class="row">
@@ -788,7 +866,7 @@ $decform = $results[0]['declarationform'];
 
         <?php if ($usertype == 'hr') { ?>
             <!--  this code is for updating the details of user for the hr team  -->
-            <div id="tab4" class="container tab-content">
+            <div id="tab4" class="container tab-content  active-tab">
                 <div class="row">
                     <div class="col-md-12 ">
                         <h2 class="mb-4 all_heading" style="text-align:center;">User Details</h2>
@@ -811,17 +889,17 @@ $decform = $results[0]['declarationform'];
                         <div id="popupForm" class="popup">
                             <div class="popup-content">
                                 <span class="close">&times;</span>
-                                <form id="certificateForm">
-                                    <label for="name">Name:</label>
-                                    <input type="text" id="name" name="name" required>
-
+                                <form method="post" action="formsubmit.php/sendcertificate" enctype="multipart/form-data">
+                                    <input type="hidden" name="sid" value="<?php echo htmlspecialchars($results[0]['sid']); ?>">
                                     <label for="email">Email:</label>
                                     <input type="email" id="email" name="email" required>
+                                    <label for="name">Name:</label>
+                                    <input type="text" id="name" name="name" required>
 
                                     <label for="pdf">Select PDF:</label>
                                     <input type="file" id="pdf" name="pdf" accept="application/pdf" required>
 
-                                    <button type="submit">Send</button>
+                                    <button type="submit" name="submit">Send</button>
                                 </form>
                             </div>
                         </div>
@@ -833,7 +911,7 @@ $decform = $results[0]['declarationform'];
             <!-- code for list of user resign -->
             <div id="tab8" class="container tab-content">
                 <div class="row">
-                    <div class="col-md-12 ">
+                    <div class="col-md-12">
                         <div class="container col-md-12 mt-3">
                             <h2 class="all_heading">Resignation of User</h2>
                             <div id="resign"></div>
@@ -843,10 +921,52 @@ $decform = $results[0]['declarationform'];
             </div>
 
         <?php  } ?>
+
+        <?php if ($usertype !== "student") { ?>
+
+            <div id="tab11" class="container tab-content ">
+                <div class="row">
+                    <div class="col-md-12 ">
+                        <?php if ($usertype == "hr") { ?>
+                            <button id="openPopupBtngatepass">Send Gate Pass</button>
+                        <?php } ?>
+                        <h2 class="mb-4 all_heading" style="text-align:center;">Request For Gate Pass</h2>
+                        <div id="gatepass"></div>
+
+                        <!-- code for sedndinge teh gate pass to user  -->
+                        <div id="popupFormgatepass" class="popup">
+                            <div class="popup-content">
+                                <span class="close">&times;</span>
+                                <form method="post" action="formsubmit.php/sendgatepass" enctype="multipart/form-data">
+                                    <input type="hidden" name="sid" value="<?php echo htmlspecialchars($results[0]['sid']); ?>">
+                                    <label for="email">Email:</label>
+                                    <input type="email" id="email" name="email" required>
+                                    <label for="name">Name:</label>
+                                    <input type="text" id="name" name="name" required>
+
+                                    <label for="pdf">Select PDF:</label>
+                                    <input type="file" id="pdf" name="pdf" accept="application/pdf" required>
+
+                                    <button type="submit" name="submit">Send</button>
+                                </form>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        <?php } ?>
+
         </div>
+
+        <!----- code for dispaly gate pass status   ---->
+
+
     </div>
-    </div>
+
     <br><br><br><br>
+
     <!-- code for footer start here -->
     <?php include 'footer.php' ?>;
 
@@ -1082,6 +1202,8 @@ $decform = $results[0]['declarationform'];
     <!---- javascript code start here  ---->
     <script src="js/index.js"></script>
     <script src="js/certificate.js"></script>
+
+
     <!-- code for leave status start here -->
     <script>
         var tabId;
@@ -1118,30 +1240,45 @@ $decform = $results[0]['declarationform'];
                     field: "remainingcl",
                     headerFilter: true
                 },
-
                 {
                     title: "Remaining RH",
                     field: "remainingrh",
                     headerFilter: true
                 },
                 {
-                    title: "Leave Reason",
+                    title: "Reason For Leave",
                     field: "reason",
                     headerFilter: true
                 },
+
                 {
-                    title: "Total EL ",
-                    field: "el",
+                    title: "CL Start Date",
+                    field: "clstartdate",
                     headerFilter: true
                 },
                 {
-                    title: "Start Date",
-                    field: "startdate",
+                    title: "CL End Date",
+                    field: "clenddate",
                     headerFilter: true
                 },
                 {
-                    title: "End Date",
-                    field: "enddate",
+                    title: "RH Start Date",
+                    field: "rhstartdate",
+                    headerFilter: true
+                },
+                {
+                    title: "RH End Date",
+                    field: "rhenddate",
+                    headerFilter: true
+                },
+                {
+                    title: "EL Start Date",
+                    field: "elstartdate",
+                    headerFilter: true
+                },
+                {
+                    title: "EL End Date",
+                    field: "elenddate",
                     headerFilter: true
                 },
             ];
@@ -1218,7 +1355,7 @@ $decform = $results[0]['declarationform'];
             var currentPage = 1;
             var table = new Tabulator("#tabulator-table", {
                 data: results,
-                layout: "fitColumns",
+                layout: "fitData",
                 columns: columns,
                 pagination: "local",
                 paginationSize: pageSize,
@@ -1256,13 +1393,20 @@ $decform = $results[0]['declarationform'];
             var selectedTab = document.getElementById(tabId);
             selectedTab.classList.add('active-tab');
         }
+
+
         // code for dispalying all the data in the table 
         if (typeof Tabulator !== 'undefined') {
             var results = <?php echo json_encode($userdetails); ?>;
             var columns = [{
                     title: "User Name",
                     field: "name",
-                    headerFilter: true
+                    headerFilter: true,
+                    formatter: function(cell) {
+                        var userName = cell.getValue();
+                        var userId = cell.getRow().getData().id;
+                        return '<a href="#" onclick="openUserDetailsPopup(' + userId + '); return false;">' + userName + '</a>';
+                    }
                 },
                 {
                     title: "Email",
@@ -1424,7 +1568,7 @@ $decform = $results[0]['declarationform'];
             var currentPage = 1;
             var table = new Tabulator("#userdetails", {
                 data: results,
-                layout: "fitColumns",
+                layout: "fitData",
                 columns: columns,
                 pagination: "local", // Enable local pagination
                 paginationSize: pageSize, // Number of rows per page
@@ -1598,7 +1742,7 @@ $decform = $results[0]['declarationform'];
         if (typeof Tabulator !== 'undefined') {
             var results = <?php echo json_encode($resign); ?>;
             var columns = [{
-                    title: "Pi Name",
+                    title: "PI Name",
                     field: "pi_name",
                     headerFilter: true
                 },
@@ -1660,11 +1804,6 @@ $decform = $results[0]['declarationform'];
                 {
                     title: "Imporovement",
                     field: "improvement",
-                    headerFilter: true
-                },
-                {
-                    title: "Drawer Key",
-                    field: "Drawer_yesno",
                     headerFilter: true
                 },
                 {
@@ -1790,6 +1929,83 @@ $decform = $results[0]['declarationform'];
             console.error('Tabulator library not defined or not loaded.');
         }
     </script>
+
+    <!-- code for dispalying gate pass status start here -->
+    <script>
+        var tabId;
+
+        function showTab(tabId) {
+            var tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(function(tab) {
+                tab.classList.remove('active-tab');
+            });
+            var selectedTab = document.getElementById(tabId);
+            selectedTab.classList.add('active-tab');
+        }
+        // code for dispalying all the data in the table 
+        if (typeof Tabulator !== 'undefined') {
+            var results = <?php echo json_encode($gatepass); ?>;
+            var columns = [{
+                    title: "Name",
+                    field: "name",
+                    headerFilter: true
+                },
+                {
+                    title: "Contact Number",
+                    field: "mobile",
+                    headerFilter: true
+                },
+                {
+                    title: "Start Date",
+                    field: "startdate",
+                    headerFilter: true
+                },
+                {
+                    title: "End Date",
+                    field: "enddate",
+                    headerFilter: true
+                },
+                {
+                    title: "Gender",
+                    field: "gender",
+                    headerFilter: true
+                },
+                {
+                    title: "Purpose",
+                    field: "purpose",
+                    headerFilter: true
+                }
+            ];
+            // function of the updatestatus start here
+            var pageSize = 10;
+            var currentPage = 1;
+            var table = new Tabulator("#gatepass", {
+                data: results,
+                layout: "fitColumns",
+                columns: columns,
+                pagination: "local",
+                paginationSize: pageSize,
+                paginationSizeSelector: [10, 15, 30],
+                paginationInitialPage: currentPage,
+            });
+            // Add the following code to initialize pagination buttons
+            var prevPageBtn = document.querySelector('.pagination-btn:first-of-type');
+            var nextPageBtn = document.querySelector('.pagination-btn:last-of-type');
+
+            if (prevPageBtn && nextPageBtn) {
+                prevPageBtn.addEventListener('click', function() {
+                    table.previousPage();
+                });
+
+                nextPageBtn.addEventListener('click', function() {
+                    table.nextPage();
+                });
+            }
+        } else {
+            console.error('Tabulator library not defined or not loaded.');
+        }
+    </script>
+
 
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

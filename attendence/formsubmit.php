@@ -8,11 +8,22 @@ header('Content-Type: application/json');
 include_once("dbconfig.php");
 include_once("api.php");
 
+// require 'PHPMailer/src/PHPMailer.php';
+// require 'PHPMailer/src/SMTP.php';
+// require 'PHPMailer/src/Exception.php';
+
+// Create a new PHPMailer instance
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
+// $mail = new PHPMailer(true);
+
 // Retrieve the request endpoint
 $uri = explode("/", $_SERVER["REQUEST_URI"]);
 $apidata = $uri[3];
 $endpoint = $uri[4];
-// echo $endpoint;
+echo $endpoint;
 
 $result = array();
 
@@ -339,7 +350,6 @@ switch ($endpoint) {
                     $status = 'pending';
                     $currentyear = date("Y");
                     $defaultDate = '0000-00-00';
-
                     $clstartdate = !empty($clstartdate) ? $clstartdate : $defaultDate;
                     $clend_date = !empty($clend_date) ? $clend_date : $defaultDate;
                     $rhstartdate = !empty($rhstartdate) ? $rhstartdate : $defaultDate;
@@ -347,11 +357,7 @@ switch ($endpoint) {
                     $elstartdate = !empty($elstartdate) ? $elstartdate : $defaultDate;
                     $elend_date = !empty($elend_date) ? $elend_date : $defaultDate;
 
-
-                    echo $clstartdate, $clend_date, $rhstartdate, $rhend_date, $elstartdate, $elend_date;
-
-
-
+                    // echo $clstartdate, $clend_date, $rhstartdate, $rhend_date, $elstartdate, $elend_date;
                     if ($currentyear) {
                         /* code for selecting  teh total cl and el from teh database */
                         $selectQuery = "SELECT `remainingcl`, `remainingrh`, `remainingel` FROM `sigin` WHERE sid = :sid";
@@ -362,16 +368,13 @@ switch ($endpoint) {
                         // print_r($result) . '<br>';
                         $newremainingcl = $result['remainingcl'] - $cl;
                         $newremainingrh = $result['remainingrh'] - $rh;
-                        $newremainingel = $result['remainingel'] - $el;
+                        // $newremainingel = $result['remainingel'] - $el;
 
                         if ($newremainingcl < 0) {
                             $_SESSION['remainingcl'] = true;
                             header("Location: ../index.php");
                         } elseif ($newremainingrh < 0) {
                             $_SESSION['remainingrh'] = true;
-                            header("Location: ../index.php");
-                        } elseif ($newremainingel < 0) {
-                            $_SESSION['remainingel'] = true;
                             header("Location: ../index.php");
                         } else {
                             $updateQuery = "UPDATE `sigin` SET `remainingcl` = :newremainingcl, `remainingrh` = :newremainingrh, `remainingel` = :newremainingel WHERE sid = :sid";
@@ -498,7 +501,160 @@ switch ($endpoint) {
             http_response_code(400);
             echo json_encode(['status' => 'error', 'message' => 'Invalid request']);
         }
+
+        break;
+
+    case "gatepass":
+        if ($_SERVER["REQUEST_METHOD"] === "POST") {
+            $sid = $_SESSION['userid'] ?? '';
+            $name = $_POST['name'] ?? '';
+            $start_date = $_POST['start_date'] ?? '';
+            $end_date = $_POST['end_date'] ?? '';
+            $contact = $_POST['contact'] ?? '';
+            $gender = $_POST['gender'] ?? '';
+            $purpose = $_POST['purpose'] ?? '';
+            try {
+                // Prepare the SQL statement
+                $stmt = $conn->prepare("INSERT INTO gatepass (sid, name, mobile, startdate, enddate, gender, purpose) 
+                                        VALUES (:sid, :name, :contact, :start_date, :end_date, :gender, :purpose)");
+                $stmt->bindParam(':sid', $sid);
+                $stmt->bindParam(':name', $name);
+                $stmt->bindParam(':contact', $contact);
+                $stmt->bindParam(':start_date', $start_date);
+                $stmt->bindParam(':end_date', $end_date);
+                $stmt->bindParam(':gender', $gender);
+                $stmt->bindParam(':purpose', $purpose);
+
+                $stmt->execute();
+
+                if ($stmt->errorCode() === '00000') {
+                    $response = ['status' => 'success', 'message' => 'Database update successful'];
+                    // echo json_encode($response);
+                    $_SESSION['gatepass'] = true;
+                    header("Location: ../index.php");
+                    exit;
+                } else {
+                    $errors = $stmt->errorInfo();
+                    echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $errors]);
+                }
+            } catch (PDOException $e) {
+                echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $e->getMessage()]);
+            }
+        } else {
+            echo "Form not submitted.";
+        }
+        break;
+
+    case "sendcertificate":
+        if ($_SERVER["REQUEST_METHOD"] === "POST") {
+            try {
+                // Retrieve form data
+                $sid = htmlspecialchars($_POST['sid']);
+                $name = htmlspecialchars($_POST['name']);
+                $email = htmlspecialchars($_POST['email']);
+                $pdfFile = $_FILES['pdf'];
+
+                // Validate uploaded file
+                if (empty($pdfFile['name'])) {
+                    die('No file selected for upload.');
+                }
+                // Directory for uploads
+                $uploadDirectory = 'certificate/';
+                if (!file_exists($uploadDirectory)) {
+                    mkdir($uploadDirectory, 0777, true);
+                }
+
+                // Move uploaded file to destination directory
+                $uploadedFilePath = $uploadDirectory . basename($pdfFile['name']);
+                if (move_uploaded_file($pdfFile['tmp_name'], $uploadedFilePath)) {
+                    $subject = "Internship Certificate";
+                    $emailid = $email;
+
+                    send_email($emailid, $subject, $message, $pdfFile);
+                    $_SESSION['certificate'] = true;
+                    header("Location: ../index.php");
+                    exit();
+                } else {
+                    die('Error uploading the file.');
+                }
+            } catch (Exception $e) {
+                echo json_encode(['status' => 'error', 'message' => 'An error occurred', 'data' => $e->getMessage()]);
+            }
+        } else {
+            echo "Form not submitted.";
+        }
+        break;
+
+    case 'sendgatepass':
+        if ($_SERVER["REQUEST_METHOD"] === "POST") {
+            try {
+                // Retrieve form data
+                $sid = htmlspecialchars($_POST['sid']);
+                $email = htmlspecialchars($_POST['email']);
+                $pdfFile = $_FILES['pdf'];
+                // Validate uploaded file
+                if (empty($pdfFile['name'])) {
+                    die('No file selected for upload.');
+                }
+                // Directory for uploads
+                $uploadDirectory = 'certificate/';
+                if (!file_exists($uploadDirectory)) {
+                    mkdir($uploadDirectory, 0777, true);
+                }
+
+                // Move uploaded file to destination directory
+                $uploadedFilePath = $uploadDirectory . basename($pdfFile['name']);
+                if (move_uploaded_file($pdfFile['tmp_name'], $uploadedFilePath)) {
+                    $subject = "Internship Certificate";
+                    $emailid = $email;
+
+                    // send_email($emailid, $subject, $message, $pdfFile);
+                    $_SESSION['certificate'] = true;
+                    header("Location: ../index.php");
+                    exit();
+                } else {
+                    die('Error uploading the file.');
+                }
+            } catch (Exception $e) {
+                echo json_encode(['status' => 'error', 'message' => 'An error occurred', 'data' => $e->getMessage()]);
+            }
+        } else {
+            echo "Form not submitted.";
+        }
+        break;
         break;
     default:
         break;
+}
+
+function send_email($emailid, $subject, $message, $pdfFile)
+{
+    // echo $emailid, $subject, $message, $pdfFile;
+    global $mail;
+    try {
+        // Server settings
+        $mail->SMTPDebug = false; // Enable verbose debug output
+        $mail->isSMTP(); // Set mailer to use SMTP
+        $mail->Host = 'mail.miphub.in'; // Specify main and backup SMTP servers
+        $mail->SMTPAuth = true; // Enable SMTP authentication
+        $mail->Username = 'admin@miphub.in'; // SMTP username
+        $mail->Password = 'Adminmiphub@123'; // SMTP password
+        // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption, `ssl` also accepted
+        $mail->Port = 587; // TCP port to connect to
+
+        // Recipients
+        $mail->setFrom('admin@miphub.in', 'MIP');
+        $mail->addAddress($emailid); // Add recipient
+
+        // Content
+        $mail->isHTML(true); // Set email format to HTML
+        $mail->Subject = $subject;
+        $mail->Body = $message;
+        $mail->addAttachment($pdfFile);
+        // Send the email
+        $mail->send();
+        echo 'Message has been sent';
+    } catch (Exception $e) {
+        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+    }
 }
