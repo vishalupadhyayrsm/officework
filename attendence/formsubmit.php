@@ -8,16 +8,6 @@ header('Content-Type: application/json');
 include_once("dbconfig.php");
 include_once("api.php");
 
-// require 'PHPMailer/src/PHPMailer.php';
-// require 'PHPMailer/src/SMTP.php';
-// require 'PHPMailer/src/Exception.php';
-
-// Create a new PHPMailer instance
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
-
-// $mail = new PHPMailer(true);
 
 // Retrieve the request endpoint
 $uri = explode("/", $_SERVER["REQUEST_URI"]);
@@ -286,19 +276,84 @@ switch ($endpoint) {
     case "leaveapproved":
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
+                $sid = $_POST['sid'];
                 $lid = $_POST['lid'];
                 $status = $_POST['status'];
-                $stmt = $conn->prepare("UPDATE `leavetable` SET `leave_status` = :status WHERE `leaveid` = :lid");
-                $stmt->bindParam(':lid', $lid);
-                $stmt->bindParam(':status', $status);
-                $stmt->execute();
-
-                if ($stmt->errorCode() === '00000') {
-                    $response = ['status' => 'success', 'message' => 'Database update successful', 'data' => ['lid' => $lid, 'status' => $status]];
-                    echo json_encode($response);
+                $rh = $_POST['rh'];
+                $cl = $_POST['cl'];
+                /* code for updateing teh cleavestatus for the if approved  */
+                if ($status == 'yes') {
+                    $stmt = $conn->prepare("UPDATE `leavetable` SET `leave_status` = :status WHERE `leaveid` = :lid");
+                    $stmt->bindParam(':lid', $lid);
+                    $stmt->bindParam(':status', $status);
+                    $stmt->execute();
+                    if ($stmt->errorCode() === '00000') {
+                        $response = ['status' => 'success', 'message' => 'Database update successful', 'data' => ['lid' => $lid, 'status' => $status]];
+                        echo json_encode($response);
+                    } else {
+                        $errors = $stmt->errorInfo();
+                        echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $errors]);
+                    }
                 } else {
-                    $errors = $stmt->errorInfo();
-                    echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $errors]);
+                    try {
+                        // Update leave status
+                        $stmt = $conn->prepare("UPDATE `leavetable` SET `leave_status` = :status WHERE `leaveid` = :lid");
+                        $stmt->bindParam(':lid', $lid, PDO::PARAM_INT);
+                        $stmt->bindParam(':status', $status, PDO::PARAM_STR);
+                        $stmt->execute();
+
+                        // Check for errors in the leave status update statement
+                        if ($stmt->errorCode() === '00000') {
+                            // Fetch the current remaining CL and RH from the database
+                            $stmt = $conn->prepare("SELECT `remainingcl`, `remainingrh` FROM `sigin` WHERE `sid` = :sid");
+                            $stmt->bindParam(':sid', $sid, PDO::PARAM_INT);
+                            $stmt->execute();
+
+                            if ($stmt->rowCount() > 0) {
+                                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                                $currentCL = $row['remainingcl'];
+                                $currentRH = $row['remainingrh'];
+
+                                // Calculate the new remaining values
+                                $newCL = $currentCL + $cl;
+                                $newRH = $currentRH + $rh;
+                                // echo $newCL, $newRH;
+                                $response = [
+                                    'status' => 'success',
+                                    'message' => 'Database update successful',
+                                    'data' => [
+                                        'lid' => $lid,
+                                        'status' => $status,
+                                        'remainingcl' => $newCL,
+                                        'remainingrh' => $newRH
+                                    ]
+                                ];
+                                echo json_encode($response);
+                                // Update the database with the new values
+                                // $updateStmt = $conn->prepare("UPDATE `sigin` SET `remainingcl` = :cl, `remainingrh` = :rh WHERE `sid` = :sid");
+                                // $updateStmt->bindParam(':sid', $sid, PDO::PARAM_INT);
+                                // $updateStmt->bindParam(':cl', $newCL, PDO::PARAM_INT);
+                                // $updateStmt->bindParam(':rh', $newRH, PDO::PARAM_INT);
+                                // $updateStmt->execute();
+
+                                // // Check for errors in the update statement
+                                // if ($updateStmt->errorCode() === '00000') {
+                                //     $response = ['status' => 'success', 'message' => 'Database update successful', 'data' => ['lid' => $lid, 'status' => $status, 'remainingcl' => $newCL, 'remainingrh' => $newRH]];
+                                //     echo json_encode($response);
+                                // } else {
+                                //     $errors = $updateStmt->errorInfo();
+                                //     echo json_encode(['status' => 'error', 'message' => 'Failed to update remaining CL and RH', 'data' => $errors]);
+                                // }
+                            } else {
+                                echo json_encode(['status' => 'error', 'message' => 'User not found.']);
+                            }
+                        } else {
+                            $errors = $stmt->errorInfo();
+                            echo json_encode(['status' => 'error', 'message' => 'Failed to update leave status', 'data' => $errors]);
+                        }
+                    } catch (PDOException $e) {
+                        echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $e->getMessage()]);
+                    }
                 }
             } catch (PDOException $e) {
                 echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $e->getMessage()]);
@@ -313,31 +368,16 @@ switch ($endpoint) {
             try {
                 $sid = $_POST['userId'];
                 $approvestatus = $_POST['status'];
-                /* check if userapproved value is no then update with  the same el, cl and rh value  */
-                if ($approvestatus == "yes") {
-                    $stmt = $conn->prepare(" UPDATE `sigin` SET `userstatus`=:userstatus WHERE sid = :sid");
-                    $stmt->bindParam(':sid', $sid);
-                    $stmt->bindParam(':userstatus', $approvestatus);
-                    $stmt->execute();
-                    if ($stmt->errorCode() === '00000') {
-                        $response = ['status' => 'success', 'message' => 'Database update successful', 'data' => ['lid' => $sid, 'status' => $approvestatus]];
-                        echo json_encode($response);
-                    } else {
-                        $errors = $stmt->errorInfo();
-                        echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $errors]);
-                    }
+                $stmt = $conn->prepare(" UPDATE `sigin` SET `userstatus`=:userstatus WHERE sid = :sid");
+                $stmt->bindParam(':sid', $sid);
+                $stmt->bindParam(':userstatus', $approvestatus);
+                $stmt->execute();
+                if ($stmt->errorCode() === '00000') {
+                    $response = ['status' => 'success', 'message' => 'Database update successful', 'data' => ['lid' => $sid, 'status' => $approvestatus]];
+                    echo json_encode($response);
                 } else {
-                    $stmt = $conn->prepare(" UPDATE `sigin` SET `userstatus`=:userstatus WHERE sid = :sid");
-                    $stmt->bindParam(':sid', $sid);
-                    $stmt->bindParam(':userstatus', $approvestatus);
-                    $stmt->execute();
-                    if ($stmt->errorCode() === '00000') {
-                        $response = ['status' => 'success', 'message' => 'Database update successful', 'data' => ['lid' => $sid, 'status' => $approvestatus]];
-                        echo json_encode($response);
-                    } else {
-                        $errors = $stmt->errorInfo();
-                        echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $errors]);
-                    }
+                    $errors = $stmt->errorInfo();
+                    echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $errors]);
                 }
             } catch (PDOException $e) {
                 echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $e->getMessage()]);
@@ -637,39 +677,63 @@ switch ($endpoint) {
             echo "Form not submitted.";
         }
         break;
+
+    case "certificatestatus":
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            try {
+                $sid = isset($_POST['sid']) ? intval($_POST['sid']) : 0;
+                $approvestatus = isset($_POST['status']) ? $_POST['status'] : '';
+                $stmt = $conn->prepare("UPDATE `certificate` SET `certificatestatus` = :certficatestatus WHERE `sid` = :sid");
+                $stmt->bindParam(':sid', $sid, PDO::PARAM_INT);
+                $stmt->bindParam(':certficatestatus', $approvestatus, PDO::PARAM_STR);
+                $stmt->execute();
+                if ($stmt->errorCode() === '00000') {
+                    // $_SESSION['certificatestatus'] = true;
+                    // header("Location: ../index.php");
+                    $response = ['status' => 'success', 'message' => 'Database update successful', 'data' => ['lid' => $sid, 'status' => $approvestatus]];
+                    echo json_encode($response);
+                } else {
+                    $errors = $stmt->errorInfo();
+                    echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $errors]);
+                }
+            } catch (PDOException $e) {
+                echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $e->getMessage()]);
+            }
+        } else {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'Invalid request']);
+        }
+
         break;
+
+    case 'gatepassstatus':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            try {
+                $sid = isset($_POST['sid']) ? intval($_POST['sid']) : 0;
+                $approvestatus = isset($_POST['status']) ? $_POST['status'] : '';
+                // UPDATE `gatepass` SET `gatepassstatus`='hello' WHERE sid =17
+                $stmt = $conn->prepare("UPDATE `gatepass` SET `gatepassstatus` = :gatepassstatus WHERE `sid` = :sid");
+                $stmt->bindParam(':sid', $sid, PDO::PARAM_INT);
+                $stmt->bindParam(':gatepassstatus', $approvestatus, PDO::PARAM_STR);
+                $stmt->execute();
+                // if ($stmt->errorCode() === '00000') {
+                //     // $_SESSION['certificatestatus'] = true;
+                //     // header("Location: ../index.php");
+                //     $response = ['status' => 'success', 'message' => 'Database update successful', 'data' => ['lid' => $sid, 'status' => $approvestatus]];
+                //     echo json_encode($response);
+                // } else {
+                //     $errors = $stmt->errorInfo();
+                //     echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $errors]);
+                // }
+            } catch (PDOException $e) {
+                echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $e->getMessage()]);
+            }
+        } else {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'Invalid request']);
+        }
+        break;
+
     default:
         break;
-}
-
-function send_email($emailid, $subject, $message, $pdfFile)
-{
-    // echo $emailid, $subject, $message, $pdfFile;
-    global $mail;
-    try {
-        // Server settings
-        $mail->SMTPDebug = false; // Enable verbose debug output
-        $mail->isSMTP(); // Set mailer to use SMTP
-        $mail->Host = 'mail.miphub.in'; // Specify main and backup SMTP servers
-        $mail->SMTPAuth = true; // Enable SMTP authentication
-        $mail->Username = 'admin@miphub.in'; // SMTP username
-        $mail->Password = 'Adminmiphub@123'; // SMTP password
-        // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption, `ssl` also accepted
-        $mail->Port = 587; // TCP port to connect to
-
-        // Recipients
-        $mail->setFrom('admin@miphub.in', 'MIP');
-        $mail->addAddress($emailid); // Add recipient
-
-        // Content
-        $mail->isHTML(true); // Set email format to HTML
-        $mail->Subject = $subject;
-        $mail->Body = $message;
-        $mail->addAttachment($pdfFile);
-        // Send the email
-        $mail->send();
-        echo 'Message has been sent';
-    } catch (Exception $e) {
-        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-    }
 }

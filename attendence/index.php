@@ -51,7 +51,8 @@ $stmt = $conn->prepare($sql);
 $stmt->execute();
 $userdetails = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$sql = "SELECT `cid`, `sid`, `piname`, `username`,`start_date`,`end_date`, `collegename`, `workdone` FROM `certificate`";
+$sql = "SELECT `cid`, `sid`, `piname`, `username`,`start_date`,`end_date`,`certificatestatus`, `collegename`, `workdone` FROM `certificate`";
+// $sql = 'SELECT sg.`certificatestatus`, ce.`cid`, ce.`sid`, ce.`piname`, ce.`username`, ce.`start_date`, ce.`end_date`, ce.`certificatestatus` AS `ce_certificatestatus`, ce.`collegename`, ce.`workdone` FROM `sigin` AS sg LEFT JOIN `certificate` AS ce ON ce.`sid` = sg.`sid`';
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 $certificate = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -62,12 +63,12 @@ $stmt->execute();
 $resign = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 if ($usertype == 'hr') {
-    $sql = "SELECT `sid`, `name`, `mobile`, `startdate`, `enddate`, `gender`, `purpose` FROM `gatepass`";
+    $sql = "SELECT `gid`,`sid`, `name`, `mobile`, `startdate`, `enddate`, `gender`, `purpose`,`gatepassstatus` FROM `gatepass`";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     $gatepass = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
-    $sql = "SELECT `sid`, `name`, `mobile`, `startdate`, `enddate`, `gender`, `purpose` FROM `gatepass` where sid=:sid ";
+    $sql = "SELECT `gid`,`sid`, `name`, `mobile`, `startdate`, `enddate`, `gender`, `purpose`,`gatepassstatus` FROM `gatepass` where sid=:sid ";
     $stmt = $conn->prepare($sql);
     $stmt->bindParam(':sid', $sid);
     $stmt->execute();
@@ -182,6 +183,10 @@ $decform = $results[0]['declarationform'];
         <?php if (isset($_SESSION['certificate']) && $_SESSION['certificate']) : ?>
             alert("Certificate Send to user Successfully");
             <?php unset($_SESSION['certificate']); ?>
+        <?php endif; ?>
+        <?php if (isset($_SESSION['certificatestatus']) && $_SESSION['certificatestatus']) : ?>
+            alert("Certificate Status Updated Successfully");
+            <?php unset($_SESSION['certificatestatus']); ?>
         <?php endif; ?>
     </script>
 </head>
@@ -1319,7 +1324,22 @@ $decform = $results[0]['declarationform'];
                                 var sid = cellData.sid;
                                 var lid = cellData.leaveid;
                                 console.log(lid, selectedValue, sid, username);
-                                updatestatus(lid, selectedValue, sid, username);
+                                /* cdoe for calculating the differnec between the leave apply  */
+                                function calculateDateDifference(startDate, endDate) {
+                                    var start = new Date(startDate);
+                                    var end = new Date(endDate);
+                                    var timeDifference = end - start;
+                                    var dayDifference = timeDifference / (1000 * 60 * 60 * 24);
+
+                                    return dayDifference;
+                                }
+                                var clDateDifference = calculateDateDifference(cellData.clstartdate, cellData.clenddate);
+                                var rhDateDifference = calculateDateDifference(cellData.rhstartdate, cellData.rhenddate);
+                                console.log("CL Date Difference: " + clDateDifference + " days");
+                                console.log("RH Date Difference: " + rhDateDifference + " days");
+
+
+                                updatestatus(lid, selectedValue, sid, username, clDateDifference, rhDateDifference);
                             });
 
                             return dropdown;
@@ -1331,19 +1351,22 @@ $decform = $results[0]['declarationform'];
             });
 
             // function for updating the leave status start here 
-            function updatestatus(lid, selectedValue, sid, username) {
-                console.log(lid, selectedValue, sid, username);
+            function updatestatus(lid, selectedValue, sid, username, clDateDifference, rhDateDifference) {
+                console.log(lid, selectedValue, sid, username, clDateDifference, rhDateDifference);
                 fetch('formsubmit.php/leaveapproved', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
                         },
 
-                        body: 'lid=' + encodeURIComponent(lid) + '&status=' + encodeURIComponent(selectedValue)
+                        body: 'lid=' + encodeURIComponent(lid) + '&status=' + encodeURIComponent(selectedValue) +
+                            '&cl=' + encodeURIComponent(clDateDifference) + '&rh=' + encodeURIComponent(rhDateDifference) +
+                            '&sid=' + encodeURIComponent(sid)
                     })
                     .then(response => response.json())
                     .then(data => {
-                        alert("Leave Status Updated Successfully")
+                        console.log(data);
+                        // alert("Leave Status Updated Successfully")
                         //   console.log('Database update successful:', data);
                     })
                     .catch(error => {
@@ -1647,36 +1670,44 @@ $decform = $results[0]['declarationform'];
             ?>
             columns.push({
                 title: "Certificate Status",
-                field: "leave_status",
+                field: "certificatestatus",
                 headerFilter: true,
                 editor: <?php echo ($usertype == 'hr') ? "'input'" : "false"; ?>,
                 cellEdited: function(cell) {
-                    console.log(cell);
+                    // console.log(cell);
                     var userId = cell.getData().sid;
                     var lid = cell.getData().leaveid;
                     var newValue = cell.getValue();
                     cell.setValue(newValue);
-                    // updatestatus(lid, userId, newValue);
+                    // console.log(userId, newValue);
+                    updatestatus(userId, newValue);
                 },
             });
             <?php // endif; 
             ?>
 
             // function of the updatestatus start here 
-            function updatestatus(lid, userId, newValue) {
-                console.log(lid, userId, newValue);
-                fetch('', {
+            function updatestatus(userId, newValue) {
+                // console.log(userId, newValue);
+                fetch('formsubmit.php/certificatestatus', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
                         },
 
-                        body: 'lid=' + encodeURIComponent(lid) + '&status=' + encodeURIComponent(newValue)
+                        body: 'sid=' + encodeURIComponent(userId) + '&status=' + encodeURIComponent(newValue)
                     })
                     .then(response => response.json())
                     .then(data => {
-                        alert("Product Status Updated Successfully")
-                        //   console.log('Database update successful:', data);
+                        var datavalue = data.data;
+                        console.log(datavalue);
+                        if (datavalue == 'no') {
+                            alert("User Successfully Disapproved");
+                            // window.location.href = "../index1.php";
+                        } else {
+                            alert("User Successfully Approved");
+                            // window.location.href = "index1.php";
+                        }
                     })
                     .catch(error => {
                         console.error('Error updating database:', error);
@@ -1976,6 +2007,40 @@ $decform = $results[0]['declarationform'];
                     headerFilter: true
                 }
             ];
+
+            columns.push({
+                title: "Certificate Status",
+                field: "gatepassstatus",
+                headerFilter: true,
+                editor: <?php echo ($usertype == 'hr') ? "'input'" : "false"; ?>,
+                cellEdited: function(cell) {
+                    var userId = cell.getData().sid;
+                    var newValue = cell.getValue();
+                    cell.setValue(newValue);
+                    console.log(userId, newValue);
+                    updategatestatus(userId, newValue);
+                },
+            });
+
+            function updategatestatus(userId, newValue) {
+                console.log(userId, newValue);
+                fetch('formsubmit.php/gatepassstatus', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+
+                        body: 'sid=' + encodeURIComponent(userId) + '&status=' + encodeURIComponent(newValue)
+                    })
+                    .then(response => response.text())
+                    .then(data => {
+                        alert("Product Status Updated Successfully")
+                    })
+                    .catch(error => {
+                        console.error('Error updating database:', error);
+                    });
+            }
+
             // function of the updatestatus start here
             var pageSize = 10;
             var currentPage = 1;
