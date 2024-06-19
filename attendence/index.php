@@ -2034,7 +2034,7 @@ $decform = $results[0]['declarationform'];
                     })
                     .then(response => response.text())
                     .then(data => {
-                        alert("Product Status Updated Successfully")
+                        alert("Gatepass Status Update Successfully")
                     })
                     .catch(error => {
                         console.error('Error updating database:', error);

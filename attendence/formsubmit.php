@@ -8,7 +8,6 @@ header('Content-Type: application/json');
 include_once("dbconfig.php");
 include_once("api.php");
 
-
 // Retrieve the request endpoint
 $uri = explode("/", $_SERVER["REQUEST_URI"]);
 $apidata = $uri[3];
@@ -703,7 +702,6 @@ switch ($endpoint) {
             http_response_code(400);
             echo json_encode(['status' => 'error', 'message' => 'Invalid request']);
         }
-
         break;
 
     case 'gatepassstatus':
