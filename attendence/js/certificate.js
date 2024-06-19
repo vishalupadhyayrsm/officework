@@ -20,7 +20,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const certificateForm = document.getElementById("certificateForm");
   certificateForm.addEventListener("submit", (event) => {
     event.preventDefault();
-
     const formData = new FormData(certificateForm);
 
     fetch("your-server-endpoint", {

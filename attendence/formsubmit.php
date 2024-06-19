@@ -313,16 +313,31 @@ switch ($endpoint) {
             try {
                 $sid = $_POST['userId'];
                 $approvestatus = $_POST['status'];
-                $stmt = $conn->prepare(" UPDATE `sigin` SET `userstatus`=:userstatus WHERE sid = :sid");
-                $stmt->bindParam(':sid', $sid);
-                $stmt->bindParam(':userstatus', $approvestatus);
-                $stmt->execute();
-                if ($stmt->errorCode() === '00000') {
-                    $response = ['status' => 'success', 'message' => 'Database update successful', 'data' => ['lid' => $sid, 'status' => $approvestatus]];
-                    echo json_encode($response);
+                /* check if userapproved value is no then update with  the same el, cl and rh value  */
+                if ($approvestatus == "yes") {
+                    $stmt = $conn->prepare(" UPDATE `sigin` SET `userstatus`=:userstatus WHERE sid = :sid");
+                    $stmt->bindParam(':sid', $sid);
+                    $stmt->bindParam(':userstatus', $approvestatus);
+                    $stmt->execute();
+                    if ($stmt->errorCode() === '00000') {
+                        $response = ['status' => 'success', 'message' => 'Database update successful', 'data' => ['lid' => $sid, 'status' => $approvestatus]];
+                        echo json_encode($response);
+                    } else {
+                        $errors = $stmt->errorInfo();
+                        echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $errors]);
+                    }
                 } else {
-                    $errors = $stmt->errorInfo();
-                    echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $errors]);
+                    $stmt = $conn->prepare(" UPDATE `sigin` SET `userstatus`=:userstatus WHERE sid = :sid");
+                    $stmt->bindParam(':sid', $sid);
+                    $stmt->bindParam(':userstatus', $approvestatus);
+                    $stmt->execute();
+                    if ($stmt->errorCode() === '00000') {
+                        $response = ['status' => 'success', 'message' => 'Database update successful', 'data' => ['lid' => $sid, 'status' => $approvestatus]];
+                        echo json_encode($response);
+                    } else {
+                        $errors = $stmt->errorInfo();
+                        echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $errors]);
+                    }
                 }
             } catch (PDOException $e) {
                 echo json_encode(['status' => 'error', 'message' => 'Database error', 'data' => $e->getMessage()]);

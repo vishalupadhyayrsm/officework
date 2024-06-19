@@ -51,7 +51,7 @@ $stmt = $conn->prepare($sql);
 $stmt->execute();
 $userdetails = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$sql = "SELECT `cid`, `sid`, `piname`, `username`, `collegename`, `workdone` FROM `certificate`";
+$sql = "SELECT `cid`, `sid`, `piname`, `username`,`start_date`,`end_date`, `collegename`, `workdone` FROM `certificate`";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 $certificate = $stmt->fetchAll(PDO::FETCH_ASSOC);
