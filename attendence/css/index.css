@@ -226,3 +226,7 @@ button:hover {
     text-decoration: none;
     cursor: pointer;
 }
+
+.is-invalid {
+    border-color: red;
+}

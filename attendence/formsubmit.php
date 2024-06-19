@@ -310,39 +310,29 @@ switch ($endpoint) {
 
                             if ($stmt->rowCount() > 0) {
                                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                                $currentCL = $row['remainingcl'];
-                                $currentRH = $row['remainingrh'];
+                                $currentCL = intval($row['remainingcl']);
+                                $currentRH = intval($row['remainingrh']);
+                                $newCL = intval($cl);
+                                $newRH = intval($rh);
 
-                                // Calculate the new remaining values
-                                $newCL = $currentCL + $cl;
-                                $newRH = $currentRH + $rh;
-                                // echo $newCL, $newRH;
-                                $response = [
-                                    'status' => 'success',
-                                    'message' => 'Database update successful',
-                                    'data' => [
-                                        'lid' => $lid,
-                                        'status' => $status,
-                                        'remainingcl' => $newCL,
-                                        'remainingrh' => $newRH
-                                    ]
-                                ];
-                                echo json_encode($response);
+                                $updatedCL = $currentCL + $newCL;
+                                $updatedRH = $currentRH + $newRH;
+
                                 // Update the database with the new values
-                                // $updateStmt = $conn->prepare("UPDATE `sigin` SET `remainingcl` = :cl, `remainingrh` = :rh WHERE `sid` = :sid");
-                                // $updateStmt->bindParam(':sid', $sid, PDO::PARAM_INT);
-                                // $updateStmt->bindParam(':cl', $newCL, PDO::PARAM_INT);
-                                // $updateStmt->bindParam(':rh', $newRH, PDO::PARAM_INT);
-                                // $updateStmt->execute();
+                                $updateStmt = $conn->prepare("UPDATE `sigin` SET `remainingcl` = :cl, `remainingrh` = :rh WHERE `sid` = :sid");
+                                $updateStmt->bindParam(':sid', $sid, PDO::PARAM_INT);
+                                $updateStmt->bindParam(':cl', $updatedCL, PDO::PARAM_INT);
+                                $updateStmt->bindParam(':rh', $updatedRH, PDO::PARAM_INT);
+                                $updateStmt->execute();
 
-                                // // Check for errors in the update statement
-                                // if ($updateStmt->errorCode() === '00000') {
-                                //     $response = ['status' => 'success', 'message' => 'Database update successful', 'data' => ['lid' => $lid, 'status' => $status, 'remainingcl' => $newCL, 'remainingrh' => $newRH]];
-                                //     echo json_encode($response);
-                                // } else {
-                                //     $errors = $updateStmt->errorInfo();
-                                //     echo json_encode(['status' => 'error', 'message' => 'Failed to update remaining CL and RH', 'data' => $errors]);
-                                // }
+                                // Check for errors in the update statement
+                                if ($updateStmt->errorCode() === '00000') {
+                                    $response = ['status' => 'success', 'message' => 'Database update successful', 'data' => ['lid' => $lid, 'status' => $status, 'remainingcl' => $newCL, 'remainingrh' => $newRH]];
+                                    echo json_encode($response);
+                                } else {
+                                    $errors = $updateStmt->errorInfo();
+                                    echo json_encode(['status' => 'error', 'message' => 'Failed to update remaining CL and RH', 'data' => $errors]);
+                                }
                             } else {
                                 echo json_encode(['status' => 'error', 'message' => 'User not found.']);
                             }

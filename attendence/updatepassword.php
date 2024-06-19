@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="mb-3">
-                    <button type="submit" class="btn btn-primary" name="login">Login</button>
+                    <button type="submit" class="btn btn-primary" name="login">Update</button>
                     <a href="signup.php" class="btn btn-secondary">Signup</a>
 
                 </div>

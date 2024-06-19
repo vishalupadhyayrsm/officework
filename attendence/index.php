@@ -79,7 +79,7 @@ if ($usertype == 'hr') {
 // $$decform  = "ye";
 // print_r($results);
 $decform = $results[0]['declarationform'];
-// echo $decform;
+echo $decform;
 // $decform = "yes";
 ?>
 <!DOCTYPE html>
@@ -263,7 +263,7 @@ $decform = $results[0]['declarationform'];
                                 <!--- code for multpage form start here ---->
                                 <form id="multiPageForm" method="post" action="formsubmit.php/deceleration" class="form_data" enctype="multipart/form-data">
                                     <div class="form-page active" id="page1">
-                                        <h2 style="text-align:center;">MIP Deceleraton Form</h2>
+                                        <h2 style="text-align:center;">MIP Deceleration Form</h2>
                                         <div class="form-group">
                                             <label for="name">Name:</label>
                                             <input type="text" class="form-control" id="name" name="name" required>
@@ -276,13 +276,17 @@ $decform = $results[0]['declarationform'];
                                             <label for="emp_roll">Employee No/Student Roll No:</label>
                                             <input type="number" class="form-control" id="emp_roll" name="emproll">
                                         </div><br>
+
                                         <div class="form-group">
                                             <label for="emp_roll">University:</label>
                                             <input type="text" class="form-control" id="university" name="univesity" required>
                                         </div><br>
                                         <div class="form-group">
                                             <label for="Aadhar">Aadhar Card:</label>
-                                            <input type="text" class="form-control" id="aadahr" name="adhar" required>
+                                            <input type="text" class="form-control" placeholder="Please enter 12 digite Aadhar card number" id="aadahr" name="adhar" pattern="\d{12}" maxlength="12" required>
+                                            <div class="invalid-feedback">
+                                                Please enter a valid 12-digit Aadhar Card number.
+                                            </div>
                                         </div><br>
                                         <div class="form-group">
                                             <label for="month">Gender:</label>
@@ -315,7 +319,11 @@ $decform = $results[0]['declarationform'];
                                         </div><br>
                                         <div class="form-group">
                                             <label for="localadd">Upload Image:</label>
-                                            <input type="file" class="form-control" id="image" name="profileimage">
+                                            <!-- <input type="file" class="form-control" id="image" name="profileimage"> -->
+                                            <input type="file" class="form-control" id="image" name="profileimage" accept=".jpg, .jpeg, .png" required>
+                                            <div class="invalid-feedback" style="display:none;">
+                                                Please upload a JPEG or PNG file.
+                                            </div>
                                         </div><br>
 
                                         <button type="button" onclick="nextPage(2)" class="btn btn-primary">Next</button>
@@ -429,8 +437,7 @@ $decform = $results[0]['declarationform'];
                                         <input id="profile-pic-input" type="file" name="profilepic" style="display: none;">
                                     </div>
                                     <div class="profile-details">
-                                        <h1 class="username">Vishal Kumar Upadhyay</h1>
-                                        <p>Designation: Project Research Assistant</p>
+                                        <h1 class="username"><?php echo $results[0]['name']; ?></h1>
                                         <p>University: <span class="text-display"><?php echo $results[0]['univesity']; ?></span><input class="input-display" type="text" name="university" value="<?php echo $results[0]['university']; ?>"></p>
                                         <p>Contact: <span class="text-display"><?php echo $results[0]['contact']; ?></span><input class="input-display" type="text" name="contact" value="<?php echo $results[0]['contact']; ?>"></p>
                                         <p>Email: <span class="text-display"><?php echo $results[0]['email']; ?></span><input class="input-display" type="email" name="email" value="<?php echo $results[0]['email']; ?>"></p>
@@ -1207,6 +1214,8 @@ $decform = $results[0]['declarationform'];
     <!---- javascript code start here  ---->
     <script src="js/index.js"></script>
     <script src="js/certificate.js"></script>
+    <script src="js/validation.js"></script>
+
 
 
     <!-- code for leave status start here -->
@@ -1363,7 +1372,7 @@ $decform = $results[0]['declarationform'];
                             '&cl=' + encodeURIComponent(clDateDifference) + '&rh=' + encodeURIComponent(rhDateDifference) +
                             '&sid=' + encodeURIComponent(sid)
                     })
-                    .then(response => response.json())
+                    .then(response => response.text())
                     .then(data => {
                         console.log(data);
                         // alert("Leave Status Updated Successfully")
@@ -1427,41 +1436,40 @@ $decform = $results[0]['declarationform'];
                     headerFilter: true,
                     formatter: function(cell) {
                         var userName = cell.getValue();
-                        var userId = cell.getRow().getData().id;
-                        return '<a href="#" onclick="openUserDetailsPopup(' + userId + '); return false;">' + userName + '</a>';
+                        var userData = cell.getRow().getData();
+                        var userId = userData.id;
+                        var sid = userData.sid; // Assuming sid is part of the row data
+                        var emailid = userData.emailid; // Assuming emailid is part of the row data
+
+                        return '<a href="userprofile.php?sid=' + sid + '" target="_blank">' + userName + '</a>';
                     }
                 },
+
                 {
                     title: "Email",
                     field: "email",
                     headerFilter: true
-                },
-                {
+                }, {
                     title: "IITB Email",
                     field: "email",
                     headerFilter: true
-                },
-                {
+                }, {
                     title: "Staff / Intern / Student",
                     field: "usertype",
                     headerFilter: true
-                },
-                {
+                }, {
                     title: "Contact No",
                     field: "contact",
                     headerFilter: true
-                },
-                {
+                }, {
                     title: "Joining Date",
                     field: "startdate",
                     headerFilter: true
-                },
-                {
+                }, {
                     title: "Deceleration Form",
                     field: "declarationform",
                     headerFilter: true
-                },
-                {
+                }, {
                     title: "Employee Code",
                     field: "empcode",
                     headerFilter: true,
@@ -1472,8 +1480,7 @@ $decform = $results[0]['declarationform'];
                         console.log(userId, newValue);
                         updateempcode(userId, newValue);
                     }
-                },
-                {
+                }, {
                     title: "Tenure End Date",
                     field: "tenureenddate",
                     headerFilter: true,
@@ -1484,8 +1491,7 @@ $decform = $results[0]['declarationform'];
                         console.log(userId, newValue);
                         updateemptenure(userId, newValue)
                     }
-                },
-                {
+                }, {
                     title: "Resign Date",
                     field: "enddate",
                     headerFilter: true
@@ -1639,7 +1645,7 @@ $decform = $results[0]['declarationform'];
                     // visible: <?php echo ($usertype == 'user') ? 'true' : 'true'; ?>,
                 },
                 {
-                    title: "Pi Name",
+                    title: "PI Name",
                     field: "piname",
                     headerFilter: true
                 },
