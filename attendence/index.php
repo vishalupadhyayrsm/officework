@@ -52,25 +52,6 @@ $stmt->execute();
 $userdetails = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // print_r($userdetails['tenureenddate']);
 
-/* code for sending the email to if tenure date */
-foreach ($userdetails as $user) {
-    if (array_key_exists('tenureenddate', $user)) {
-        $givenDate = DateTime::createFromFormat('d/m/Y', $user['tenureenddate']);
-        if ($givenDate) {
-            $today = new DateTime();
-            $interval = $today->diff($givenDate);
-            $daysDifference = $interval->days;
-            if ($daysDifference <= 15) {
-            }
-            // echo "Difference in days between $dateString and today: $daysDifference days\n";
-        } else {
-            echo "Invalid date format or date: $dateString\n";
-        }
-    }
-}
-
-
-
 
 $sql = "SELECT `cid`, `sid`, `piname`, `username`,`start_date`,`end_date`,`certificatestatus`, `collegename`, `workdone` FROM `certificate`";
 // $sql = 'SELECT sg.`certificatestatus`, ce.`cid`, ce.`sid`, ce.`piname`, ce.`username`, ce.`start_date`, ce.`end_date`, ce.`certificatestatus` AS `ce_certificatestatus`, ce.`collegename`, ce.`workdone` FROM `sigin` AS sg LEFT JOIN `certificate` AS ce ON ce.`sid` = sg.`sid`';
