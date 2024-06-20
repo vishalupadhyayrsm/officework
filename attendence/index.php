@@ -435,7 +435,7 @@ $decform = $results[0]['declarationform'];
                                     <input type="hidden" id="sid" name="sid" value="<?php echo $results[0]['sid']; ?>">
                                     <div class="profile-picture">
                                         <img id="profile-img" src="<?php echo $results[0]['profilepic']; ?>" alt="user_profile">
-                                        <span id="edit-icon" class="edit-icon">edit</span>
+                                        <span id="edit-icon" class="edit-icon" style="display:none;" hidden>edit</span>
                                         <input id="profile-pic-input" type="file" name="profilepic" style="display: none;">
                                     </div>
                                     <div class="profile-details">
@@ -2113,6 +2113,7 @@ $decform = $results[0]['declarationform'];
     <script>
         var results = <?php echo json_encode($userdetails); ?>;
         // console.log(results);
+        var notifications = [];
         results.forEach(result => {
             console.log(result.tenureenddate);
             var newValue = result.tenureenddate;
@@ -2132,7 +2133,13 @@ $decform = $results[0]['declarationform'];
                         console.log("less than or equal to 15 days:", result.name, result.email);
                         var name = result.name;
                         var email = result.email;
-                        sendtenuredetail(name, email)
+                        notifications.push({
+                            name: name,
+                            email: email,
+                            daysDiff: daysDiff
+                        });
+                        // sendtenuredetail(name, email)
+                        senddetail();
                     } else {
                         console.log("greater than or equal to 15");
                     }
@@ -2146,24 +2153,43 @@ $decform = $results[0]['declarationform'];
             }
         });
 
-        function sendtenuredetail(name, email) {
-            console.log(name, email);
+        function senddetail() {
+            // console.log(name, email);
+            console.log(notifications);
             fetch('formsubmit.php/tenurenotification', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
+                        'Content-Type': 'application/json'
                     },
-
-                    body: 'name=' + encodeURIComponent(name) + '&email=' + encodeURIComponent(email)
+                    body: JSON.stringify(notifications)
                 })
-                .then(response => response.text())
+                .then(response => response.json())
                 .then(data => {
-                    // alert("")
+                    console.log('Notifications sent:', data);
                 })
                 .catch(error => {
-                    console.error('Error updating database:', error);
+                    console.error('Error sending notifications:', error);
                 });
         }
+
+        // function sendtenuredetail(name, email) {
+        //     console.log(name, email);
+        //     fetch('formsubmit.php/tenurenotification', {
+        //             method: 'POST',
+        //             headers: {
+        //                 'Content-Type': 'application/x-www-form-urlencoded'
+        //             },
+
+        //             body: 'name=' + encodeURIComponent(name) + '&email=' + encodeURIComponent(email)
+        //         })
+        //         .then(response => response.text())
+        //         .then(data => {
+        //             // alert("")
+        //         })
+        //         .catch(error => {
+        //             console.error('Error updating database:', error);
+        //         });
+        // }
     </script>
 
 

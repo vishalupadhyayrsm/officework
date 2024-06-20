@@ -208,7 +208,7 @@ switch ($endpoint) {
                     // Update profile pic only if uploaded
                     $profilepic_updated = true;
                 } else {
-                    $uploadedFilePath = '';
+                    // $uploadedFilePath = '';
                     $profilepic_updated = false;
                 }
 
