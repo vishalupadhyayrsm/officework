@@ -526,12 +526,18 @@ switch ($endpoint) {
             try {
                 $sid = $_POST['userId'];
                 $newValue = $_POST['status'];
+                $daysDiff = $_POST['daysdiff'];
                 $stmt = $conn->prepare("UPDATE `sigin` SET `tenureenddate` = :tenureenddate WHERE sid = :sid");
                 $stmt->bindParam(':sid', $sid);
                 $stmt->bindParam(':tenureenddate', $newValue);
                 $stmt->execute();
 
                 if ($stmt->errorCode() === '00000') {
+                    if ($daysDiff <= 15) {
+
+                        $subject = "Tenure End";
+                        $emailid = "vishalm.rsm@gmail.com";
+                    }
                     $response = ['status' => 'success', 'message' => 'Database update successful'];
                     echo json_encode($response);
                 } else {

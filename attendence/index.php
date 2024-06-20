@@ -79,7 +79,7 @@ if ($usertype == 'hr') {
 // $$decform  = "ye";
 // print_r($results);
 $decform = $results[0]['declarationform'];
-echo $decform;
+// echo $decform;
 // $decform = "yes";
 ?>
 <!DOCTYPE html>
@@ -1425,8 +1425,6 @@ echo $decform;
             var selectedTab = document.getElementById(tabId);
             selectedTab.classList.add('active-tab');
         }
-
-
         // code for dispalying all the data in the table 
         if (typeof Tabulator !== 'undefined') {
             var results = <?php echo json_encode($userdetails); ?>;
@@ -1480,7 +1478,8 @@ echo $decform;
                         console.log(userId, newValue);
                         updateempcode(userId, newValue);
                     }
-                }, {
+                },
+                {
                     title: "Tenure End Date",
                     field: "tenureenddate",
                     headerFilter: true,
@@ -1489,9 +1488,37 @@ echo $decform;
                         var userId = cell.getData().sid;
                         var newValue = cell.getValue();
                         console.log(userId, newValue);
-                        updateemptenure(userId, newValue)
+                        // Update tenure end date
+                        var dateParts = newValue.split("/");
+                        if (dateParts.length === 3) {
+                            var day = parseInt(dateParts[0], 10);
+                            var month = parseInt(dateParts[1], 10) - 1;
+                            var year = parseInt(dateParts[2], 10);
+
+                            var enteredDate = new Date(year, month, day);
+
+                            if (!isNaN(enteredDate.getTime())) {
+                                var currentDate = new Date();
+                                var timeDiff = enteredDate - currentDate;
+                                var daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                                updateemptenure(userId, newValue, daysDiff);
+                                if (daysDiff < 15) {
+                                    cell.getElement().style.backgroundColor = "red";
+                                } else {
+                                    cell.getElement().style.backgroundColor = "";
+                                }
+                            } else {
+                                console.error("Invalid date format entered:", newValue);
+                                cell.getElement().style.backgroundColor = "";
+                            }
+                        } else {
+                            console.error("Invalid date format entered:", newValue);
+                            cell.getElement().style.backgroundColor = "";
+                        }
                     }
-                }, {
+                },
+
+                {
                     title: "Resign Date",
                     field: "enddate",
                     headerFilter: true
@@ -1573,13 +1600,15 @@ echo $decform;
                     });
             }
             /* code for updating the tenure in th database by admin */
-            function updateemptenure(userId, newValue) {
+            function updateemptenure(userId, newValue, daysDiff) {
+                console.log(userId, newValue, daysDiff);
                 fetch('formsubmit.php/updateemptenure', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
                         },
-                        body: 'userId=' + encodeURIComponent(userId) + '&status=' + encodeURIComponent(newValue)
+                        body: 'userId=' + encodeURIComponent(userId) + '&status=' + encodeURIComponent(newValue) +
+                            '&daysdiff=' + encodeURIComponent(daysDiff)
                     })
                     .then(response => response.json())
                     .then(data => {
