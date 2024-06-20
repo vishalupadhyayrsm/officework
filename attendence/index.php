@@ -2,6 +2,7 @@
 session_start();
 include 'dbconfig.php';
 
+
 // include 'fecthdata.php';
 if (isset($_SESSION['user_email'])) {
     $email = $_SESSION['user_email'];
@@ -10,7 +11,6 @@ if (isset($_SESSION['user_email'])) {
     $sid = $_SESSION['userid'];
     $decform = $_SESSION['decform'];
     // echo $usertype;
-
     if ($usertype == "system") {
         header("Location: ../system");
     }
@@ -50,6 +50,27 @@ $sql = "SELECT `sid`, `name`, `email`,`empcode`,`password`,`startdate`,`enddate`
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 $userdetails = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// print_r($userdetails['tenureenddate']);
+
+/* code for sending the email to if tenure date */
+foreach ($userdetails as $user) {
+    if (array_key_exists('tenureenddate', $user)) {
+        $givenDate = DateTime::createFromFormat('d/m/Y', $user['tenureenddate']);
+        if ($givenDate) {
+            $today = new DateTime();
+            $interval = $today->diff($givenDate);
+            $daysDifference = $interval->days;
+            if ($daysDifference <= 15) {
+            }
+            // echo "Difference in days between $dateString and today: $daysDifference days\n";
+        } else {
+            echo "Invalid date format or date: $dateString\n";
+        }
+    }
+}
+
+
+
 
 $sql = "SELECT `cid`, `sid`, `piname`, `username`,`start_date`,`end_date`,`certificatestatus`, `collegename`, `workdone` FROM `certificate`";
 // $sql = 'SELECT sg.`certificatestatus`, ce.`cid`, ce.`sid`, ce.`piname`, ce.`username`, ce.`start_date`, ce.`end_date`, ce.`certificatestatus` AS `ce_certificatestatus`, ce.`collegename`, ce.`workdone` FROM `sigin` AS sg LEFT JOIN `certificate` AS ce ON ce.`sid` = sg.`sid`';
@@ -1484,24 +1505,27 @@ $decform = $results[0]['declarationform'];
                     field: "tenureenddate",
                     headerFilter: true,
                     editor: <?php echo ($usertype == 'hr' || $usertype == 'admin') ? "'input'" : "false"; ?>,
+                    cellEditing: function(cell) {
+                        var originalValue = cell.getValue();
+                        console.log("Original tenure end date:", originalValue);
+                    },
                     cellEdited: function(cell) {
                         var userId = cell.getData().sid;
                         var newValue = cell.getValue();
-                        console.log(userId, newValue);
+                        var row = cell.getRow();
+                        console.log(userId, newValue, row);
                         // Update tenure end date
+                        updateemptenure(userId, newValue);
                         var dateParts = newValue.split("/");
                         if (dateParts.length === 3) {
                             var day = parseInt(dateParts[0], 10);
                             var month = parseInt(dateParts[1], 10) - 1;
                             var year = parseInt(dateParts[2], 10);
-
                             var enteredDate = new Date(year, month, day);
-
                             if (!isNaN(enteredDate.getTime())) {
                                 var currentDate = new Date();
                                 var timeDiff = enteredDate - currentDate;
                                 var daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-                                updateemptenure(userId, newValue, daysDiff);
                                 if (daysDiff < 15) {
                                     cell.getElement().style.backgroundColor = "red";
                                 } else {
@@ -1573,7 +1597,6 @@ $decform = $results[0]['declarationform'];
                         console.error('Error updating database:', error);
                     });
             }
-
             /* code for sending the update empcode */
             function updateempcode(userId, newValue) {
                 fetch('formsubmit.php/updateempcode', {
@@ -1600,15 +1623,13 @@ $decform = $results[0]['declarationform'];
                     });
             }
             /* code for updating the tenure in th database by admin */
-            function updateemptenure(userId, newValue, daysDiff) {
-                console.log(userId, newValue, daysDiff);
+            function updateemptenure(userId, newValue) {
                 fetch('formsubmit.php/updateemptenure', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
                         },
-                        body: 'userId=' + encodeURIComponent(userId) + '&status=' + encodeURIComponent(newValue) +
-                            '&daysdiff=' + encodeURIComponent(daysDiff)
+                        body: 'userId=' + encodeURIComponent(userId) + '&status=' + encodeURIComponent(newValue)
                     })
                     .then(response => response.json())
                     .then(data => {
@@ -1619,6 +1640,7 @@ $decform = $results[0]['declarationform'];
                         console.error('Error updating database:', error);
                     });
             }
+
 
 
 
@@ -2106,6 +2128,62 @@ $decform = $results[0]['declarationform'];
         }
     </script>
 
+    <!-- code for checking that if tenure is end or not  -->
+    <script>
+        var results = <?php echo json_encode($userdetails); ?>;
+        // console.log(results);
+        results.forEach(result => {
+            console.log(result.tenureenddate);
+            var newValue = result.tenureenddate;
+            var dateParts = newValue.split("/");
+
+            if (dateParts.length === 3) {
+                var day = parseInt(dateParts[0], 10);
+                var month = parseInt(dateParts[1], 10) - 1;
+                var year = parseInt(dateParts[2], 10);
+                var enteredDate = new Date(year, month, day);
+
+                if (!isNaN(enteredDate.getTime())) {
+                    var currentDate = new Date();
+                    var timeDiff = enteredDate.getTime() - currentDate.getTime();
+                    var daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                    if (daysDiff < 15) {
+                        console.log("less than or equal to 15 days:", result.name, result.email);
+                        var name = result.name;
+                        var email = result.email;
+                        sendtenuredetail(name, email)
+                    } else {
+                        console.log("greater than or equal to 15");
+                    }
+                } else {
+                    console.error("Invalid date format entered:", newValue);
+                    // cell.getElement().style.backgroundColor = "";
+                }
+            } else {
+                console.error("Invalid date format entered:", newValue);
+                // cell.getElement().style.backgroundColor = "";
+            }
+        });
+
+        function sendtenuredetail(name, email) {
+            console.log(name, email);
+            fetch('formsubmit.php/tenurenotification', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+
+                    body: 'name=' + encodeURIComponent(name) + '&email=' + encodeURIComponent(email)
+                })
+                .then(response => response.text())
+                .then(data => {
+                    // alert("")
+                })
+                .catch(error => {
+                    console.error('Error updating database:', error);
+                });
+        }
+    </script>
 
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

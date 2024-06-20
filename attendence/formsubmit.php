@@ -522,7 +522,6 @@ switch ($endpoint) {
 
     case 'updateemptenure':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // echo "helo";
             try {
                 $sid = $_POST['userId'];
                 $newValue = $_POST['status'];
@@ -531,10 +530,8 @@ switch ($endpoint) {
                 $stmt->bindParam(':sid', $sid);
                 $stmt->bindParam(':tenureenddate', $newValue);
                 $stmt->execute();
-
                 if ($stmt->errorCode() === '00000') {
                     if ($daysDiff <= 15) {
-
                         $subject = "Tenure End";
                         $emailid = "vishalm.rsm@gmail.com";
                     }
@@ -665,6 +662,28 @@ switch ($endpoint) {
                 } else {
                     die('Error uploading the file.');
                 }
+            } catch (Exception $e) {
+                echo json_encode(['status' => 'error', 'message' => 'An error occurred', 'data' => $e->getMessage()]);
+            }
+        } else {
+            echo "Form not submitted.";
+        }
+        break;
+
+    case 'tenurenotification':
+        if ($_SERVER["REQUEST_METHOD"] === "POST") {
+            try {
+                // Retrieve form data
+                $sid = htmlspecialchars($_POST['sid']);
+                $email = htmlspecialchars($_POST['email']);
+
+                $subject = "Internship Certificate";
+                $emailid = $email;
+
+                // send_email($emailid, $subject, $message, $pdfFile);
+                $_SESSION['certificate'] = true;
+                header("Location: ../index.php");
+                exit();
             } catch (Exception $e) {
                 echo json_encode(['status' => 'error', 'message' => 'An error occurred', 'data' => $e->getMessage()]);
             }
