@@ -76,8 +76,6 @@ if ($usertype == 'hr') {
     $stmt->execute();
     $gatepass = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
-
-
 // $$decform  = "ye";
 // print_r($results);
 $decform = $results[0]['declarationform'];
