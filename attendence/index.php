@@ -1337,13 +1337,23 @@ $decform = $results[0]['declarationform'];
                                 function calculateDateDifference(startDate, endDate) {
                                     var start = new Date(startDate);
                                     var end = new Date(endDate);
+                                    if (start.getTime() === end.getTime()) {
+                                        return 1;
+                                    }
                                     var timeDifference = end - start;
                                     var dayDifference = timeDifference / (1000 * 60 * 60 * 24);
-
+                                    console.log(dayDifference)
+                                    if (dayDifference === 0) {
+                                        dayDifference = 1;
+                                    }
                                     return dayDifference;
                                 }
+                                console.log()
                                 var clDateDifference = calculateDateDifference(cellData.clstartdate, cellData.clenddate);
                                 var rhDateDifference = calculateDateDifference(cellData.rhstartdate, cellData.rhenddate);
+                                if (isNaN(rhDateDifference) || rhDateDifference === "") {
+                                    rhDateDifference = 0;
+                                }
                                 console.log("CL Date Difference: " + clDateDifference + " days");
                                 console.log("RH Date Difference: " + rhDateDifference + " days");
 
