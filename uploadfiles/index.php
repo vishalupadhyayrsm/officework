@@ -75,7 +75,6 @@
                 })
                 .then(response => response.text())
                 .then(data => {
-                    // Handle the response from the server
                     console.log(data);
                     alert('Form submitted successfully');
                 })
