@@ -173,7 +173,7 @@ button:hover {
 /* code for updating the notice start here  */
 .allimp_notice{
     color: red;
-    font-size: 16px;
+    font-size: 20px;
     font-family: system-ui;
 }
 .list_cl {
