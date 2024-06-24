@@ -37,7 +37,7 @@ body,.username,p{
     position: absolute;
     right: 20px;
     top: 15px;
-    background-color: blue;
+    background-color: red;
     padding: 12px;
     border-radius: 5px;
 }
