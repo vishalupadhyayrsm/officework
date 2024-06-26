@@ -6,7 +6,6 @@
     <title>Dropdown Example</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-      /* css code for hiding the dropdown  */
         .hidden {
             display: none;
         }
@@ -26,20 +25,16 @@
             <label for="secondDropdown">Select another option:</label>
             <select class="form-control" id="secondDropdown">
                 <option value="">Select...</option>
-                <option value="subOption1">Sub Option 1</option>
-                <option value="subOption2">Sub Option 2</option>
             </select>
         </div>
         <div class="form-group hidden" id="thirdDropdownDiv">
             <label for="thirdDropdown">Select a third option:</label>
             <select class="form-control" id="thirdDropdown">
                 <option value="">Select...</option>
-                <option value="subSubOption1">Sub Sub Option 1</option>
-                <option value="subSubOption2">Sub Sub Option 2</option>
             </select>
         </div>
         <div class="hidden" id="resultDiv">
-            <p>You have selected a third sub option!</p>
+            <p id="resultText"></p>
         </div>
         <button class="btn btn-primary hidden" id="submitButton">Submit</button>
     </div>
@@ -49,35 +44,97 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     
     <script>
+        const options = {
+            option1: {
+                subOptions: ["Sub Option 1.1", "Sub Option 1.2"],
+                subSubOptions: {
+                    "Sub Option 1.1": ["Sub Sub Option 1.1.1", "Sub Sub Option 1.1.2"],
+                    "Sub Option 1.2": ["Sub Sub Option 1.2.1", "Sub Sub Option 1.2.2"]
+                }
+            },
+            option2: {
+                subOptions: ["Sub Option 2.1", "Sub Option 2.2"],
+                subSubOptions: {
+                    "Sub Option 2.1": ["Sub Sub Option 2.1.1", "Sub Sub Option 2.1.2"],
+                    "Sub Option 2.2": ["Sub Sub Option 2.2.1", "Sub Sub Option 2.2.2"]
+                }
+            }
+        };
+
+        const fixedData = {
+            "option1_Sub Option 1.1_Sub Sub Option 1.1.1": "Fixed data for option1 -> Sub Option 1.1 -> Sub Sub Option 1.1.1",
+            "option1_Sub Option 1.1_Sub Sub Option 1.1.2": "Fixed data for option1 -> Sub Option 1.1 -> Sub Sub Option 1.1.2",
+            "option1_Sub Option 1.2_Sub Sub Option 1.2.1": "Fixed data for option1 -> Sub Option 1.2 -> Sub Sub Option 1.2.1",
+            "option1_Sub Option 1.2_Sub Sub Option 1.2.2": "Fixed data for option1 -> Sub Option 1.2 -> Sub Sub Option 1.2.2",
+            "option2_Sub Option 2.1_Sub Sub Option 2.1.1": "Fixed data for option2 -> Sub Option 2.1 -> Sub Sub Option 2.1.1",
+            "option2_Sub Option 2.1_Sub Sub Option 2.1.2": "Fixed data for option2 -> Sub Option 2.1 -> Sub Sub Option 2.1.2",
+            "option2_Sub Option 2.2_Sub Sub Option 2.2.1": "Fixed data for option2 -> Sub Option 2.2 -> Sub Sub Option 2.2.1",
+            "option2_Sub Option 2.2_Sub Sub Option 2.2.2": "Fixed data for option2 -> Sub Option 2.2 -> Sub Sub Option 2.2.2"
+        };
+
         $(document).ready(function() {
             $('#firstDropdown').change(function() {
-                if ($(this).val()) {
-                    $('#secondDropdownDiv').removeClass('hidden');
+                const firstValue = $(this).val();
+                const secondDropdown = $('#secondDropdown');
+                const secondDropdownDiv = $('#secondDropdownDiv');
+                const thirdDropdownDiv = $('#thirdDropdownDiv');
+                const resultDiv = $('#resultDiv');
+                const submitButton = $('#submitButton');
+                
+                if (firstValue) {
+                    const subOptions = options[firstValue].subOptions;
+                    secondDropdown.empty().append('<option value="">Select...</option>');
+                    subOptions.forEach(option => {
+                        secondDropdown.append(`<option value="${option}">${option}</option>`);
+                    });
+                    secondDropdownDiv.removeClass('hidden');
                 } else {
-                    $('#secondDropdownDiv').addClass('hidden');
-                    $('#thirdDropdownDiv').addClass('hidden');
-                    $('#resultDiv').addClass('hidden');
-                    $('#submitButton').addClass('hidden');
+                    secondDropdownDiv.addClass('hidden');
+                    thirdDropdownDiv.addClass('hidden');
+                    resultDiv.addClass('hidden');
+                    submitButton.addClass('hidden');
                 }
             });
 
             $('#secondDropdown').change(function() {
-                if ($(this).val()) {
-                    $('#thirdDropdownDiv').removeClass('hidden');
+                const firstValue = $('#firstDropdown').val();
+                const secondValue = $(this).val();
+                const thirdDropdown = $('#thirdDropdown');
+                const thirdDropdownDiv = $('#thirdDropdownDiv');
+                const resultDiv = $('#resultDiv');
+                const submitButton = $('#submitButton');
+
+                if (secondValue) {
+                    const subSubOptions = options[firstValue].subSubOptions[secondValue];
+                    thirdDropdown.empty().append('<option value="">Select...</option>');
+                    subSubOptions.forEach(option => {
+                        thirdDropdown.append(`<option value="${option}">${option}</option>`);
+                    });
+                    thirdDropdownDiv.removeClass('hidden');
                 } else {
-                    $('#thirdDropdownDiv').addClass('hidden');
-                    $('#resultDiv').addClass('hidden');
-                    $('#submitButton').addClass('hidden');
+                    thirdDropdownDiv.addClass('hidden');
+                    resultDiv.addClass('hidden');
+                    submitButton.addClass('hidden');
                 }
             });
 
             $('#thirdDropdown').change(function() {
-                if ($(this).val()) {
-                    $('#resultDiv').removeClass('hidden');
-                    $('#submitButton').removeClass('hidden');
+                const firstValue = $('#firstDropdown').val();
+                const secondValue = $('#secondDropdown').val();
+                const thirdValue = $(this).val();
+                const resultDiv = $('#resultDiv');
+                const resultText = $('#resultText');
+                const submitButton = $('#submitButton');
+
+                if (thirdValue) {
+                    const key = `${firstValue}_${secondValue}_${thirdValue}`;
+                    const data = fixedData[key];
+                    resultText.text(data);
+                    resultDiv.removeClass('hidden');
+                    submitButton.removeClass('hidden');
                 } else {
-                    $('#resultDiv').addClass('hidden');
-                    $('#submitButton').addClass('hidden');
+                    resultDiv.addClass('hidden');
+                    submitButton.addClass('hidden');
                 }
             });
 
