@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dropdown Example</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+      /* css code for hiding the dropdown  */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="form-group">
+            <label for="firstDropdown">Select an option:</label>
+            <select class="form-control" id="firstDropdown">
+                <option value="">Select...</option>
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+            </select>
+        </div>
+        <div class="form-group hidden" id="secondDropdownDiv">
+            <label for="secondDropdown">Select another option:</label>
+            <select class="form-control" id="secondDropdown">
+                <option value="">Select...</option>
+                <option value="subOption1">Sub Option 1</option>
+                <option value="subOption2">Sub Option 2</option>
+            </select>
+        </div>
+        <div class="form-group hidden" id="thirdDropdownDiv">
+            <label for="thirdDropdown">Select a third option:</label>
+            <select class="form-control" id="thirdDropdown">
+                <option value="">Select...</option>
+                <option value="subSubOption1">Sub Sub Option 1</option>
+                <option value="subSubOption2">Sub Sub Option 2</option>
+            </select>
+        </div>
+        <div class="hidden" id="resultDiv">
+            <p>You have selected a third sub option!</p>
+        </div>
+        <button class="btn btn-primary hidden" id="submitButton">Submit</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            $('#firstDropdown').change(function() {
+                if ($(this).val()) {
+                    $('#secondDropdownDiv').removeClass('hidden');
+                } else {
+                    $('#secondDropdownDiv').addClass('hidden');
+                    $('#thirdDropdownDiv').addClass('hidden');
+                    $('#resultDiv').addClass('hidden');
+                    $('#submitButton').addClass('hidden');
+                }
+            });
+
+            $('#secondDropdown').change(function() {
+                if ($(this).val()) {
+                    $('#thirdDropdownDiv').removeClass('hidden');
+                } else {
+                    $('#thirdDropdownDiv').addClass('hidden');
+                    $('#resultDiv').addClass('hidden');
+                    $('#submitButton').addClass('hidden');
+                }
+            });
+
+            $('#thirdDropdown').change(function() {
+                if ($(this).val()) {
+                    $('#resultDiv').removeClass('hidden');
+                    $('#submitButton').removeClass('hidden');
+                } else {
+                    $('#resultDiv').addClass('hidden');
+                    $('#submitButton').addClass('hidden');
+                }
+            });
+
+            $('#submitButton').click(function() {
+                const firstValue = $('#firstDropdown').val();
+                const secondValue = $('#secondDropdown').val();
+                const thirdValue = $('#thirdDropdown').val();
+
+                const csvContent = "data:text/csv;charset=utf-8," 
+                    + "First Dropdown,Second Dropdown,Third Dropdown\n"
+                    + `${firstValue},${secondValue},${thirdValue}`;
+
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "dropdown_values.csv");
+                document.body.appendChild(link); // Required for FF
+
+                link.click();
+                document.body.removeChild(link);
+            });
+        });
+    </script>
+</body>
+</html>
