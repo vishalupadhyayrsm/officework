@@ -13,26 +13,31 @@
 </head>
 <body>
     <div class="container mt-5">
+        <!-- code for selcting the first dropdown when page will load  -->
         <div class="form-group">
             <label for="firstDropdown">Select an option:</label>
             <select class="form-control" id="firstDropdown">
                 <option value="">Select...</option>
-                <option value="option1">Option 1</option>
-                <option value="option2">Option 2</option>
+                <option value="option1">Select Component  1</option>
+                <option value="option2">Select Component  2</option>
+                <option value="option3">Select Component  3</option>
             </select>
         </div>
+        <!-- code for dispalying the dropwon based on the valkue of first dropdown  -->
         <div class="form-group hidden" id="secondDropdownDiv">
-            <label for="secondDropdown">Select another option:</label>
+            <label id="secondDropdownLabel" for="secondDropdown">Select another option:</label>
             <select class="form-control" id="secondDropdown">
                 <option value="">Select...</option>
             </select>
         </div>
+        <!-- code for selcting the third dropdown value start here  -->
         <div class="form-group hidden" id="thirdDropdownDiv">
-            <label for="thirdDropdown">Select a third option:</label>
+            <label id="thirdDropdownLabel" for="thirdDropdown">Select a third option:</label>
             <select class="form-control" id="thirdDropdown">
                 <option value="">Select...</option>
             </select>
         </div>
+        <!-- code for dispalying the final (modified config of the component in this page ) -->
         <div class="hidden" id="resultDiv">
             <p id="resultText"></p>
         </div>
@@ -42,121 +47,165 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
     
     <script>
-        const options = {
+       /* code for stroing the every  dropdown value start here  */
+       const options = {
             option1: {
-                subOptions: ["Sub Option 1.1", "Sub Option 1.2"],
+                label: "Select Another Option:",
+                subOptions: ["Hero", "HomePage PubGrid1", "Events", "Multimedia", "Hubs"],
                 subSubOptions: {
-                    "Sub Option 1.1": ["Sub Sub Option 1.1.1", "Sub Sub Option 1.1.2"],
-                    "Sub Option 1.2": ["Sub Sub Option 1.2.1", "Sub Sub Option 1.2.2"]
+                    "Hero": ["Credit and Securitized Global Page1", "Credit and Securitized US Page1", "Macro HomePage1", "Banking Fallout Page1", "Future of AI page1"],
+                    "HomePage PubGrid1": ["PubGrid Option 1", "PubGrid option 2"],
+                    "Events": ["Event Option 1", "Event Option 2"],
+                    "Multimedia": ["Multimedia Option 1", "Multimedia Option 2"],
+                    "Hubs": ["Hub Option 1", "Hub Option 2"]
                 }
             },
             option2: {
-                subOptions: ["Sub Option 2.1", "Sub Option 2.2"],
+                label: "Select Another Option : ",
+                subOptions: ["Hero2", "HomePage PubGrid2", "Events2", "Multimedia2", "Hubs2"],
                 subSubOptions: {
-                    "Sub Option 2.1": ["Sub Sub Option 2.1.1", "Sub Sub Option 2.1.2"],
-                    "Sub Option 2.2": ["Sub Sub Option 2.2.1", "Sub Sub Option 2.2.2"]
+                    "Hero2": ["Credit and Securitized Global Page2", "Credit and Securitized US Page2", "Macro HomePage2", "Banking Fallout Page2", "Future of AI page"],
+                    "HomePage PubGrid2": ["PubGrid Option 2", "PubGrid option 2"],
+                    "Events2": ["Event Option 2", "Event Option 2"],
+                    "Multimedia2": ["Multimedia Option 2", "Multimedia Option 2"],
+                    "Hubs2": ["Hub Option 2", "Hub Option 2"]
                 }
-            }
+            },
+          /* code for difining as many as option user wants for first dropdown */
         };
+        
 
+        /* json  for storing the final data for every dropdown  (Here  just match teh naming for teh every dropdown)*/
         const fixedData = {
-            "option1_Sub Option 1.1_Sub Sub Option 1.1.1": "Fixed data for option1 -> Sub Option 1.1 -> Sub Sub Option 1.1.1",
-            "option1_Sub Option 1.1_Sub Sub Option 1.1.2": "Fixed data for option1 -> Sub Option 1.1 -> Sub Sub Option 1.1.2",
-            "option1_Sub Option 1.2_Sub Sub Option 1.2.1": "Fixed data for option1 -> Sub Option 1.2 -> Sub Sub Option 1.2.1",
-            "option1_Sub Option 1.2_Sub Sub Option 1.2.2": "Fixed data for option1 -> Sub Option 1.2 -> Sub Sub Option 1.2.2",
-            "option2_Sub Option 2.1_Sub Sub Option 2.1.1": "Fixed data for option2 -> Sub Option 2.1 -> Sub Sub Option 2.1.1",
-            "option2_Sub Option 2.1_Sub Sub Option 2.1.2": "Fixed data for option2 -> Sub Option 2.1 -> Sub Sub Option 2.1.2",
-            "option2_Sub Option 2.2_Sub Sub Option 2.2.1": "Fixed data for option2 -> Sub Option 2.2 -> Sub Sub Option 2.2.1",
-            "option2_Sub Option 2.2_Sub Sub Option 2.2.2": "Fixed data for option2 -> Sub Option 2.2 -> Sub Sub Option 2.2.2"
+            "option1_Hero_Credit and Securitized Global Page1": "Modfied Config of the component in this page",
+            "option1_Hero_Credit and Securitized US Page1": "Credit",
+            "option1_Hero_Macro HomePage1": "Macro HomePage",
+            "option1_Hero_Banking Fallout Page1": "Banking Fallout Page",
+            "option1_Hero_Future of AI page1": "Future of AI page",
+            "option1_HomePage PubGrid1_PubGrid Option 1": "PubGrid Option 1",
+            "option1_HomePagePubGrid1_PubGrid Option 2": "PubGrid Option 2",
+            "option1_Events_Event Option 1": "Event Option 1",
+            "option1_Events_Event Option 2": "Event Option 2",
+            "option1_Multimedia_Multimedia Option 1": "Multimedia Option 1",
+            "option1_Multimedia_Multimedia Option 2": "Multimedia Option 2",
+            "option1_Hubs_Hub Option 1": "Hub Option 1",
+            "option1_Hubs_Hub Option 2": "Hub Option 2",
+            /* define the same for other options  */
         };
 
         $(document).ready(function() {
-            $('#firstDropdown').change(function() {
-                const firstValue = $(this).val();
-                const secondDropdown = $('#secondDropdown');
-                const secondDropdownDiv = $('#secondDropdownDiv');
-                const thirdDropdownDiv = $('#thirdDropdownDiv');
-                const resultDiv = $('#resultDiv');
-                const submitButton = $('#submitButton');
-                
-                if (firstValue) {
-                    const subOptions = options[firstValue].subOptions;
-                    secondDropdown.empty().append('<option value="">Select...</option>');
-                    subOptions.forEach(option => {
-                        secondDropdown.append(`<option value="${option}">${option}</option>`);
+                    $('#firstDropdown').change(function() {
+                        /*  getting the value for dropdowon */
+                        const firstValue = $(this).val();
+                        const secondDropdown = $('#secondDropdown');
+                        const secondDropdownDiv = $('#secondDropdownDiv');
+                        const secondDropdownLabel = $('#secondDropdownLabel');
+                        const thirdDropdownDiv = $('#thirdDropdownDiv');
+                        const resultDiv = $('#resultDiv');
+                        const submitButton = $('#submitButton');
+
+                        // Whenever user select the differne option for the dropdown it will clear the previous option
+                        secondDropdown.empty().append('<option value="">Select...</option>');
+
+
+                        if (firstValue) {
+                            const subOptions = options[firstValue].subOptions;
+                            const label = options[firstValue].label;
+
+                            /*  this code will diapaly teh second dropdown start here and appending the second dropdown value from the 
+                            json array 
+                            */
+                            subOptions.forEach(option => {
+                                secondDropdown.append(`<option value="${option}">${option}</option>`);
+                            });
+                            secondDropdownLabel.text(label);
+                            secondDropdownDiv.removeClass('hidden');
+                        } else {
+                            secondDropdownDiv.addClass('hidden');
+                            thirdDropdownDiv.addClass('hidden');
+                            resultDiv.addClass('hidden');
+                            submitButton.addClass('hidden');
+                        }
                     });
-                    secondDropdownDiv.removeClass('hidden');
-                } else {
-                    secondDropdownDiv.addClass('hidden');
-                    thirdDropdownDiv.addClass('hidden');
-                    resultDiv.addClass('hidden');
-                    submitButton.addClass('hidden');
-                }
-            });
 
-            $('#secondDropdown').change(function() {
-                const firstValue = $('#firstDropdown').val();
-                const secondValue = $(this).val();
-                const thirdDropdown = $('#thirdDropdown');
-                const thirdDropdownDiv = $('#thirdDropdownDiv');
-                const resultDiv = $('#resultDiv');
-                const submitButton = $('#submitButton');
+                    /* code for selecting the value from the second dropdown start here once the value is populated in teh secodn div  */
+                    $('#secondDropdown').change(function() {
 
-                if (secondValue) {
-                    const subSubOptions = options[firstValue].subSubOptions[secondValue];
-                    thirdDropdown.empty().append('<option value="">Select...</option>');
-                    subSubOptions.forEach(option => {
-                        thirdDropdown.append(`<option value="${option}">${option}</option>`);
+                        const firstValue = $('#firstDropdown').val();
+                        const secondValue = $(this).val();
+                        const thirdDropdown = $('#thirdDropdown');
+                        const thirdDropdownDiv = $('#thirdDropdownDiv');
+                        const thirdDropdownLabel = $('#thirdDropdownLabel');
+                        const resultDiv = $('#resultDiv');
+                        const submitButton = $('#submitButton');
+
+                         // Whenever user select the differne option for the dropdown it will clear the previous option
+                        thirdDropdown.empty().append('<option value="">Select...</option>');
+
+                        if (secondValue) {
+                            const subSubOptions = options[firstValue].subSubOptions[secondValue];
+                            const label = `Select a sub-sub-option for ${secondValue}:`;
+
+                            /*  this code will diapaly teh third dropdown start here and appending the second dropdown value from the 
+                            json array 
+                            */
+                            subSubOptions.forEach(option => {
+                                thirdDropdown.append(`<option value="${option}">${option}</option>`);
+                            });
+                            thirdDropdownLabel.text(label);
+                            thirdDropdownDiv.removeClass('hidden');
+                        } else {
+                            thirdDropdownDiv.addClass('hidden');
+                            resultDiv.addClass('hidden');
+                            submitButton.addClass('hidden');
+                        }
                     });
-                    thirdDropdownDiv.removeClass('hidden');
-                } else {
-                    thirdDropdownDiv.addClass('hidden');
-                    resultDiv.addClass('hidden');
-                    submitButton.addClass('hidden');
-                }
-            });
 
-            $('#thirdDropdown').change(function() {
-                const firstValue = $('#firstDropdown').val();
-                const secondValue = $('#secondDropdown').val();
-                const thirdValue = $(this).val();
-                const resultDiv = $('#resultDiv');
-                const resultText = $('#resultText');
-                const submitButton = $('#submitButton');
+                    /* code for selecting the value from the third dropdown start here once the value is populated in teh secodn div  */
+                    $('#thirdDropdown').change(function() {
+                        const firstValue = $('#firstDropdown').val();
+                        const secondValue = $('#secondDropdown').val();
+                        const thirdValue = $(this).val();
+                        const resultDiv = $('#resultDiv');
+                        const resultText = $('#resultText');
+                        const submitButton = $('#submitButton');
 
-                if (thirdValue) {
-                    const key = `${firstValue}_${secondValue}_${thirdValue}`;
-                    const data = fixedData[key];
-                    resultText.text(data);
-                    resultDiv.removeClass('hidden');
-                    submitButton.removeClass('hidden');
-                } else {
-                    resultDiv.addClass('hidden');
-                    submitButton.addClass('hidden');
-                }
-            });
+                        /* code for dispalying the final dropdown value  */
+                        if (thirdValue) {
+                            const key = `${firstValue}_${secondValue}_${thirdValue}`;
+                            const data = fixedData[key];
+                            resultText.text(data);
+                            resultDiv.removeClass('hidden');
+                            submitButton.removeClass('hidden');
+                        } else {
+                            resultDiv.addClass('hidden');
+                            submitButton.addClass('hidden');
+                        }
+                    });
 
-            $('#submitButton').click(function() {
-                const firstValue = $('#firstDropdown').val();
-                const secondValue = $('#secondDropdown').val();
-                const thirdValue = $('#thirdDropdown').val();
+                    $('#submitButton').click(function() {
+                        const firstValue = $('#firstDropdown').val();
+                        const secondValue = $('#secondDropdown').val();
+                        const thirdValue = $('#thirdDropdown').val();
+                        const finalResult = $('#resultText').text() || '';
+                        console.log(firstValue, secondValue, thirdValue, finalResult);
 
-                const csvContent = "data:text/csv;charset=utf-8," 
-                    + "First Dropdown,Second Dropdown,Third Dropdown\n"
-                    + `${firstValue},${secondValue},${thirdValue}`;
+                        const csvContent = `First Dropdown,Second Dropdown,Third Dropdown,Final Result\n"${firstValue}","${secondValue}","${thirdValue}","${finalResult}"`;
 
-                const encodedUri = encodeURI(csvContent);
-                const link = document.createElement("a");
-                link.setAttribute("href", encodedUri);
-                link.setAttribute("download", "dropdown_values.csv");
-                document.body.appendChild(link); // Required for FF
+                        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement("a");
+                        link.setAttribute("href", url);
+                        link.setAttribute("download", "dropdown_values.csv");
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                            });
+                        });
 
-                link.click();
-                document.body.removeChild(link);
-            });
-        });
     </script>
 </body>
 </html>
