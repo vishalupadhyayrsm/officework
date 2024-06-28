@@ -4,10 +4,8 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json');
-
 include_once("dbconfig.php");
 include_once("api.php");
-
 // Retrieve the request endpoint
 $uri = explode("/", $_SERVER["REQUEST_URI"]);
 $apidata = $uri[3];
