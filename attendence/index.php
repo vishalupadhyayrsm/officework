@@ -1210,9 +1210,6 @@ $decform = $results[0]['declarationform'];
         <script src="js/index.js"></script>
         <script src="js/certificate.js"></script>
         <script src="js/validation.js"></script>
-
-
-
         <!-- code for leave status start here -->
         <script>
             var tabId;
