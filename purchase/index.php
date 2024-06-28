@@ -11,43 +11,100 @@
     <link href="https://unpkg.com/tabulator-tables@5.5.2/dist/css/tabulator.min.css" rel="stylesheet">
     <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <!-- Include pdf.js library -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script> -->
-    <script src="pdf.min.js"></script>
-    <script src="pdf.worker.js"></script>
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/popup.css">
+    <style>
+        .form-page {
+            display: none;
+        }
+
+        .form-page.active {
+            display: block;
+        }
+
+        button {
+            margin: 10px 0;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .active-tab {
+            display: block;
+        }
+
+        .red-row {
+            color: red;
+        }
+
+        .green-row {
+            color: green;
+        }
+
+        .not-editable-row,
+        .disabled-cell {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        .disabled-row {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .disabled-cell {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+    </style>
 </head>
 
 <body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <span class="navbar-brand"> <?php echo $_SESSION['username']; ?></span>
+            <div class="container">
+                <div class="header-content">
+                    <h2 class="model_name text-center">Machine Intelligence Program</h2>
+                </div>
+                <a href="logout.php" class="logout">Logout</a>
+            </div>
+        </nav>
+    </header>
+
     <div class="container-fluid">
         <div class="row">
+            <!-- code for the button start here  -->
             <div class="col-12 col-md-2" style="border-right:1px solid black;">
+                <button onclick="showTab('tab1')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">Invoice Details</button>
+                <button onclick="showTab('tab2')" class="btn btn-primary order_status_button click_here_button btn-lg mb-2">Upload Invoice</button>
             </div>
+            <!-- code for the displaying the data start here  -->
             <div class="col-12 col-md-10">
-                <div id="" class="container tab-content active-tab">
+                <div id="tab2" class="container tab-content ">
                     <div class="row">
                         <div class="col-md-6 offset-md-3">
-                            <h2 style="text-align:center;">PDF Text Extractor</h2>
+                            <h2 style="text-align:center;">PDF</h2>
                             <br>
-                            <div class="form-group">
-                                <label for="dropdown">Select Source:</label>
-                                <select id="dropdown" class="form-control">
-                                    <option value="">Select</option>
-                                    <option value="amazon">Amazon</option>
-                                    <option value="electronic">Electronic.com</option>
-                                    <option value="dgk">dgk</option>
-                                    <option value="credence">Credence</option>
-                                    <option value="bl">Balmer Lawrie</option>
-                                    <option value="dmart">D-Mart</option>
-                                    <option value="ola">OLA</option>
-                                </select>
-                            </div><br>
+                            <form method="post" action="formsubmit.php/storebilldeatils" class="form_data" enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label for="pdfInput">Select Invoice:</label>
+                                    <input type="file" class="form-control" id="pdfInput" name="invoice" accept=".pdf">
+                                </div>
+                                <br>
+                                <button type="" class="btn btn-success">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
 
-                            <div class="form-group">
-                                <label for="pdfInput">Select Invoice:</label>
-                                <input type="file" class="form-control" id="pdfInput" accept=".pdf">
-                            </div><br>
-                            <button id="submitBtn" class="btn btn-success">Submit</button>
-                            <div id="pdfText" style="display:none;"></div>
+                <!-- code for displaying the invoice data start here  -->
+                <div id="tab1" class="container tab-content active-tab">
+                    <div class="row">
+                        <div class="col-md-12 ">
+                            <h2 class="mb-4 all_heading" style="text-align:center;">Invoice</h2>
+                            <div id="invoice"></div>
                         </div>
                     </div>
                 </div>
@@ -56,219 +113,67 @@
     </div>
 
     <script>
-        let extractedData = [];
+        function showTab(tabId) {
+            var tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(function(tab) {
+                tab.classList.remove('active-tab');
+            });
+            var selectedTab = document.getElementById(tabId);
+            selectedTab.classList.add('active-tab');
+        }
 
-        document.getElementById('pdfInput').addEventListener('change', function(event) {
-            var file = event.target.files[0];
-            if (!file) {
-                console.error('No file selected.');
-                return;
-            }
-
-            var reader = new FileReader();
-            reader.onload = function(event) {
-                var arrayBuffer = event.target.result;
-
-                pdfjsLib.getDocument(arrayBuffer).promise.then(function(pdf) {
-                    return pdf.getPage(1);
-                }).then(function(page) {
-                    return page.getTextContent();
-                }).then(function(textContent) {
-                    extractedData = [];
-                    var previousLineEndsWithColon = false;
-                    var previousKey = '';
-                    var selectedOption = document.getElementById('dropdown').value;
-
-                    console.log(textContent);
-
-                    switch (selectedOption) {
-                        case 'dmart':
-                            if (str.endsWith(':')) {
-                                previousKey = str.substring(0, str.length - 1).trim();
-                                previousLineEndsWithColon = true;
-                            } else if (previousLineEndsWithColon) {
-                                var value = str.trim();
-                                extractedData.push({
-                                    key: previousKey,
-                                    value: value
-                                });
-                                previousLineEndsWithColon = false;
-                                previousKey = '';
-                            }
-                            break;
-                        case 'ola':
-                            textContent.items.forEach(function(item, index) {
-                                var str = item.str.trim();
-
-                                // Handle Total Payable
-                                if (str === 'Total Payable') {
-                                    var nextStr = '';
-                                    var nextNextStr = '';
-
-                                    // Check the next two items if they exist
-                                    if (index + 1 < textContent.items.length) {
-                                        nextStr = textContent.items[index + 1].str.trim();
-                                    }
-                                    if (index + 2 < textContent.items.length) {
-                                        nextNextStr = textContent.items[index + 2].str.trim();
-                                    }
-
-                                    // Concatenate next two strings
-                                    var balanceValue = nextStr + ' ' + nextNextStr;
-                                    extractedData.push({
-                                        key: 'Balance',
-                                        value: balanceValue
-                                    });
-                                }
-                                // Handle Date
-                                else if (str === 'Date') {
-                                    var nextStr = '';
-
-                                    // Check the next item
-                                    if (index + 1 < textContent.items.length) {
-                                        nextStr = textContent.items[index + 1].str.trim();
-                                    }
-
-                                    extractedData.push({
-                                        key: 'Date',
-                                        value: nextStr
-                                    });
-                                }
-                                // Handle CRN
-                                else if (str.startsWith('CRN')) {
-                                    extractedData.push({
-                                        key: 'Invoice',
-                                        value: str
-                                    });
-                                }
-                            });
-
-                            break;
-                        case 'credence':
-                            textContent.items.forEach(function(item, index) {
-                                var str = item.str.trim();
-                                if (['Date', 'Invoice No.', 'Balance'].includes(str)) {
-                                    var nextStr = '';
-                                    for (var i = index + 1; i < textContent.items.length; i++) {
-                                        nextStr = textContent.items[i].str.trim();
-                                        if (nextStr !== '') {
-                                            break;
-                                        }
-                                    }
-                                    if (nextStr !== '') {
-                                        extractedData.push({
-                                            key: str,
-                                            value: nextStr
-                                        });
-                                    }
-                                }
-                            });
-                            break;
-                        case 'bl':
-                            textContent.items.forEach(function(item, index) {
-                                var str = item.str.trim();
-                                if (index === 73) {
-                                    var concatStr = '';
-                                    if (textContent.items[93]) {
-                                        concatStr = textContent.items[93].str.trim();
-                                    }
-                                    extractedData.push({
-                                        key: str,
-                                        value: concatStr
-                                    });
-                                } else if (str === 'Grand Total') {
-                                    var nextStr = '';
-                                    if (index + 1 < textContent.items.length) {
-                                        nextStr = textContent.items[index + 1].str.trim();
-                                        if (nextStr === '' && index + 2 < textContent.items.length) {
-                                            nextStr = textContent.items[index + 2].str.trim();
-                                        }
-                                    }
-                                    extractedData.push({
-                                        key: str,
-                                        value: nextStr
-                                    });
-                                } else if (['Date', 'InvoiceNo', 'Balance'].includes(str)) {
-                                    var nextStr = '';
-                                    for (var i = index + 1; i < textContent.items.length; i++) {
-                                        nextStr = textContent.items[i].str.trim();
-                                        if (nextStr !== '') {
-                                            break;
-                                        }
-                                    }
-                                    if (nextStr !== '') {
-                                        extractedData.push({
-                                            key: str,
-                                            value: nextStr
-                                        });
-                                    }
-                                } else {
-
-                                }
-                            });
-                            break;
-                        case 'dgk':
-
-                            break;
-                        default:
-                            textContent.items.forEach(function(item) {
-                                var str = item.str.trim();
-                                console.log(str);
-                                if (str.endsWith(':')) {
-                                    previousKey = str.substring(0, str.length - 1).trim();
-                                    previousLineEndsWithColon = true;
-                                } else if (previousLineEndsWithColon) {
-                                    var value = str.trim();
-                                    extractedData.push({
-                                        key: previousKey,
-                                        value: value
-                                    });
-                                    previousLineEndsWithColon = false;
-                                    previousKey = '';
-                                }
-                            });
-                            break;
-                    }
-
-                    console.log('Extracted Data:', extractedData);
-                }).catch(function(reason) {
-                    console.error('Error extracting text:', reason);
-                });
-            };
-            reader.readAsArrayBuffer(file);
-        });
-
-        document.getElementById('submitBtn').addEventListener('click', function() {
-            var selectedOption = document.getElementById('dropdown').value;
-
-            var data = {
-                dropdownValue: selectedOption,
-                extractedData: extractedData
-            };
-            console.log(data);
-
-            fetch('formsubmit.php/invoice', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
+        if (typeof Tabulator !== 'undefined') {
+            // Fetch data from API asynchronously
+            fetch('formsubmit.php/invoice')
+                .then(response => response.json())
                 .then(data => {
-                    console.log('Success:', data);
-                    // Optionally handle success response
+                    var columns = [{
+                            title: "S.No.",
+                            field: "ivid",
+                            headerFilter: true
+                        },
+                        {
+                            title: "Invoice Number",
+                            field: "invoicenumber",
+                            headerFilter: true
+                        },
+                        {
+                            title: "Invoice Date",
+                            field: "date",
+                            headerFilter: true
+                        }
+                    ];
+                    var pageSize = 10;
+                    var currentPage = 1;
+                    var table = new Tabulator("#invoice", {
+                        data: data,
+                        layout: "fitcolumn",
+                        columns: columns,
+                        pagination: "local",
+                        paginationSize: pageSize,
+                        paginationSizeSelector: [10, 15, 30],
+                        paginationInitialPage: currentPage,
+                    });
+
+                    var prevPageBtn = document.querySelector('.pagination-btn:first-of-type');
+                    var nextPageBtn = document.querySelector('.pagination-btn:last-of-type');
+
+                    if (prevPageBtn && nextPageBtn) {
+                        prevPageBtn.addEventListener('click', function() {
+                            table.previousPage();
+                        });
+
+                        nextPageBtn.addEventListener('click', function() {
+                            table.nextPage();
+                        });
+                    }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    // Handle error
+                    console.error('Error fetching data from API:', error);
                 });
-        });
+        } else {
+            console.error('Tabulator library not defined or not loaded.');
+        }
     </script>
 </body>
 
