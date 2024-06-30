@@ -968,8 +968,6 @@ $decform = $results[0]['declarationform'];
             </div>
 
             <!----- code for dispaly gate pass status   ---->
-
-
         </div>
 
         <br><br><br><br>
