@@ -17,12 +17,14 @@ $usertype = $_SESSION['usertype'];
                     <li><a href="./accountfinance.php">Account and Finanance</a></li>
                     <?php //} 
                     ?>
+                    <li><a href="./staff.php">Staff</a></li>
+                    <li><a href="./amazon.php">Amazon</a></li>
                 </ul>
             </li>
             <li class="nav-label">Apps</li>
             <li><a class="has-arrow" href="javascript:void()" aria-expanded="false"><i class="icon icon-app-store"></i><span class="nav-text">Apps</span></a>
                 <ul aria-expanded="false">
-                    <li><a href="./app-profile.html">Profile</a></li>
+                    <li><a href="./profile.php">Profile</a></li>
                     <li><a class="has-arrow" href="javascript:void()" aria-expanded="false">Email</a>
                         <ul aria-expanded="false">
                             <li><a href="./email-compose.html">Compose</a></li>

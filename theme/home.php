@@ -364,7 +364,7 @@ $decform = $results[0]['declarationform'];
                 <div class="row page-titles mx-0">
                     <div class="col-sm-6 p-md-0">
                         <div class="welcome-text">
-                            <h4>Hi, welcome back!</h4>
+                            <h4>Hi, welcome back! HR</h4>
                         </div>
                     </div>
                     <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
@@ -451,7 +451,7 @@ $decform = $results[0]['declarationform'];
                         <div class="card">
                             <div class="card-header">
                                 <h4 class="card-title">All Certificate list</h4>
-                                <button id="openPopupBtn">Send Certificate</button>
+                                <button id="openPopupBtn" class='badge badge-success'>Send Certificate</button>
                             </div>
                             <div class="card-body">
                                 <div id="certificate"></div>
@@ -510,7 +510,7 @@ $decform = $results[0]['declarationform'];
                         <div class="card">
                             <div class="card-header">
                                 <h4 class="card-title">Gate Pass</h4>
-                                <button id="openPopupBtn">Send Gate Pass</button>
+                                <button id="openPopupBtn" class='badge badge-success'>Send Gate Pass</button>
                             </div>
                             <div class="card-body">
                                 <!-- <div id="vmap13" class="vmap"></div> -->
@@ -780,94 +780,6 @@ $decform = $results[0]['declarationform'];
                         </div>
                     </div>
 
-                    <!-- <div class="col-xl-12 col-xxl-6 col-lg-6 col-md-12">
-                        <div class="row">
-                            <div class="col-xl-3 col-lg-6 col-sm-6 col-xxl-6 col-md-6">
-                                <div class="card">
-                                    <div class="social-graph-wrapper widget-facebook">
-                                        <span class="s-icon"><i class="fa fa-facebook"></i></span>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-6 border-right">
-                                            <div class="pt-3 pb-3 pl-0 pr-0 text-center">
-                                                <h4 class="m-1"><span class="counter">89</span> k</h4>
-                                                <p class="m-0">Friends</p>
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="pt-3 pb-3 pl-0 pr-0 text-center">
-                                                <h4 class="m-1"><span class="counter">119</span> k</h4>
-                                                <p class="m-0">Followers</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xl-3 col-lg-6 col-sm-6 col-xxl-6 col-md-6">
-                                <div class="card">
-                                    <div class="social-graph-wrapper widget-linkedin">
-                                        <span class="s-icon"><i class="fa fa-linkedin"></i></span>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-6 border-right">
-                                            <div class="pt-3 pb-3 pl-0 pr-0 text-center">
-                                                <h4 class="m-1"><span class="counter">89</span> k</h4>
-                                                <p class="m-0">Friends</p>
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="pt-3 pb-3 pl-0 pr-0 text-center">
-                                                <h4 class="m-1"><span class="counter">119</span> k</h4>
-                                                <p class="m-0">Followers</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xl-3 col-lg-6 col-sm-6 col-xxl-6 col-md-6">
-                                <div class="card">
-                                    <div class="social-graph-wrapper widget-googleplus">
-                                        <span class="s-icon"><i class="fa fa-google-plus"></i></span>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-6 border-right">
-                                            <div class="pt-3 pb-3 pl-0 pr-0 text-center">
-                                                <h4 class="m-1"><span class="counter">89</span> k</h4>
-                                                <p class="m-0">Friends</p>
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="pt-3 pb-3 pl-0 pr-0 text-center">
-                                                <h4 class="m-1"><span class="counter">119</span> k</h4>
-                                                <p class="m-0">Followers</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-xl-3 col-lg-6 col-sm-6 col-xxl-6 col-md-6">
-                                <div class="card">
-                                    <div class="social-graph-wrapper widget-twitter">
-                                        <span class="s-icon"><i class="fa fa-twitter"></i></span>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-6 border-right">
-                                            <div class="pt-3 pb-3 pl-0 pr-0 text-center">
-                                                <h4 class="m-1"><span class="counter">89</span> k</h4>
-                                                <p class="m-0">Friends</p>
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="pt-3 pb-3 pl-0 pr-0 text-center">
-                                                <h4 class="m-1"><span class="counter">119</span> k</h4>
-                                                <p class="m-0">Followers</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
                 </div>
 
             </div>
