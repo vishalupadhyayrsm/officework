@@ -71,7 +71,7 @@ switch ($endpoint) {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $extractedTextURL = $_POST['extractedTextURL'];
-                $apiKey = 'sk-proj-SFfcEheRhG5M92UDPAQdT3BlbkFJHs1rPv32VdzYax3GOw09';
+                // $apiKey = 'sk-proj-SFfcEheRhG5M92UDPAQdT3BlbkFJHs1rPv32VdzYax3GOw09';
                 $prompt = $extractedTextURL . "</br>" . "Answer all the following questions :
                 What is the name of the company which created the invoice 
                 What is the invoice number 
