@@ -416,7 +416,6 @@ $decform = $results[0]['declarationform'];
                 <?php
                 }
                 ?>
-
                 <!-- code for dispaly the intern decelartion form that user has filled  -->
                 <?php
                 if (($usertype != "hr") && $decform  == 'yes') {

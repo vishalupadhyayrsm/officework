@@ -1,3 +1,20 @@
+<?php
+session_start();
+include 'dbconfig.php';
+
+$sid = isset($_GET['sid']) ? $_GET['sid'] : null;
+$sid = $_SESSION['userid'];
+
+$sql = "SELECT sg.`sid`,sg.`name`, sg.`email`, sg.`usertype`,sg.`tenureenddate`, sg.`contact`, sg.`cl`, sg.`rh`,sg.`el`, sg.remainingcl, sg.remainingrh,sg.remainingel, sg.declarationform,lt.leaveid, lt.`clstartdate`, lt.`clenddate`,lt.`rhstartdate`, lt.`rhenddate`, lt.`elstartdate`, lt.`elenddate`,  lt.`reason`, lt.`leave_status`,de.declarationform,de.emp_roll,de.`univesity`,de.name,de.iitbemail,de.aadhar,de.gender,de.localaddress,de.localpostal,de.permanentadd,de.permpostal, de.homecontact,de.emename1,de.emerelation,de.emeadd,de.emecontact,de.empostalcode,de.emesecondname,de.emesecrelation,de.medicalcondition,de.profilepic
+FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid LEFT JOIN declarationform as de on de.sid = sg.sid where sg.sid=:sid ";
+$stmt = $conn->prepare($sql);
+$stmt->bindParam(':sid', $sid);
+$stmt->execute();
+$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// print_r($results);
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -143,7 +160,7 @@
                 <div class="row page-titles mx-0">
                     <div class="col-sm-6 p-md-0">
                         <div class="welcome-text">
-                            <h4>Hi, welcome back! User</h4>
+                            <h4>Hi, welcome back! <?php echo $results[0]['name'] ?></h4>
                         </div>
                     </div>
                     <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
@@ -171,19 +188,19 @@
                                             <div class="row">
                                                 <div class="col-xl-4 col-sm-4 border-right-1 prf-col">
                                                     <div class="profile-name">
-                                                        <h4 class="text-primary">Mitchell C. Shay</h4>
-                                                        <p>UX / UI Designer</p>
+                                                        <h4 class="text-primary"><?php echo $results[0]['name'] ?></h4>
+                                                        <p><?php echo $results[0]['usertype'] ?></p>
                                                     </div>
                                                 </div>
                                                 <div class="col-xl-4 col-sm-4 border-right-1 prf-col">
                                                     <div class="profile-email">
-                                                        <h4 class="text-muted">hello@email.com</h4>
+                                                        <h4 class="text-muted"><?php echo $results[0]['email'] ?></h4>
                                                         <p>Email</p>
                                                     </div>
                                                 </div>
                                                 <div class="col-xl-4 col-sm-4 prf-col">
                                                     <div class="profile-call">
-                                                        <h4 class="text-muted">(+1) 321-837-1030</h4>
+                                                        <h4 class="text-muted"><?php echo $results[0]['contact'] ?></h4>
                                                         <p>Phone No.</p>
                                                     </div>
                                                 </div>
@@ -196,8 +213,8 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4">
-                        <div class="card">
+                    <div class="col-lg-2">
+                        <!-- <div class="card">
                             <div class="card-body">
                                 <div class="profile-statistics">
                                     <div class="text-center mt-4 border-bottom-1 pb-3">
@@ -289,7 +306,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                     <div class="col-lg-8">
                         <div class="card">
@@ -297,15 +314,15 @@
                                 <div class="profile-tab">
                                     <div class="custom-tab-1">
                                         <ul class="nav nav-tabs">
-                                            <li class="nav-item"><a href="#my-posts" data-toggle="tab" class="nav-link active show">Posts</a>
-                                            </li>
+                                            <!-- <li class="nav-item"><a href="#my-posts" data-toggle="tab" class="nav-link active show">Posts</a>
+                                            </li> -->
                                             <li class="nav-item"><a href="#about-me" data-toggle="tab" class="nav-link">About Me</a>
                                             </li>
-                                            <li class="nav-item"><a href="#profile-settings" data-toggle="tab" class="nav-link">Setting</a>
-                                            </li>
+                                            <!-- <li class="nav-item"><a href="#profile-settings" data-toggle="tab" class="nav-link">Setting</a>
+                                            </li> -->
                                         </ul>
                                         <div class="tab-content">
-                                            <div id="my-posts" class="tab-pane fade active show">
+                                            <!-- <div id="my-posts" class="tab-pane fade active show">
                                                 <div class="my-post-content pt-3">
                                                     <div class="post-input">
                                                         <textarea name="textarea" id="textarea" cols="30" rows="5" class="form-control bg-transparent" placeholder="Please type what you want...."></textarea> <a href="javascript:void()"><i class="ti-clip"></i> </a>
@@ -344,8 +361,8 @@
                                                     <div class="text-center mb-2"><a href="javascript:void()" class="btn btn-primary">Load More</a>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div id="about-me" class="tab-pane fade">
+                                            </div> -->
+                                            <div id="about-me" class="tab-pane fade active show">
                                                 <div class="profile-about-me">
                                                     <div class="pt-4 border-bottom-1 pb-4">
                                                         <h4 class="text-primary">About Me</h4>
@@ -375,7 +392,7 @@
                                                             <h5 class="f-w-500">Name <span class="pull-right">:</span>
                                                             </h5>
                                                         </div>
-                                                        <div class="col-9"><span>Mitchell C.Shay</span>
+                                                        <div class="col-9"><span><?php echo $results[0]['name'] ?> </span>
                                                         </div>
                                                     </div>
                                                     <div class="row mb-4">
@@ -383,42 +400,85 @@
                                                             <h5 class="f-w-500">Email <span class="pull-right">:</span>
                                                             </h5>
                                                         </div>
-                                                        <div class="col-9"><span>example@examplel.com</span>
+                                                        <div class="col-9"><span><?php echo $results[0]['email'] ?></span>
                                                         </div>
                                                     </div>
                                                     <div class="row mb-4">
                                                         <div class="col-3">
-                                                            <h5 class="f-w-500">Availability <span class="pull-right">:</span></h5>
+                                                            <h5 class="f-w-500">Gender <span class="pull-right">:</span></h5>
                                                         </div>
-                                                        <div class="col-9"><span>Full Time (Free Lancer)</span>
+                                                        <div class="col-9"><span><?php echo $results[0]['gender'] ?></span>
                                                         </div>
                                                     </div>
                                                     <div class="row mb-4">
                                                         <div class="col-3">
-                                                            <h5 class="f-w-500">Age <span class="pull-right">:</span>
+                                                            <h5 class="f-w-500">Aadhar <span class="pull-right">:</span>
                                                             </h5>
                                                         </div>
-                                                        <div class="col-9"><span>27</span>
+                                                        <div class="col-9"><span><?php echo $results[0]['aadhar'] ?></span>
                                                         </div>
                                                     </div>
                                                     <div class="row mb-4">
                                                         <div class="col-3">
-                                                            <h5 class="f-w-500">Location <span class="pull-right">:</span></h5>
+                                                            <h5 class="f-w-500">Medical Condition<span class="pull-right">:</span></h5>
                                                         </div>
-                                                        <div class="col-9"><span>Rosemont Avenue Melbourne,
-                                                                Florida</span>
+                                                        <div class="col-9"><span><?php echo $results[0]['medicalcondition']; ?></span>
                                                         </div>
                                                     </div>
                                                     <div class="row mb-4">
                                                         <div class="col-3">
-                                                            <h5 class="f-w-500">Year Experience <span class="pull-right">:</span></h5>
+                                                            <h5 class="f-w-500">Local Address<span class="pull-right">:</span></h5>
                                                         </div>
-                                                        <div class="col-9"><span>07 Year Experiences</span>
+                                                        <div class="col-9"><span><?php echo $results[0]['localaddress']; ?></span>
+                                                        </div>
+                                                    </div>
+                                                    <h2 class="emergency_details">Emergency Contact Details (First Person)</h2>
+                                                    <div class="row mb-4">
+                                                        <div class="col-3">
+                                                            <h5 class="f-w-500">Person Name<span class="pull-right">:</span></h5>
+                                                        </div>
+                                                        <div class="col-9"><span><?php echo $results[0]['emename1']; ?></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-4">
+                                                        <div class="col-3">
+                                                            <h5 class="f-w-500">Relation<span class="pull-right">:</span></h5>
+                                                        </div>
+                                                        <div class="col-9"><span><?php echo $results[0]['emerelation']; ?></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-4">
+                                                        <div class="col-3">
+                                                            <h5 class="f-w-500">Contact Number<span class="pull-right">:</span></h5>
+                                                        </div>
+                                                        <div class="col-9"><span><?php echo $results[0]['emecontact']; ?></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-4">
+                                                        <div class="col-3">
+                                                            <h5 class="f-w-500">Address<span class="pull-right">:</span></h5>
+                                                        </div>
+                                                        <div class="col-9"><span><?php echo $results[0]['emeadd']; ?></span>
+                                                        </div>
+                                                    </div>
+                                                    <h2 class="emergency_details">Emergency Contact Details (Second Person)</h2>
+                                                    <div class="row mb-4">
+                                                        <div class="col-3">
+                                                            <h5 class="f-w-500">Person Name<span class="pull-right">:</span></h5>
+                                                        </div>
+                                                        <div class="col-9"><span><?php echo $results[0]['emesecondname']; ?></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mb-4">
+                                                        <div class="col-3">
+                                                            <h5 class="f-w-500">Relation<span class="pull-right">:</span></h5>
+                                                        </div>
+                                                        <div class="col-9"><span><?php echo $results[0]['emesecrelation']; ?></span>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div id="profile-settings" class="tab-pane fade">
+                                            <!-- <div id="profile-settings" class="tab-pane fade">
                                                 <div class="pt-3">
                                                     <div class="settings-form">
                                                         <h4 class="text-primary">Account Setting</h4>
@@ -471,7 +531,7 @@
                                                         </form>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div> -->
                                         </div>
                                     </div>
                                 </div>

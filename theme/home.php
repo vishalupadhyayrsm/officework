@@ -14,66 +14,53 @@ if (isset($_SESSION['user_email'])) {
     }
     // code for checking that if the usertype is staff or not 
     try {
-
-        if ($usertype == "staff") {
-            $sql = "SELECT sg.`sid`,sg.`name`, sg.`email`, sg.`usertype`,sg.`tenureenddate`, sg.`contact`, sg.`cl`, sg.`rh`,sg.`el`, sg.remainingcl, sg.remainingrh,sg.remainingel, sg.declarationform,lt.leaveid, lt.`clstartdate`, lt.`clenddate`,lt.`rhstartdate`, lt.`rhenddate`, lt.`elstartdate`, lt.`elenddate`,  lt.`reason`, lt.`leave_status`,de.declarationform,de.emp_roll,de.`univesity`,de.name,de.iitbemail,de.aadhar,de.gender,de.localaddress,de.localpostal,de.permanentadd,de.permpostal, de.homecontact,de.emename1,de.emerelation,de.emeadd,de.emecontact,de.empostalcode,de.emesecondname,de.emesecrelation,de.medicalcondition,de.profilepic
-             FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid LEFT JOIN declarationform as de on de.sid = sg.sid where sg.sid=:sid ";
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':sid', $sid);
-            $stmt->execute();
-        } elseif ($usertype == "intern" || $usertype == "student") {
-            $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.declarationform, de.`declarationform`, de.`name`,de.iitbemail,de.aadhar, de.`emp_roll`,de.`univesity`, de.`gender`, de.`localaddress`, de.`localpostal`, de.`permanentadd`, de.`permpostal`, de.`homecontact`, de.`emename1`, de.`emerelation`, de.`emeadd`, de.`emecontact`, de.`empostalcode`, de.`emesecondname`, de.`emesecrelation`, de.`medicalcondition`, de.`term`, de.`profilepic`
-             FROM `sigin` as sg LEFT JOIN declarationform as de on de.sid = sg.sid where sg.sid=:sid ";
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':sid', $sid);
-            $stmt->execute();
-        } elseif ($usertype == "hr") {
-            $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`,sg.`el`, sg.remainingcl, sg.remainingrh,sg.remainingel, sg.declarationform,lt.leaveid,lt.`reason`,lt.`clstartdate`, lt.`clenddate`,lt.`rhstartdate`, lt.`rhenddate`, lt.`elstartdate`, lt.`elenddate`, lt.`leave_status` 
-                    FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid";
-            $stmt = $conn->prepare($sql);
-            // $stmt->bindParam(':sid', $sid);
-            $stmt->execute();
-        }
+        $sql = "SELECT sg.`sid`, sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`, sg.`el`, sg.remainingcl, sg.remainingrh, sg.remainingel, sg.declarationform, lt.leaveid, lt.`reason`, lt.`clstartdate`, lt.`clenddate`, lt.`rhstartdate`, lt.`rhenddate`, lt.`elstartdate`, lt.`elenddate`, lt.`leave_status`, counts.total_records, counts.student_count, counts.staff_count, counts.intern_count
+            FROM sigin AS sg LEFT JOIN leavetable AS lt ON lt.sid = sg.sid CROSS JOIN ( SELECT COUNT(sg.sid) AS total_records, SUM(CASE WHEN sg.usertype = 'student' THEN 1 ELSE 0 END) AS student_count, SUM(CASE WHEN sg.usertype = 'staff' THEN 1 ELSE 0 END) AS staff_count, SUM(CASE WHEN sg.usertype = 'intern' THEN 1 ELSE 0 END) AS intern_count FROM sigin AS sg ) AS counts";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        // print_r($results);
+
+        /* code for fecthing teh userdeatils start here  */
+        $sql = "SELECT `sid`, `name`, `email`,`empcode`,`password`,`startdate`,`enddate`,`userstatus`,`tenureenddate`, `usertype`, `contact`, `cl`, `rh`, `remainingcl`, `remainingrh`, `year`, `declarationform`, `resign` FROM `sigin`";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $userdetails = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+        /* code for fecthing the certificate details start here */
+        $sql = "SELECT `cid`, `sid`, `piname`, `username`,`start_date`,`end_date`,`certificatestatus`, `collegename`, `workdone` FROM `certificate`";
+        // $sql = 'SELECT sg.`certificatestatus`, ce.`cid`, ce.`sid`, ce.`piname`, ce.`username`, ce.`start_date`, ce.`end_date`, ce.`certificatestatus` AS `ce_certificatestatus`, ce.`collegename`, ce.`workdone` FROM `sigin` AS sg LEFT JOIN `certificate` AS ce ON ce.`sid` = sg.`sid`';
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $certificate = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        /* code for fecthing the gate pass data start here */
+        $sql = "SELECT `rid`, `sid`, `pi_name`, `start_date`, `terminationdate`, `startingposition`, `endingpostion`, `reason_leaving`, `planafterleaving`, `imporove_suggestion`, `what_mostlike`, `what_leastlike`, `taking_anotherjob`, `new_place_job`, `improvement`, `Drawer_yesno`, `CupboardKeys_yesno`, `labbookyesno`, `hardwareno`,`otherremarks`, `anyothersno` FROM `resigndata`";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $resign = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        /* code for dispalying the  gate pass start here  */
+        $sql = "SELECT `gid`,`sid`, `name`, `mobile`, `startdate`, `enddate`, `gender`, `purpose`,`gatepassstatus` FROM `gatepass`";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $gatepass = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();
     }
 } else {
-    header("Location: login.php");
+    header("Location: ./index.php");
     exit();
 }
 
-$sql = "SELECT `sid`, `name`, `email`,`empcode`,`password`,`startdate`,`enddate`,`userstatus`,`tenureenddate`, `usertype`, `contact`, `cl`, `rh`, `remainingcl`, `remainingrh`, `year`, `declarationform`, `resign` FROM `sigin`";
-$stmt = $conn->prepare($sql);
-$stmt->execute();
-$userdetails = $stmt->fetchAll(PDO::FETCH_ASSOC);
-// print_r($userdetails);
-
-
-$sql = "SELECT `cid`, `sid`, `piname`, `username`,`start_date`,`end_date`,`certificatestatus`, `collegename`, `workdone` FROM `certificate`";
-// $sql = 'SELECT sg.`certificatestatus`, ce.`cid`, ce.`sid`, ce.`piname`, ce.`username`, ce.`start_date`, ce.`end_date`, ce.`certificatestatus` AS `ce_certificatestatus`, ce.`collegename`, ce.`workdone` FROM `sigin` AS sg LEFT JOIN `certificate` AS ce ON ce.`sid` = sg.`sid`';
-$stmt = $conn->prepare($sql);
-$stmt->execute();
-$certificate = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-$sql = "SELECT `rid`, `sid`, `pi_name`, `start_date`, `terminationdate`, `startingposition`, `endingpostion`, `reason_leaving`, `planafterleaving`, `imporove_suggestion`, `what_mostlike`, `what_leastlike`, `taking_anotherjob`, `new_place_job`, `improvement`, `Drawer_yesno`, `CupboardKeys_yesno`, `labbookyesno`, `hardwareno`,`otherremarks`, `anyothersno` FROM `resigndata`";
-$stmt = $conn->prepare($sql);
-$stmt->execute();
-$resign = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-if ($usertype == 'hr') {
-    $sql = "SELECT `gid`,`sid`, `name`, `mobile`, `startdate`, `enddate`, `gender`, `purpose`,`gatepassstatus` FROM `gatepass`";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-    $gatepass = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} else {
-    $sql = "SELECT `gid`,`sid`, `name`, `mobile`, `startdate`, `enddate`, `gender`, `purpose`,`gatepassstatus` FROM `gatepass` where sid=:sid ";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':sid', $sid);
-    $stmt->execute();
-    $gatepass = $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+// if ($usertype == 'hr') {
+// } else {
+//     $sql = "SELECT `gid`,`sid`, `name`, `mobile`, `startdate`, `enddate`, `gender`, `purpose`,`gatepassstatus` FROM `gatepass` where sid=:sid ";
+//     $stmt = $conn->prepare($sql);
+//     $stmt->bindParam(':sid', $sid);
+//     $stmt->execute();
+//     $gatepass = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// }
 $decform = $results[0]['declarationform'];
 // echo $decform;
 // $decform = "yes";
@@ -100,9 +87,6 @@ $decform = $results[0]['declarationform'];
 
 <body>
 
-    <!--*******************
-        Preloader start
-    ********************-->
     <div id="preloader">
         <div class="sk-three-bounce">
             <div class="sk-child sk-bounce1"></div>
@@ -110,20 +94,20 @@ $decform = $results[0]['declarationform'];
             <div class="sk-child sk-bounce3"></div>
         </div>
     </div>
-    <!--*******************
-        Preloader end
-    ********************-->
 
     <!--**********************************
         Main wrapper start
     ***********************************-->
     <div id="main-wrapper">
+        <?php include 'sidebar.php' ?>
+
+
         <!-- code for displaying the logo and name start here  -->
-        <div class="nav-header">
-            <a href="index.html" class="brand-logo">
+        <!-- <div class="nav-header">
+            <a href="home.php" class="brand-logo">
                 <img class="logo-abbr" src="./images/logo.png" alt="">
-                <img class="logo-compact" src="./images/logo-text.png" alt="">
-                <img class="brand-title" src="./images/logo-text.png" alt="">
+                <img class="logo-compact" src="./images/mip.png" alt="">
+                <img class="brand-title" src="./images/mip.png" alt="">
             </a>
 
             <div class="nav-control">
@@ -131,37 +115,36 @@ $decform = $results[0]['declarationform'];
                     <span class="line"></span><span class="line"></span><span class="line"></span>
                 </div>
             </div>
-        </div>
+        </div> -->
         <!-- code for dispalying the logo and name ends here   -->
 
         <!-- code for header start here  -->
-        <div class="header">
+        <!-- <div class="header">
             <div class="header-content">
                 <nav class="navbar navbar-expand">
-                    <div class="collapse navbar-collapse justify-content-between">
-                        <div class="header-left">
+                    <div class="collapse navbar-collapse justify-content-between"> -->
+        <!-- <div class="header-left">
                             <div class="search_bar dropdown">
                                 <span class="search_icon p-3 c-pointer" data-toggle="dropdown">
                                     <i class="mdi mdi-magnify"></i>
                                 </span>
-                                <!-- code for search bar start here  -->
                                 <div class="dropdown-menu p-0 m-0">
                                     <form>
                                         <input class="form-control" type="search" placeholder="Search" aria-label="Search">
                                     </form>
                                 </div>
                             </div>
-                        </div>
+                        </div> -->
 
-                        <ul class="navbar-nav header-right">
-                            <li class="nav-item dropdown notification_dropdown">
-                                <a class="nav-link" href="#" role="button" data-toggle="dropdown">
+        <!-- <ul class="navbar-nav header-right">
+                            <li class="nav-item dropdown notification_dropdown"> -->
+        <!-- <a class="nav-link" href="#" role="button" data-toggle="dropdown">
                                     <i class="mdi mdi-bell"></i>
                                     <div class="pulse-css"></div>
-                                </a>
-                                <!-- code for dispaying the notification start here  -->
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <ul class="list-unstyled">
+                                </a> -->
+        <!-- code for dispaying the notification start here  -->
+        <!-- <div class="dropdown-menu dropdown-menu-right"> -->
+        <!-- <ul class="list-unstyled">
                                         <li class="media dropdown-item">
                                             <span class="success"><i class="ti-user"></i></span>
                                             <div class="media-body">
@@ -210,14 +193,14 @@ $decform = $results[0]['declarationform'];
                                             </div>
                                             <span class="notify-time">3:20 am</span>
                                         </li>
-                                    </ul>
-                                    <!-- code for notification ends here  -->
-                                    <!-- code for see all the notification start here nad i have to add the link -->
-                                    <a class="all-notification" href="#">See all notifications <i class="ti-arrow-right"></i></a>
-                                </div>
-                            </li>
-                            <!-- code for getting dropdown list start here  -->
-                            <li class="nav-item dropdown header-profile">
+                                    </ul> -->
+        <!-- code for notification ends here  -->
+        <!-- code for see all the notification start here nad i have to add the link -->
+        <!-- <a class="all-notification" href="#">See all notifications <i class="ti-arrow-right"></i></a> -->
+        <!-- </div>
+                            </li> -->
+        <!-- code for getting dropdown list start here  -->
+        <!-- <li class="nav-item dropdown header-profile">
                                 <a class="nav-link" href="#" role="button" data-toggle="dropdown">
                                     <i class="mdi mdi-account"></i>
                                 </a>
@@ -230,18 +213,20 @@ $decform = $results[0]['declarationform'];
                                         <i class="icon-envelope-open"></i>
                                         <span class="ml-2">Inbox </span>
                                     </a>
-                                    <a href="./page-login.html" class="dropdown-item">
+                                    <a href="./logout.php" class="dropdown-item">
                                         <i class="icon-key"></i>
                                         <span class="ml-2">Logout </span>
                                     </a>
                                 </div>
-                            </li>
-                            <!-- code ends for dispaying the dropdown when user click on the profile  -->
-                        </ul>
+                            </li> -->
+        <!-- code ends for dispaying the dropdown when user click on the profile  -->
+        <!-- </ul>
                     </div>
                 </nav>
             </div>
-        </div>
+        </div> -->
+
+
         <!-- code for header ends here  -->
 
         <!-- code for side bar start here to display all the list start here  -->
@@ -354,26 +339,27 @@ $decform = $results[0]['declarationform'];
 
 
         </div> -->
-        <?php include 'sidebar.php' ?>
-        <!-- code for side bar start here to display all the list start here  -->
+
 
         <!-- code for main body start here  -->
         <div class="content-body">
             <!-- row -->
             <div class="container-fluid">
-                <div class="row page-titles mx-0">
-                    <div class="col-sm-6 p-md-0">
-                        <div class="welcome-text">
-                            <h4>Hi, welcome back! HR</h4>
+                <?php if ($usertype !== 'admin') { ?>
+                    <div class="row page-titles mx-0">
+                        <div class="col-sm-6 p-md-0">
+                            <div class="welcome-text">
+                                <h4>Hi, welcome back! HR</h4>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="javascript:void(0)">Layout</a></li>
+                                <li class="breadcrumb-item active"><a href="javascript:void(0)">Blank</a></li>
+                            </ol>
                         </div>
                     </div>
-                    <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="javascript:void(0)">Layout</a></li>
-                            <li class="breadcrumb-item active"><a href="javascript:void(0)">Blank</a></li>
-                        </ol>
-                    </div>
-                </div>
+                <?php } ?>
                 <!-- code for displaying the user detials here  -->
                 <div class="row">
                     <div class="col-lg-3 col-sm-6">
@@ -381,11 +367,8 @@ $decform = $results[0]['declarationform'];
                             <div class="stat-widget-two card-body">
                                 <div class="stat-content">
                                     <div class="stat-text">Total No of User</div>
-                                    <div class="stat-digit">8500</div>
+                                    <div class="stat-digit"><?php echo $results[0]['total_records'] ?></div>
                                 </div>
-                                <!-- <div class="progress">
-                                    <div class="progress-bar progress-bar-success w-85" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
-                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -394,7 +377,7 @@ $decform = $results[0]['declarationform'];
                             <div class="stat-widget-two card-body">
                                 <div class="stat-content">
                                     <div class="stat-text">Total Staff</div>
-                                    <div class="stat-digit">7800</div>
+                                    <div class="stat-digit"><?php echo $results[0]['staff_count'] ?></div>
                                 </div>
 
                             </div>
@@ -405,7 +388,7 @@ $decform = $results[0]['declarationform'];
                             <div class="stat-widget-two card-body">
                                 <div class="stat-content">
                                     <div class="stat-text">Total Intern</div>
-                                    <div class="stat-digit">500</div>
+                                    <div class="stat-digit"><?php echo $results[0]['intern_count'] ?></div>
                                 </div>
 
                             </div>
@@ -416,7 +399,7 @@ $decform = $results[0]['declarationform'];
                             <div class="stat-widget-two card-body">
                                 <div class="stat-content">
                                     <div class="stat-text">Total Student</div>
-                                    <div class="stat-digit">650</div>
+                                    <div class="stat-digit"><?php echo $results[0]['student_count'] ?></div>
                                 </div>
 
                             </div>
@@ -426,6 +409,9 @@ $decform = $results[0]['declarationform'];
                 </div>
 
                 <div class="row">
+
+
+
                     <!-- code for user dispalying user details start here  -->
                     <div class="col-xl-12 col-lg-12 col-md-12">
                         <div class="card">
@@ -435,13 +421,30 @@ $decform = $results[0]['declarationform'];
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-xl-12 col-lg-8">
-                                        <!-- <div id="morris-bar-chart"></div> -->
                                         <div id="userdetails"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- code for dispalying the leave status start here  -->
+                    <div class="col-xl-12 col-lg-12 col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title">Leave Status</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-xl-12 col-lg-8">
+                                        <div id="leave"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
                 </div>
 
                 <!-- code for dispalying the user details, certificate  and resign list start here  -->
@@ -451,13 +454,54 @@ $decform = $results[0]['declarationform'];
                         <div class="card">
                             <div class="card-header">
                                 <h4 class="card-title">All Certificate list</h4>
-                                <button id="openPopupBtn" class='badge badge-success'>Send Certificate</button>
+                                <!-- <button id="openPopupBtn" class='badge badge-success'>Send Certificate</button> -->
+                                <a href="javascript:void()" data-toggle="modal" data-target="#sendcertificate" class="btn btn-primary btn-event w-20">
+                                    <span class="align-middle"></span>Send Certificate
+                                </a>
                             </div>
                             <div class="card-body">
                                 <div id="certificate"></div>
                             </div>
                         </div>
                     </div>
+                    <!-- code for sedning certifciate start  here  -->
+                    <div class="modal fade none-border" id="sendcertificate">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title"><strong>Send Certificate</strong></h4>
+                                </div>
+                                <div class="modal-body">
+                                    <form method="post" action="formsubmit.php/sendcertificate" enctype="multipart/form-data">
+                                        <input type="hidden" name="sid" value="<?php echo htmlspecialchars($results[0]['sid']); ?>">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label class="control-label">Name</label>
+                                                <input class="form-control form-white" placeholder="Enter name" type="text" id="name" name="name" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="control-label">Email</label>
+                                                <input class="form-control form-white" placeholder="Enter Email" type="email" id="email" name="email" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="pdf">Select PDF:</label>
+                                                <input class="form-control form-white" type="file" id="pdf" name="pdf" accept="application/pdf" required>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-danger waves-effect waves-light save-category" data-dismiss="modal">Send</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- code for sending certificate ends here  -->
+                    <!-- code for dispalying  certificate ends here  -->
+
                     <!-- code for dispalying the new certificate list start as notification -->
                     <div class="col-lg-4">
                         <div class="card">
@@ -476,7 +520,8 @@ $decform = $results[0]['declarationform'];
                                                 <th>Status</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody id="data-table-body">
+                                            <!-- <tbody>
                                             <tr>
                                                 <td>
                                                     <div class="round-img">
@@ -499,7 +544,7 @@ $decform = $results[0]['declarationform'];
                                                 <td><span>456 pcs</span></td>
                                                 <td><span class="badge badge-warning">Pending</span></td>
                                             </tr>
-                                        </tbody>
+                                        </tbody> -->
                                     </table>
                                 </div>
                             </div>
@@ -510,7 +555,10 @@ $decform = $results[0]['declarationform'];
                         <div class="card">
                             <div class="card-header">
                                 <h4 class="card-title">Gate Pass</h4>
-                                <button id="openPopupBtn" class='badge badge-success'>Send Gate Pass</button>
+                                <!-- <button id="openPopupBtn" class='badge badge-success'>Send Gate Pass</button> -->
+                                <a href="javascript:void()" data-toggle="modal" data-target="#gatepassdata" class="btn btn-primary btn-event w-20">
+                                    <span class="align-middle"></span>Send Gate Pass
+                                </a>
                             </div>
                             <div class="card-body">
                                 <!-- <div id="vmap13" class="vmap"></div> -->
@@ -518,6 +566,43 @@ $decform = $results[0]['declarationform'];
                             </div>
                         </div>
                     </div>
+                    <!-- code for sedning gate pass start  here  -->
+                    <div class="modal fade none-border" id="gatepassdata">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title"><strong>Send Gate Pass</strong></h4>
+                                </div>
+                                <div class="modal-body">
+                                    <form method="post" action="formsubmit.php/sendgatepass" enctype=" multipart/form-data">
+                                        <input type="hidden" name="sid" value="<?php echo htmlspecialchars($results[0]['sid']); ?>">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label class="control-label">Name</label>
+                                                <input class="form-control form-white" placeholder="Enter name" type="text" id="name" name="name" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="control-label">Email</label>
+                                                <input class="form-control form-white" placeholder="Enter Email" type="email" id="email" name="email" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="pdf">Select PDF:</label>
+                                                <input class="form-control form-white" type="file" id="pdf" name="pdf" accept="application/pdf" required>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-danger waves-effect waves-light save-category" data-dismiss="modal">Send</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- code for sending gate pass ends here  -->
+
                     <div class="col-lg-4">
                         <div class="card">
                             <div class="card-header">
@@ -796,7 +881,198 @@ $decform = $results[0]['declarationform'];
 
     </div>
 
+    <!-- code for leave status start here -->
+    <script>
+        if (typeof Tabulator !== 'undefined') {
+            var results = <?php echo json_encode($results); ?>;
+            var columns = [{
+                    title: "User Name",
+                    field: "name",
+                    headerFilter: true
+                    // visible: <?php echo ($usertype == 'user') ? 'true' : 'true'; ?>,
+                },
+                {
+                    title: "Total CL",
+                    field: "cl",
+                    headerFilter: true,
+                },
+                {
+                    title: "Total RH",
+                    field: "rh",
+                    headerFilter: true
+                },
+                {
+                    title: "Remaining CL",
+                    field: "remainingcl",
+                    headerFilter: true
+                },
+                {
+                    title: "Remaining RH",
+                    field: "remainingrh",
+                    headerFilter: true
+                },
+                {
+                    title: "Reason For Leave",
+                    field: "reason",
+                    headerFilter: true
+                },
 
+                {
+                    title: "CL Start Date",
+                    field: "clstartdate",
+                    headerFilter: true
+                },
+                {
+                    title: "CL End Date",
+                    field: "clenddate",
+                    headerFilter: true
+                },
+                {
+                    title: "RH Start Date",
+                    field: "rhstartdate",
+                    headerFilter: true
+                },
+                {
+                    title: "RH End Date",
+                    field: "rhenddate",
+                    headerFilter: true
+                },
+                {
+                    title: "EL Start Date",
+                    field: "elstartdate",
+                    headerFilter: true
+                },
+                {
+                    title: "EL End Date",
+                    field: "elenddate",
+                    headerFilter: true
+                },
+            ];
+
+            // code for updating the user leave status start here 
+            columns.push({
+                title: "Leave Status",
+                field: "leave_status",
+                headerFilter: true,
+                formatter: function(cell, formatterParams, onRendered) {
+                    var value = cell.getValue();
+                    var cellEl = cell.getElement();
+                    var row = cell.getRow();
+                    if (value === 'yes') {
+                        cellEl.disabled = true;
+                        cellEl.classList.add('disabled-cell');
+                        row.getElement().classList.add('green-row');
+                        return 'Approved';
+                    } else if (value === 'no') {
+                        cellEl.disabled = true;
+                        cellEl.classList.add('disabled-cell');
+                        row.getElement().classList.add('red-row');
+                        return 'Denied';
+                    } else {
+                        <?php if ($usertype == 'hr') : ?>
+                            var dropdown = document.createElement('select');
+                            dropdown.classList.add('form-control');
+                            dropdown.innerHTML = `
+                                        <option value="">Select</option>
+                                        <option value="yes">Approved</option>
+                                        <option value="no">Dissapproved</option>
+                                    `;
+                            // Add event listener to the dropdown
+                            dropdown.addEventListener('change', function(event) {
+                                var selectedValue = event.target.value;
+                                var cellData = cell.getData();
+                                var username = cellData.name;
+                                var sid = cellData.sid;
+                                var lid = cellData.leaveid;
+                                console.log(lid, selectedValue, sid, username);
+                                /* cdoe for calculating the differnec between the leave apply  */
+                                function calculateDateDifference(startDate, endDate) {
+                                    var start = new Date(startDate);
+                                    var end = new Date(endDate);
+                                    if (start.getTime() === end.getTime()) {
+                                        return 1;
+                                    }
+                                    var timeDifference = end - start;
+                                    var dayDifference = timeDifference / (1000 * 60 * 60 * 24);
+                                    console.log(dayDifference)
+                                    if (dayDifference === 0) {
+                                        dayDifference = 1;
+                                    }
+                                    return dayDifference;
+                                }
+                                console.log()
+                                var clDateDifference = calculateDateDifference(cellData.clstartdate, cellData.clenddate);
+                                var rhDateDifference = calculateDateDifference(cellData.rhstartdate, cellData.rhenddate);
+                                if (isNaN(rhDateDifference) || rhDateDifference === "") {
+                                    rhDateDifference = 0;
+                                }
+                                console.log("CL Date Difference: " + clDateDifference + " days");
+                                console.log("RH Date Difference: " + rhDateDifference + " days");
+
+
+                                updatestatus(lid, selectedValue, sid, username, clDateDifference, rhDateDifference);
+                            });
+
+                            return dropdown;
+                        <?php else : ?>
+                            return '';
+                        <?php endif; ?>
+                    }
+                }
+            });
+
+            // function for updating the leave status start here 
+            function updatestatus(lid, selectedValue, sid, username, clDateDifference, rhDateDifference) {
+                console.log(lid, selectedValue, sid, username, clDateDifference, rhDateDifference);
+                fetch('formsubmit.php/leaveapproved', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+
+                        body: 'lid=' + encodeURIComponent(lid) + '&status=' + encodeURIComponent(selectedValue) +
+                            '&cl=' + encodeURIComponent(clDateDifference) + '&rh=' + encodeURIComponent(rhDateDifference) +
+                            '&sid=' + encodeURIComponent(sid)
+                    })
+                    .then(response => response.text())
+                    .then(data => {
+                        // console.log(data);
+                        // alert("Leave Status Updated Successfully")
+                        //   console.log('Database update successful:', data);
+                    })
+                    .catch(error => {
+                        console.error('Error updating database:', error);
+                    });
+            }
+
+            var pageSize = 10;
+            var currentPage = 1;
+            var table = new Tabulator("#leave", {
+                data: results,
+                layout: "fitData",
+                columns: columns,
+                pagination: "local",
+                paginationSize: pageSize,
+                paginationSizeSelector: [10, 15, 30],
+                paginationInitialPage: currentPage,
+            });
+            // Add the following code to initialize pagination buttons
+            var prevPageBtn = document.querySelector('.pagination-btn:first-of-type');
+            var nextPageBtn = document.querySelector('.pagination-btn:last-of-type');
+
+            if (prevPageBtn && nextPageBtn) {
+                prevPageBtn.addEventListener('click', function() {
+                    table.previousPage();
+                });
+
+                nextPageBtn.addEventListener('click', function() {
+                    table.nextPage();
+                });
+            }
+        } else {
+            console.error('Tabulator library not defined or not loaded.');
+        }
+    </script>
 
     <!-- script for dispalying the tabulator data  -->
     <script>
@@ -813,7 +1089,7 @@ $decform = $results[0]['declarationform'];
                         var sid = userData.sid; // Assuming sid is part of the row data
                         var emailid = userData.emailid; // Assuming emailid is part of the row data
 
-                        return '<a href="userprofile.php?sid=' + sid + '" target="_blank">' + userName + '</a>';
+                        return '<a href="profile.php?sid=' + sid + '" target="_blank" style="color: black;font-weight: bold;">' + userName + '</a>';
                     }
                 },
 
@@ -1021,6 +1297,8 @@ $decform = $results[0]['declarationform'];
             console.error('Tabulator library not defined or not loaded.');
         }
     </script>
+    <!-- script for dispalaying the tabulator data ends here  -->
+
     <!-- code for dispalying the certificate start here  -->
     <script>
         if (typeof Tabulator !== 'undefined') {
@@ -1448,9 +1726,7 @@ $decform = $results[0]['declarationform'];
 
 
 
-
-
-
+    <script src='./js/index.js'></script>
 
 
 

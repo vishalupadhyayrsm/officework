@@ -8,58 +8,41 @@ if (isset($_SESSION['user_email'])) {
     $usertype = $_SESSION['usertype'];
     $sid = $_SESSION['userid'];
     $decform = $_SESSION['decform'];
-    // echo $usertype;
-    if ($usertype == "system") {
-        header("Location: ../system");
-    }
+    /* code to check taht if user has filled teh decleration form  or not */
+    // if ($decform != 'yes') {
+    //     header("Location: ./decleration.php");
+    // }
+    // if ($usertype == "system") {
+    //     header("Location: ../system");
+    // }
     // code for checking that if the usertype is staff or not 
     try {
-
-        if ($usertype == "staff") {
-            $sql = "SELECT sg.`sid`,sg.`name`, sg.`email`, sg.`usertype`,sg.`tenureenddate`, sg.`contact`, sg.`cl`, sg.`rh`,sg.`el`, sg.remainingcl, sg.remainingrh,sg.remainingel, sg.declarationform,lt.leaveid, lt.`clstartdate`, lt.`clenddate`,lt.`rhstartdate`, lt.`rhenddate`, lt.`elstartdate`, lt.`elenddate`,  lt.`reason`, lt.`leave_status`,de.declarationform,de.emp_roll,de.`univesity`,de.name,de.iitbemail,de.aadhar,de.gender,de.localaddress,de.localpostal,de.permanentadd,de.permpostal, de.homecontact,de.emename1,de.emerelation,de.emeadd,de.emecontact,de.empostalcode,de.emesecondname,de.emesecrelation,de.medicalcondition,de.profilepic
-             FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid LEFT JOIN declarationform as de on de.sid = sg.sid where sg.sid=:sid ";
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':sid', $sid);
-            $stmt->execute();
-        } elseif ($usertype == "intern" || $usertype == "student") {
-            $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.declarationform, de.`declarationform`, de.`name`,de.iitbemail,de.aadhar, de.`emp_roll`,de.`univesity`, de.`gender`, de.`localaddress`, de.`localpostal`, de.`permanentadd`, de.`permpostal`, de.`homecontact`, de.`emename1`, de.`emerelation`, de.`emeadd`, de.`emecontact`, de.`empostalcode`, de.`emesecondname`, de.`emesecrelation`, de.`medicalcondition`, de.`term`, de.`profilepic`
-             FROM `sigin` as sg LEFT JOIN declarationform as de on de.sid = sg.sid where sg.sid=:sid ";
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':sid', $sid);
-            $stmt->execute();
-        } elseif ($usertype == "hr") {
-            $sql = "SELECT sg.`sid`,sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`,sg.`el`, sg.remainingcl, sg.remainingrh,sg.remainingel, sg.declarationform,lt.leaveid,lt.`reason`,lt.`clstartdate`, lt.`clenddate`,lt.`rhstartdate`, lt.`rhenddate`, lt.`elstartdate`, lt.`elenddate`, lt.`leave_status` 
-                    FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid";
-            $stmt = $conn->prepare($sql);
-            // $stmt->bindParam(':sid', $sid);
-            $stmt->execute();
-        }
+        $sql = "SELECT sg.`sid`,sg.`name`, sg.`email`, sg.`usertype`,sg.`tenureenddate`, sg.`contact`, sg.`cl`, sg.`rh`,sg.`el`, sg.remainingcl, sg.remainingrh,sg.remainingel, sg.declarationform,lt.leaveid, 
+        lt.`clstartdate`, lt.`clenddate`,lt.`rhstartdate`, lt.`rhenddate`, lt.`elstartdate`, lt.`elenddate`,  lt.`reason`, lt.`leave_status`,de.declarationform,de.emp_roll,de.`univesity`,de.name,de.iitbemail,
+        de.aadhar,de.gender,de.localaddress,de.localpostal,de.permanentadd,de.permpostal, de.homecontact,de.emename1,de.emerelation,de.emeadd,de.emecontact,de.empostalcode,de.emesecondname,de.emesecrelation,de.medicalcondition,de.profilepic
+        FROM `sigin` as sg LEFT JOIN leavetable as lt on lt.sid = sg.sid LEFT JOIN declarationform as de on de.sid = sg.sid where sg.sid=:sid ";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':sid', $sid);
+        $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        // print_r($results);
+
+        /* code for dispalying the gatepass data start here  */
+        $sql = "SELECT `gid`,`sid`, `name`, `mobile`, `startdate`, `enddate`, `gender`, `purpose`,`gatepassstatus` FROM `gatepass` where sid=:sid ";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':sid', $sid);
+        $stmt->execute();
+        $gatepass = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
         echo "Error: " . $e->getMessage();
     }
 } else {
-    header("Location: login.php");
+    header("Location: ./login.php");
     exit();
 }
 
 
-if ($usertype == 'hr') {
-    $sql = "SELECT `gid`,`sid`, `name`, `mobile`, `startdate`, `enddate`, `gender`, `purpose`,`gatepassstatus` FROM `gatepass`";
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
-    $gatepass = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} else {
-    $sql = "SELECT `gid`,`sid`, `name`, `mobile`, `startdate`, `enddate`, `gender`, `purpose`,`gatepassstatus` FROM `gatepass` where sid=:sid ";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':sid', $sid);
-    $stmt->execute();
-    $gatepass = $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
 $decform = $results[0]['declarationform'];
-// echo $decform;
-// $decform = "yes";
+
 
 ?>
 <!DOCTYPE html>
@@ -70,7 +53,6 @@ $decform = $results[0]['declarationform'];
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>MIP</title>
-    <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="./images/logo.png">
     <link rel="stylesheet" href="./vendor/owl-carousel/css/owl.carousel.min.css">
     <link rel="stylesheet" href="./vendor/owl-carousel/css/owl.theme.default.min.css">
@@ -82,134 +64,7 @@ $decform = $results[0]['declarationform'];
 </head>
 
 <body>
-
-
     <div id="main-wrapper">
-        <div class="nav-header">
-            <a href="index.html" class="brand-logo">
-                <img class="logo-abbr" src="./images/logo.png" alt="">
-                <img class="logo-compact" src="./images/logo-text.png" alt="">
-                <img class="brand-title" src="./images/logo-text.png" alt="">
-            </a>
-
-            <div class="nav-control">
-                <div class="hamburger">
-                    <span class="line"></span><span class="line"></span><span class="line"></span>
-                </div>
-            </div>
-        </div>
-        <!-- code for dispalying the logo and name ends here   -->
-
-        <!-- code for header start here  -->
-        <div class="header">
-            <div class="header-content">
-                <nav class="navbar navbar-expand">
-                    <div class="collapse navbar-collapse justify-content-between">
-                        <div class="header-left">
-                            <div class="search_bar dropdown">
-                                <span class="search_icon p-3 c-pointer" data-toggle="dropdown">
-                                    <i class="mdi mdi-magnify"></i>
-                                </span>
-                                <!-- code for search bar start here  -->
-                                <div class="dropdown-menu p-0 m-0">
-                                    <form>
-                                        <input class="form-control" type="search" placeholder="Search" aria-label="Search">
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
-                        <ul class="navbar-nav header-right">
-                            <li class="nav-item dropdown notification_dropdown">
-                                <a class="nav-link" href="#" role="button" data-toggle="dropdown">
-                                    <i class="mdi mdi-bell"></i>
-                                    <div class="pulse-css"></div>
-                                </a>
-                                <!-- code for dispaying the notification start here  -->
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <ul class="list-unstyled">
-                                        <li class="media dropdown-item">
-                                            <span class="success"><i class="ti-user"></i></span>
-                                            <div class="media-body">
-                                                <a href="#">
-                                                    <p><strong>Martin</strong> has added a <strong>customer</strong> Successfully
-                                                    </p>
-                                                </a>
-                                            </div>
-                                            <span class="notify-time">3:20 am</span>
-                                        </li>
-                                        <li class="media dropdown-item">
-                                            <span class="primary"><i class="ti-shopping-cart"></i></span>
-                                            <div class="media-body">
-                                                <a href="#">
-                                                    <p><strong>Jennifer</strong> purchased Light Dashboard 2.0.</p>
-                                                </a>
-                                            </div>
-                                            <span class="notify-time">3:20 am</span>
-                                        </li>
-                                        <li class="media dropdown-item">
-                                            <span class="danger"><i class="ti-bookmark"></i></span>
-                                            <div class="media-body">
-                                                <a href="#">
-                                                    <p><strong>Robin</strong> marked a <strong>ticket</strong> as unsolved.
-                                                    </p>
-                                                </a>
-                                            </div>
-                                            <span class="notify-time">3:20 am</span>
-                                        </li>
-                                        <li class="media dropdown-item">
-                                            <span class="primary"><i class="ti-heart"></i></span>
-                                            <div class="media-body">
-                                                <a href="#">
-                                                    <p><strong>David</strong> purchased Light Dashboard 1.0.</p>
-                                                </a>
-                                            </div>
-                                            <span class="notify-time">3:20 am</span>
-                                        </li>
-                                        <li class="media dropdown-item">
-                                            <span class="success"><i class="ti-image"></i></span>
-                                            <div class="media-body">
-                                                <a href="#">
-                                                    <p><strong> James.</strong> has added a<strong>customer</strong> Successfully
-                                                    </p>
-                                                </a>
-                                            </div>
-                                            <span class="notify-time">3:20 am</span>
-                                        </li>
-                                    </ul>
-                                    <!-- code for notification ends here  -->
-                                    <!-- code for see all the notification start here nad i have to add the link -->
-                                    <a class="all-notification" href="#">See all notifications <i class="ti-arrow-right"></i></a>
-                                </div>
-                            </li>
-                            <!-- code for getting dropdown list start here  -->
-                            <li class="nav-item dropdown header-profile">
-                                <a class="nav-link" href="#" role="button" data-toggle="dropdown">
-                                    <i class="mdi mdi-account"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <a href="./profile.php" class="dropdown-item">
-                                        <i class="icon-user"></i>
-                                        <span class="ml-2">Profile </span>
-                                    </a>
-                                    <a href="./email-inbox.html" class="dropdown-item">
-                                        <i class="icon-envelope-open"></i>
-                                        <span class="ml-2">Inbox </span>
-                                    </a>
-                                    <a href="./page-login.html" class="dropdown-item">
-                                        <i class="icon-key"></i>
-                                        <span class="ml-2">Logout </span>
-                                    </a>
-                                </div>
-                            </li>
-                            <!-- code ends for dispaying the dropdown when user click on the profile  -->
-                        </ul>
-                    </div>
-                </nav>
-            </div>
-        </div>
-        <!-- code for header ends here  -->
-
         <!-- code for sidebar start here  -->
         <?php include 'sidebar.php' ?>
 
@@ -219,92 +74,116 @@ $decform = $results[0]['declarationform'];
         <div class="content-body">
             <!-- row -->
             <div class="container-fluid">
-                <div class="row page-titles mx-0">
-                    <div class="col-sm-6 p-md-0">
-                        <div class="welcome-text">
-                            <h4>Hi, welcome back! Staff</h4>
+                <?php if ($usertype !== 'admin') { ?>
+                    <div class="row page-titles mx-0">
+                        <div class="col-sm-6 p-md-0">
+                            <div class="welcome-text">
+                                <h4>Hi, welcome back! Staff</h4>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="javascript:void(0)">Layout</a></li>
+                                <li class="breadcrumb-item active"><a href="javascript:void(0)">Blank</a></li>
+                            </ol>
                         </div>
                     </div>
-                    <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="javascript:void(0)">Layout</a></li>
-                            <li class="breadcrumb-item active"><a href="javascript:void(0)">Blank</a></li>
-                        </ol>
-                    </div>
-                </div>
+                <?php } ?>
                 <!-- code for displaying the cl and rh start here   -->
-                <div class="row">
-                    <div class="col-lg-2 col-sm-6">
-                        <div class="card">
-                            <div class="stat-widget-two card-body">
-                                <div class="stat-content">
-                                    <div class="stat-text">No of CL</div>
-                                    <div class="stat-digit">8</div>
+                <?php if ($usertype == 'staff') { ?>
+                    <div class="row">
+                        <div class="col-lg-2 col-sm-6">
+                            <div class="card">
+                                <div class="stat-widget-two card-body">
+                                    <div class="stat-content">
+                                        <div class="stat-text">No of CL</div>
+                                        <div class="stat-digit">8</div>
+                                    </div>
                                 </div>
-                                <!-- <div class="progress">
-                                    <div class="progress-bar progress-bar-success w-85" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100"></div>
-                                </div> -->
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-2 col-sm-6">
-                        <div class="card">
-                            <div class="stat-widget-two card-body">
-                                <div class="stat-content">
-                                    <div class="stat-text">No of RH</div>
-                                    <div class="stat-digit">2</div>
-                                </div>
+                        <div class="col-lg-2 col-sm-6">
+                            <div class="card">
+                                <div class="stat-widget-two card-body">
+                                    <div class="stat-content">
+                                        <div class="stat-text">No of RH</div>
+                                        <div class="stat-digit">2</div>
+                                    </div>
 
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-2 col-sm-6">
-                        <div class="card">
-                            <div class="stat-widget-two card-body">
-                                <div class="stat-content">
-                                    <div class="stat-text">Remaining CL</div>
-                                    <div class="stat-digit">4</div>
-                                </div>
+                        <div class="col-lg-2 col-sm-6">
+                            <div class="card">
+                                <div class="stat-widget-two card-body">
+                                    <div class="stat-content">
+                                        <div class="stat-text">Remaining CL</div>
+                                        <div class="stat-digit"><?php echo htmlspecialchars($row['remainingcl']); ?></div>
+                                    </div>
 
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-lg-2 col-sm-6">
-                        <div class="card">
-                            <div class="stat-widget-two card-body">
-                                <div class="stat-content">
-                                    <div class="stat-text">Remaining RH</div>
-                                    <div class="stat-digit">1</div>
+                        <div class="col-lg-2 col-sm-6">
+                            <div class="card">
+                                <div class="stat-widget-two card-body">
+                                    <div class="stat-content">
+                                        <div class="stat-text">Remaining RH</div>
+                                        <div class="stat-digit"><?php echo htmlspecialchars($row['remainingrh']); ?></div>
+                                    </div>
+
                                 </div>
-
                             </div>
+                            <!-- /# card -->
                         </div>
-                        <!-- /# card -->
-                    </div>
-                    <div class="col-lg-2 col-sm-6">
-                        <div class="card">
-                            <div class="stat-widget-two card-body">
-                                <div class="stat-content">
-                                    <div class="stat-text">Total Product Order</div>
-                                    <div class="stat-digit">1</div>
+                        <div class="col-lg-2 col-sm-6">
+                            <div class="card">
+                                <div class="stat-widget-two card-body">
+                                    <div class="stat-content">
+                                        <div class="stat-text">Total Product Order</div>
+                                        <div class="stat-digit">1</div>
+                                    </div>
+
                                 </div>
-
                             </div>
+                            <!-- /# card -->
                         </div>
-                        <!-- /# card -->
-                    </div>
-                </div>
+                        <div class="col-lg-2 col-sm-6">
+                            <div class="card">
+                                <div class="stat-widget-two card-body">
+                                    <div class="stat-content">
+                                        <div class="stat-text">No Of Gate Pass</div>
+                                        <div class="stat-digit">1</div>
+                                    </div>
 
+                                </div>
+                            </div>
+                            <!-- /# card -->
+                        </div>
+                    </div>
+                <?php } ?>
 
                 <!-- code for dispalying the user details, certificate  and resign list start here  -->
                 <div class="row">
+                    <!-- code for dispalying the amozon prodcut order details start here -->
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title">Order Details</h4>
+                                <!-- <button id="openPopupBtn">Send Gate Pass</button> -->
+                            </div>
+                            <div class="card-body">
+                                <!-- <div id="vmap13" class="vmap"></div> -->
+                                <!-- <div id="resign"></div> -->
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- code for dispalying the gate pass start here  -->
-                    <div class="col-lg-8">
+                    <div class="col-lg-6">
                         <div class="card">
                             <div class="card-header">
                                 <h4 class="card-title">Gate Pass</h4>
-                                <button id="openPopupBtn">Send Gate Pass</button>
                             </div>
                             <div class="card-body">
                                 <!-- <div id="vmap13" class="vmap"></div> -->
@@ -312,7 +191,7 @@ $decform = $results[0]['declarationform'];
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
+                    <!-- <div class="col-lg-4">
                         <div class="card">
                             <div class="card-header">
                                 <h4 class="card-title">New Gate Paass Request</h4>
@@ -368,14 +247,13 @@ $decform = $results[0]['declarationform'];
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- code for displaying the certificate start here  -->
-                    <div class="col-lg-8">
+                    <div class="col-lg-6">
                         <div class="card">
                             <div class="card-header">
                                 <h4 class="card-title">All Certificate list</h4>
-                                <button id="openPopupBtn">Send Certificate</button>
                             </div>
                             <div class="card-body">
                                 <div id="certificate"></div>
@@ -383,7 +261,7 @@ $decform = $results[0]['declarationform'];
                         </div>
                     </div>
                     <!-- code for dispalying the new certificate list start as notification -->
-                    <div class="col-lg-4">
+                    <!-- <div class="col-lg-4">
                         <div class="card">
                             <div class="card-header">
                                 <h4 class="card-title">New Certificate Request</h4>
@@ -428,10 +306,10 @@ $decform = $results[0]['declarationform'];
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                     <!-- code for dispalying the resignation list start here  -->
-                    <div class="col-lg-8">
+                    <div class="col-lg-12">
                         <div class="card">
                             <div class="card-header">
                                 <h4 class="card-title">Resignation List</h4>
@@ -443,63 +321,7 @@ $decform = $results[0]['declarationform'];
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">New Resignation</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Name</th>
-                                                <th>Product</th>
-                                                <th>quantity</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <div class="round-img">
-                                                        <a href=""><img width="35" src="./images/avatar/1.png" alt=""></a>
-                                                    </div>
-                                                </td>
-                                                <td>Lew Shawon</td>
-                                                <td><span>Dell-985</span></td>
-                                                <td><span>456 pcs</span></td>
-                                                <td><span class="badge badge-success">Done</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="round-img">
-                                                        <a href=""><img width="35" src="./images/avatar/1.png" alt=""></a>
-                                                    </div>
-                                                </td>
-                                                <td>Lew Shawon</td>
-                                                <td><span>Asus-565</span></td>
-                                                <td><span>456 pcs</span></td>
-                                                <td><span class="badge badge-warning">Pending</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="round-img">
-                                                        <a href=""><img width="35" src="./images/avatar/1.png" alt=""></a>
-                                                    </div>
-                                                </td>
-                                                <td>lew Shawon</td>
-                                                <td><span>Dell-985</span></td>
-                                                <td><span>456 pcs</span></td>
-                                                <td><span class="badge badge-success">Done</span></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
 
                 </div>
 

@@ -12,14 +12,10 @@
     <link href="./vendor/pg-calendar/css/pignose.calendar.min.css" rel="stylesheet">
     <link href="./vendor/chartist/css/chartist.min.css" rel="stylesheet">
     <link href="./css/style.css" rel="stylesheet">
-
 </head>
 
 <body>
 
-    <!--*******************
-        Preloader start
-    ********************-->
     <div id="preloader">
         <div class="sk-three-bounce">
             <div class="sk-child sk-bounce1"></div>
@@ -27,9 +23,6 @@
             <div class="sk-child sk-bounce3"></div>
         </div>
     </div>
-    <!--*******************
-        Preloader end
-    ********************-->
 
 
     <!--**********************************
@@ -193,11 +186,8 @@
                     <div class="col-lg-3 col-sm-6">
                         <div class="card">
                             <div class="stat-widget-one card-body">
-                                <div class="stat-icon d-inline-block">
-                                    <i class="ti-money text-success border-success"></i>
-                                </div>
                                 <div class="stat-content d-inline-block">
-                                    <div class="stat-text">Profit</div>
+                                    <div class="stat-text">Total Invoice</div>
                                     <div class="stat-digit">1,012</div>
                                 </div>
                             </div>

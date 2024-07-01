@@ -187,8 +187,11 @@ if (isset($_POST['register'])) {
                     if ($result['usertype'] == 'system') {
                         header("Location: system/index.php");
                         exit();
-                    } else {
+                    } else if ($result['usertype'] == 'hr') {
                         header("Location: home.php");
+                        exit();
+                    } else {
+                        header("Location: staff.php");
                         exit();
                     }
                 } else {
