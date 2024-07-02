@@ -354,7 +354,7 @@ switch ($endpoint) {
         break;
     case 'userapproved':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            try {nt
+            try {
                 $sid = $_POST['userId'];
                 $approvestatus = $_POST['status'];
                 $stmt = $conn->prepare(" UPDATE `sigin` SET `userstatus`=:userstatus WHERE sid = :sid");
