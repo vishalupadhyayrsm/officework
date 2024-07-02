@@ -1,312 +1,202 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+<style>
+    * {
+        box-sizing: border-box;
+    }
 
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>MIP</title>
-    <link rel="icon" type="image/png" sizes="16x16" href="./images/logo.png">
-    <link href="./vendor/jquery-steps/css/jquery.steps.css" rel="stylesheet">
-    <link href="./css/style.css" rel="stylesheet">
-</head>
+    body {
+        background-color: #f1f1f1;
+    }
+
+    #regForm {
+        background-color: #ffffff;
+        margin: 100px auto;
+        font-family: Raleway;
+        padding: 40px;
+        width: 70%;
+        min-width: 300px;
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+    input {
+        padding: 10px;
+        width: 100%;
+        font-size: 17px;
+        font-family: Raleway;
+        border: 1px solid #aaaaaa;
+    }
+
+    input.invalid {
+        background-color: #ffdddd;
+    }
+
+    .tab {
+        display: none;
+    }
+
+    button {
+        background-color: #04AA6D;
+        color: #ffffff;
+        border: none;
+        padding: 10px 20px;
+        font-size: 17px;
+        font-family: Raleway;
+        cursor: pointer;
+    }
+
+    button:hover {
+        opacity: 0.8;
+    }
+
+    #prevBtn {
+        background-color: #bbbbbb;
+    }
+
+    .step {
+        height: 15px;
+        width: 15px;
+        margin: 0 2px;
+        background-color: #bbbbbb;
+        border: none;
+        border-radius: 50%;
+        display: inline-block;
+        opacity: 0.5;
+    }
+
+    .step.active {
+        opacity: 1;
+    }
+
+    .step.finish {
+        background-color: #04AA6D;
+    }
+</style>
 
 <body>
-    <div id="main-wrapper">
-        <div class="content-body">
-            <div class="container-fluid">
-                <div class="row page-titles mx-0">
-                    <div class="col-sm-6 p-md-0">
-                        <div class="welcome-text">
-                            <h4>Hi, welcome back!</h4>
-                            <p class="mb-0">Your business dashboard template</p>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
-                            <li class="breadcrumb-item active"><a href="javascript:void(0)">Components</a></li>
-                        </ol>
-                    </div>
-                </div>
-                <!-- row -->
-                <div class="row">
-                    <div class="col-xl-12 col-xxl-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">Form step</h4>
-                            </div>
-                            <div class="card-body">
-                                <form action="#" id="step-form-horizontal" class="step-form-horizontal">
-                                    <div>
-                                        <h4>Personal Info</h4>
-                                        <section>
-                                            <div class="row">
-                                                <div class="col-lg-6 mb-4">
-                                                    <div class="form-group">
-                                                        <label class="text-label">First Name*</label>
-                                                        <input type="text" name="firstName" class="form-control" placeholder="Parsley" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-6 mb-4">
-                                                    <div class="form-group">
-                                                        <label class="text-label">Last Name*</label>
-                                                        <input type="text" name="lastName" class="form-control" placeholder="Montana" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-12 mb-4">
-                                                    <div class="form-group">
-                                                        <label class="text-label">Email Address*</label>
-                                                        <div class="input-group">
-                                                            <input type="email" class="form-control" id="inputGroupPrepend2" aria-describedby="inputGroupPrepend2" placeholder="example@example.com.com" required>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-12 mb-4">
-                                                    <div class="form-group">
-                                                        <label class="text-label">Phone Number*</label>
-                                                        <div class="input-group">
-                                                            <input type="text" name="phoneNumber" class="form-control" placeholder="(+1)408-657-9007" required>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-12 mb-4">
-                                                    <div class="form-group">
-                                                        <label class="text-label">Where are you from*</label>
-                                                        <input type="text" name="place" class="form-control" required>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </section>
-                                        <h4>Company Info</h4>
-                                        <section>
-                                            <div class="row">
-                                                <div class="col-lg-12 mb-4">
-                                                    <div class="form-group">
-                                                        <label class="text-label">Company Name*</label>
-                                                        <input type="text" name="firstName" class="form-control" placeholder="Cellophane Square" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-12 mb-4">
-                                                    <div class="form-group">
-                                                        <label class="text-label">Company Email Address*</label>
-                                                        <div class="input-group">
-                                                            <input type="email" class="form-control" id="emial1" placeholder="example@example.com.com" required>
 
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-12 mb-4">
-                                                    <div class="form-group">
-                                                        <label class="text-label">Company Phone Number*</label>
-                                                        <div class="input-group">
-                                                            <input type="text" name="phoneNumber" class="form-control" placeholder="(+1)408-657-9007" required>
-
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-lg-12 mb-4">
-                                                    <div class="form-group">
-                                                        <label class="text-label">Your position in Company*</label>
-                                                        <input type="text" name="place" class="form-control" required>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </section>
-                                        <h4>Business Hours</h4>
-                                        <section>
-                                            <div class="row">
-                                                <div class="col-4 col-sm-3 mb-4">
-                                                    <h4>Monday *</h4>
-                                                </div>
-                                                <div class="col-4 col-sm-3 mb-4">
-                                                    <div class="form-group">
-                                                        <input class="form-control" value="9.00" type="number" name="input1" id="input1">
-                                                    </div>
-                                                </div>
-                                                <div class="col-4 col-sm-3 mb-4">
-                                                    <div class="form-group">
-                                                        <input class="form-control" value="6.00" type="number" name="input2" id="input2">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-4 col-sm-3 mb-4">
-                                                    <h4>Tuesday *</h4>
-                                                </div>
-                                                <div class="col-4 col-sm-3 mb-4">
-                                                    <div class="form-group">
-                                                        <input class="form-control" value="9.00" type="number" name="input3" id="input3">
-                                                    </div>
-                                                </div>
-                                                <div class="col-4 col-sm-3 mb-4">
-                                                    <div class="form-group">
-                                                        <input class="form-control" value="6.00" type="number" name="input4" id="input4">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-4 col-sm-3 mb-4">
-                                                    <h4>Wednesday *</h4>
-                                                </div>
-                                                <div class="col-4 col-sm-3 mb-4">
-                                                    <div class="form-group">
-                                                        <input class="form-control" value="9.00" type="number" name="input5" id="input5">
-                                                    </div>
-                                                </div>
-                                                <div class="col-4 col-sm-3 mb-4">
-                                                    <div class="form-group">
-                                                        <input class="form-control" value="6.00" type="number" name="input6" id="input6">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-4 col-sm-3 mb-4">
-                                                    <h4>Thrusday *</h4>
-                                                </div>
-                                                <div class="col-4 col-sm-3 mb-4">
-                                                    <div class="form-group">
-                                                        <input class="form-control" value="9.00" type="number" name="input7" id="input7">
-                                                    </div>
-                                                </div>
-                                                <div class="col-4 col-sm-3 mb-4">
-                                                    <div class="form-group">
-                                                        <input class="form-control" value="6.00" type="number" name="input8" id="input8">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-4 col-sm-3 mb-4">
-                                                    <h4>Friday *</h4>
-                                                </div>
-                                                <div class="col-4 col-sm-3 mb-4">
-                                                    <div class="form-group">
-                                                        <input class="form-control" value="9.00" type="number" name="input9" id="input9">
-                                                    </div>
-                                                </div>
-                                                <div class="col-4 col-sm-3 mb-4">
-                                                    <div class="form-group">
-                                                        <input class="form-control" value="6.00" type="number" name="input10" id="input10">
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </section>
-                                        <h4>Email Setup</h4>
-                                        <section>
-                                            <div class="row emial-setup">
-                                                <div class="col-sm-3 col-6">
-                                                    <div class="form-group">
-                                                        <label for="mailclient11" class="mailclinet mailclinet-gmail">
-                                                            <input type="radio" name="emailclient" id="mailclient11">
-                                                            <span class="mail-icon">
-                                                                <i class="mdi mdi-google-plus" aria-hidden="true"></i>
-                                                            </span>
-                                                            <span class="mail-text">I'm using Gmail</span>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-3 col-6">
-                                                    <div class="form-group">
-                                                        <label for="mailclient12" class="mailclinet mailclinet-office">
-                                                            <input type="radio" name="emailclient" id="mailclient12">
-                                                            <span class="mail-icon">
-                                                                <i class="mdi mdi-office" aria-hidden="true"></i>
-                                                            </span>
-                                                            <span class="mail-text">I'm using Office</span>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-3 col-6">
-                                                    <div class="form-group">
-                                                        <label for="mailclient13" class="mailclinet mailclinet-drive">
-                                                            <input type="radio" name="emailclient" id="mailclient13">
-                                                            <span class="mail-icon">
-                                                                <i class="mdi mdi-google-drive" aria-hidden="true"></i>
-                                                            </span>
-                                                            <span class="mail-text">I'm using Drive</span>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-3 col-6">
-                                                    <div class="form-group">
-                                                        <label for="mailclient14" class="mailclinet mailclinet-another">
-                                                            <input type="radio" name="emailclient" id="mailclient14">
-                                                            <span class="mail-icon">
-                                                                <i class="fa fa-question-circle-o" aria-hidden="true"></i>
-                                                            </span>
-                                                            <span class="mail-text">Another Service</span>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-12">
-                                                    <div class="skip-email text-center">
-                                                        <p>Or if want skip this step entirely and setup it later</p>
-                                                        <a href="javascript:void()">Skip step</a>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </section>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
+    <form id="regForm" action="/action_page.php">
+        <h1>Register:</h1>
+        <!-- One "tab" for each step in the form: -->
+        <div class="tab">
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <div class="form-group">
+                        <label class="text-label">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
                     </div>
                 </div>
             </div>
+            <p><input placeholder="First name..." oninput="this.className = ''" name="fname"></p>
+            <p><input placeholder="Last name..." oninput="this.className = ''" name="lname"></p>
         </div>
-        <!--**********************************
-            Content body end
-        ***********************************-->
-
-
-        <!--**********************************
-            Footer start
-        ***********************************-->
-        <div class="footer">
-            <div class="copyright">
-                <p>Copyright © Designed &amp; Developed by <a href="#" target="_blank">Quixkit</a> 2019</p>
+        <div class="tab">Contact Info:
+            <p><input placeholder="E-mail..." oninput="this.className = ''" name="email"></p>
+            <p><input placeholder="Phone..." oninput="this.className = ''" name="phone"></p>
+        </div>
+        <div class="tab">Birthday:
+            <p><input placeholder="dd" oninput="this.className = ''" name="dd"></p>
+            <p><input placeholder="mm" oninput="this.className = ''" name="nn"></p>
+            <p><input placeholder="yyyy" oninput="this.className = ''" name="yyyy"></p>
+        </div>
+        <div class="tab">Login Info:
+            <p><input placeholder="Username..." oninput="this.className = ''" name="uname"></p>
+            <p><input placeholder="Password..." oninput="this.className = ''" name="pword" type="password"></p>
+        </div>
+        <div style="overflow:auto;">
+            <div style="float:right;">
+                <button type="button" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
+                <button type="button" id="nextBtn" onclick="nextPrev(1)">Next</button>
             </div>
         </div>
-        <!--**********************************
-            Footer end
-        ***********************************-->
+        <!-- Circles which indicates the steps of the form: -->
+        <div style="text-align:center;margin-top:40px;">
+            <span class="step"></span>
+            <span class="step"></span>
+            <span class="step"></span>
+            <span class="step"></span>
+        </div>
+    </form>
 
-        <!--**********************************
-           Support ticket button start
-        ***********************************-->
+    <script>
+        var currentTab = 0; // Current tab is set to be the first tab (0)
+        showTab(currentTab); // Display the current tab
 
-        <!--**********************************
-           Support ticket button end
-        ***********************************-->
+        function showTab(n) {
+            // This function will display the specified tab of the form...
+            var x = document.getElementsByClassName("tab");
+            x[n].style.display = "block";
+            //... and fix the Previous/Next buttons:
+            if (n == 0) {
+                document.getElementById("prevBtn").style.display = "none";
+            } else {
+                document.getElementById("prevBtn").style.display = "inline";
+            }
+            if (n == (x.length - 1)) {
+                document.getElementById("nextBtn").innerHTML = "Submit";
+            } else {
+                document.getElementById("nextBtn").innerHTML = "Next";
+            }
+            //... and run a function that will display the correct step indicator:
+            fixStepIndicator(n)
+        }
 
+        function nextPrev(n) {
+            // This function will figure out which tab to display
+            var x = document.getElementsByClassName("tab");
+            // Exit the function if any field in the current tab is invalid:
+            if (n == 1 && !validateForm()) return false;
+            // Hide the current tab:
+            x[currentTab].style.display = "none";
+            // Increase or decrease the current tab by 1:
+            currentTab = currentTab + n;
+            // if you have reached the end of the form...
+            if (currentTab >= x.length) {
+                // ... the form gets submitted:
+                document.getElementById("regForm").submit();
+                return false;
+            }
+            // Otherwise, display the correct tab:
+            showTab(currentTab);
+        }
 
-    </div>
-    <!--**********************************
-        Main wrapper end
-    ***********************************-->
+        function validateForm() {
+            // This function deals with validation of the form fields
+            var x, y, i, valid = true;
+            x = document.getElementsByClassName("tab");
+            y = x[currentTab].getElementsByTagName("input");
+            // A loop that checks every input field in the current tab:
+            for (i = 0; i < y.length; i++) {
+                // If a field is empty...
+                if (y[i].value == "") {
+                    // add an "invalid" class to the field:
+                    y[i].className += " invalid";
+                    // and set the current valid status to false
+                    valid = false;
+                }
+            }
+            // If the valid status is true, mark the step as finished and valid:
+            if (valid) {
+                document.getElementsByClassName("step")[currentTab].className += " finish";
+            }
+            return valid; // return the valid status
+        }
 
-    <!--**********************************
-        Scripts
-    ***********************************-->
-    <!-- Required vendors -->
-    <script src="./vendor/global/global.min.js"></script>
-    <script src="./js/quixnav-init.js"></script>
-    <script src="./js/custom.min.js"></script>
-
-
-
-    <script src="./vendor/jquery-steps/build/jquery.steps.min.js"></script>
-    <script src="./vendor/jquery-validation/jquery.validate.min.js"></script>
-    <!-- Form validate init -->
-    <script src="./js/plugins-init/jquery.validate-init.js"></script>
-
-
-
-    <!-- Form step init -->
-    <script src="./js/plugins-init/jquery-steps-init.js"></script>
+        function fixStepIndicator(n) {
+            // This function removes the "active" class of all steps...
+            var i, x = document.getElementsByClassName("step");
+            for (i = 0; i < x.length; i++) {
+                x[i].className = x[i].className.replace(" active", "");
+            }
+            //... and adds the "active" class on the current step:
+            x[n].className += " active";
+        }
+    </script>
 
 </body>
 
