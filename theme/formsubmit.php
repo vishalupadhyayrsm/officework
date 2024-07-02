@@ -7,11 +7,25 @@ header('Content-Type: application/json');
 
 include_once("dbconfig.php");
 include_once("api.php");
+
+// require 'PHPMailer/src/PHPMailer.php';
+// require 'PHPMailer/src/SMTP.php';
+// require 'PHPMailer/src/Exception.php';
+
+// // Create a new PHPMailer instance
+// use PHPMailer\PHPMailer\PHPMailer;
+// use PHPMailer\PHPMailer\SMTP;
+// use PHPMailer\PHPMailer\Exception;
+
+// $mail = new PHPMailer(true);
+
 // Retrieve the request endpoint
 $uri = explode("/", $_SERVER["REQUEST_URI"]);
+// print_r($uri);
 $apidata = $uri[3];
-$endpoint = $uri[4];
-echo $endpoint;
+// $endpoint = $uri[4];
+$endpoint = $uri[2];
+// echo $endpoint;
 
 $result = array();
 
@@ -491,10 +505,8 @@ switch ($endpoint) {
         break;
 
         /* code for updating the emp code start here */
-
     case 'updateempcode':
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // echo "helo";
             try {
                 $sid = $_POST['userId'];
                 $newValue = $_POST['status'];
@@ -502,7 +514,6 @@ switch ($endpoint) {
                 $stmt->bindParam(':sid', $sid);
                 $stmt->bindParam(':empcode', $newValue);
                 $stmt->execute();
-
                 if ($stmt->errorCode() === '00000') {
                     $response = ['status' => 'success', 'message' => 'Database update successful'];
                     echo json_encode($response);
@@ -598,6 +609,7 @@ switch ($endpoint) {
                 $sid = htmlspecialchars($_POST['sid']);
                 $name = htmlspecialchars($_POST['name']);
                 $email = htmlspecialchars($_POST['email']);
+                $message = htmlspecialchars($_POST['message']);
                 $pdfFile = $_FILES['pdf'];
 
                 // Validate uploaded file
@@ -613,12 +625,36 @@ switch ($endpoint) {
                 // Move uploaded file to destination directory
                 $uploadedFilePath = $uploadDirectory . basename($pdfFile['name']);
                 if (move_uploaded_file($pdfFile['tmp_name'], $uploadedFilePath)) {
-                    $subject = "Internship Certificate";
+                    $subject = "Internship Completion Certificate";
                     $emailid = $email;
-
-                    send_email($emailid, $subject, $message, $pdfFile);
+                    // $name="Vishal";
+                    $fullMessage = 'Dear ' . htmlspecialchars($name) . '
+                            ,
+                            <br><br>
+                            Congratulations on completing your internship with IIT Bombay.
+                            <br><br>
+                            Your dedication and hard work have been commendable. Your contributions to our organization have been valuable.
+                            <br><br>
+                            We are confident that you have a bright future ahead. On behalf of IIT Bombay, we wish you every success in your future endeavors. 
+                            Please feel free to reach out if you need any further assistance or if you require any documentation from our organization.
+                            <br><br>
+                            Also, please find the attached internship certificate for your future reference.
+                            <br><br>
+                            Please do not reply on this email. If you have any query kindly mail on the mip.iitb@gmail.com.
+                            <br><br><br><br><br>
+                           <address> 
+                           Thanks & Regards,<br>
+                           Admin Team,<br>
+                           Machine Intelligence Program,<br>
+                           NCAIR office, 2nd Floor, Pre-Engineered Building,<br> 
+                           Opp. Hillside Power house,<br>
+                           IIT-Bombay, Powai, Mumbai- 400076<br>
+                           Ph. +91.22.25764946
+                           </address>';
+                    // send_email($emailid, $subject, $message, $name);
                     $_SESSION['certificate'] = true;
-                    header("Location: ../index.php");
+                    header("Location: ../home.php");
+                    send_email($emailid, $subject, $fullMessage, $uploadedFilePath);
                     exit();
                 } else {
                     die('Error uploading the file.');
@@ -634,29 +670,46 @@ switch ($endpoint) {
     case 'sendgatepass':
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
             try {
-                // Retrieve form data
                 $sid = htmlspecialchars($_POST['sid']);
+                $name = htmlspecialchars($_POST['name']);
                 $email = htmlspecialchars($_POST['email']);
+                $message = htmlspecialchars($_POST['message']);
                 $pdfFile = $_FILES['pdf'];
-                // Validate uploaded file
+
                 if (empty($pdfFile['name'])) {
                     die('No file selected for upload.');
                 }
-                // Directory for uploads
-                $uploadDirectory = 'certificate/';
+                $uploadDirectory = 'gatepass/';
                 if (!file_exists($uploadDirectory)) {
                     mkdir($uploadDirectory, 0777, true);
                 }
 
-                // Move uploaded file to destination directory
                 $uploadedFilePath = $uploadDirectory . basename($pdfFile['name']);
                 if (move_uploaded_file($pdfFile['tmp_name'], $uploadedFilePath)) {
-                    $subject = "Internship Certificate";
+                    $subject = "Gate pass";
                     $emailid = $email;
+                    // $name="Vishal";
+                    $fullMessage = 'Dear ' . htmlspecialchars($name) . '
+                            ,
+                            <br><br>
+                            PFA soft copy of entry gate pass.
+                            <br><br>
+                            Please do not reply on this email. If you have any query kindly mail on the mip.iitb@gmail.com.
+                            <br><br><br><br><br>
+                           <address> 
+                           Thanks & Regards,<br>
+                           Admin Team,<br>
+                           Machine Intelligence Program,<br>
+                           NCAIR office, 2nd Floor, Pre-Engineered Building,<br> 
+                           Opp. Hillside Power house,<br>
+                           IIT-Bombay, Powai, Mumbai- 400076<br>
+                           Ph. +91.22.25764946
+                           </address>';
 
-                    // send_email($emailid, $subject, $message, $pdfFile);
+                    // send_email($emailid, $subject, $message, $name);
                     $_SESSION['certificate'] = true;
-                    header("Location: ../index.php");
+                    header("Location: ../home.php");
+                    send_email($emailid, $subject, $fullMessage, $uploadedFilePath);
                     exit();
                 } else {
                     die('Error uploading the file.');
@@ -755,6 +808,52 @@ switch ($endpoint) {
         $jsonResults = json_encode($results);
         echo $jsonResults;
         break;
+
+    case 'newgatepass':
+        $stmt = $conn->prepare("SELECT `name`, `mobile`, `startdate`, `enddate`, `purpose`, `gatepassstatus` FROM gatepass where `gatepassstatus`='pending'");
+        $stmt->execute();
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $jsonResults = json_encode($results);
+        echo $jsonResults;
+        break;
     default:
         break;
+}
+
+
+function send_email($emailid, $subject, $fullMessage, $uploadedFilePath)
+{
+    // echo $emailid, $subject, $fullMessage, $uploadedFilePath;
+    global $mail;
+    try {
+        // Server settings
+        $mail->SMTPDebug = false; // Enable verbose debug output
+        $mail->isSMTP(); // Set mailer to use SMTP
+        $mail->Host = 'mail.miphub.in'; // Specify main and backup SMTP servers
+        $mail->SMTPAuth = true; // Enable SMTP authentication
+        $mail->Username = 'admin@miphub.in'; // SMTP username
+        $mail->Password = 'Adminmiphub@123'; // SMTP password
+        // $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // Enable TLS encryption, `ssl` also accepted
+        $mail->Port = 587; // TCP port to connect to
+
+        // Recipients
+        $mail->setFrom('admin@miphub.in', 'MIP');
+        $mail->addAddress($emailid);
+        // $mail->addAddress('rahulmistri@iitb.ac.in'); 
+        //  $mail->addAddress('manjunair1990@iitb.ac.in'); 
+
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body = $fullMessage;
+
+        if (!empty($uploadedFilePath)) {
+            $mail->addAttachment($uploadedFilePath);
+        }
+        // Send the email   
+        $mail->send();
+        echo 'Message has been sent';
+    } catch (Exception $e) {
+        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+    }
 }
