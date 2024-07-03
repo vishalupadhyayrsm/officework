@@ -26,6 +26,16 @@ if (isset($_SESSION['user_email'])) {
         $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        // code for getting all the invoice start  here 
+        $sqlquery = "SELECT ai.sid, ai.companyname, ai.invoicenumber, ai.invoicedate, ai.amount, ai.invoiceactivity, ai.service, ai.filename, s.name 
+        FROM allinvoice ai 
+        LEFT JOIN sigin s ON s.sid = ai.sid";
+        $stmt = $conn->prepare($sqlquery);
+        $stmt->execute(); // Execute the prepared statement first
+        $invoices = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch the results after execution
+        // print_r($invoices);
+        // code for getting all teh invoice ends here 
+
         /* code for dispalying the gatepass data start here  */
         $sql = "SELECT `gid`,`sid`, `name`, `mobile`, `startdate`, `enddate`, `gender`, `purpose`,`gatepassstatus` FROM `gatepass` where sid=:sid ";
         $stmt = $conn->prepare($sql);
@@ -36,14 +46,10 @@ if (isset($_SESSION['user_email'])) {
         echo "Error: " . $e->getMessage();
     }
 } else {
-    header("Location: ./login.php");
+    header("Location: ./index.php");
     exit();
 }
-
-
 $decform = $results[0]['declarationform'];
-
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -61,6 +67,13 @@ $decform = $results[0]['declarationform'];
     <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
     <link href="./vendor/jqvmap/css/jqvmap.min.css" rel="stylesheet">
     <link href="./css/style.css" rel="stylesheet">
+    <script src="pdf.min.js"></script>
+    <script src="pdf.worker.js"></script>
+    <style>
+        label {
+            color: black;
+        }
+    </style>
 </head>
 
 <body>
@@ -86,543 +99,328 @@ $decform = $results[0]['declarationform'];
                         </div>
                     </div>
                 <?php } ?>
-                <!-- code for displaying the cl and rh start here   -->
-                <?php if ($usertype == 'staff') { ?>
-                    <div class="row">
-                        <div class="col-lg-2 col-sm-6">
-                            <div class="card">
-                                <div class="stat-widget-two card-body">
-                                    <div class="stat-content">
-                                        <div class="stat-text">No of CL</div>
-                                        <div class="stat-digit">8</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-2 col-sm-6">
-                            <div class="card">
-                                <div class="stat-widget-two card-body">
-                                    <div class="stat-content">
-                                        <div class="stat-text">No of RH</div>
-                                        <div class="stat-digit">2</div>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-2 col-sm-6">
-                            <div class="card">
-                                <div class="stat-widget-two card-body">
-                                    <div class="stat-content">
-                                        <div class="stat-text">Remaining CL</div>
-                                        <div class="stat-digit"><?php echo htmlspecialchars($row['remainingcl']); ?></div>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-2 col-sm-6">
-                            <div class="card">
-                                <div class="stat-widget-two card-body">
-                                    <div class="stat-content">
-                                        <div class="stat-text">Remaining RH</div>
-                                        <div class="stat-digit"><?php echo htmlspecialchars($row['remainingrh']); ?></div>
-                                    </div>
-
-                                </div>
-                            </div>
-                            <!-- /# card -->
-                        </div>
-                        <div class="col-lg-2 col-sm-6">
-                            <div class="card">
-                                <div class="stat-widget-two card-body">
-                                    <div class="stat-content">
-                                        <div class="stat-text">Total Product Order</div>
-                                        <div class="stat-digit">1</div>
-                                    </div>
-
-                                </div>
-                            </div>
-                            <!-- /# card -->
-                        </div>
-                        <div class="col-lg-2 col-sm-6">
-                            <div class="card">
-                                <div class="stat-widget-two card-body">
-                                    <div class="stat-content">
-                                        <div class="stat-text">No Of Gate Pass</div>
-                                        <div class="stat-digit">1</div>
-                                    </div>
-
-                                </div>
-                            </div>
-                            <!-- /# card -->
-                        </div>
-                    </div>
-                <?php } ?>
-
                 <!-- code for dispalying the user details, certificate  and resign list start here  -->
                 <div class="row">
                     <!-- code for dispalying the amozon prodcut order details start here -->
-                    <div class="col-lg-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">Order Details</h4>
-                                <!-- <button id="openPopupBtn">Send Gate Pass</button> -->
-                            </div>
-                            <div class="card-body">
-                                <!-- <div id="vmap13" class="vmap"></div> -->
-                                <!-- <div id="resign"></div> -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- code for dispalying the gate pass start here  -->
                     <div class="col-lg-6">
                         <div class="card">
                             <div class="card-header">
-                                <h4 class="card-title">Gate Pass</h4>
+                                <h4 class="card-title">Upload Invoice </h4>
                             </div>
                             <div class="card-body">
-                                <!-- <div id="vmap13" class="vmap"></div> -->
-                                <div id="gatepass"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- <div class="col-lg-4">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">New Gate Paass Request</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Name</th>
-                                                <th>Product</th>
-                                                <th>quantity</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <div class="round-img">
-                                                        <a href=""><img width="35" src="./images/avatar/1.png" alt=""></a>
-                                                    </div>
-                                                </td>
-                                                <td>Lew Shawon</td>
-                                                <td><span>Dell-985</span></td>
-                                                <td><span>456 pcs</span></td>
-                                                <td><span class="badge badge-success">Done</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="round-img">
-                                                        <a href=""><img width="35" src="./images/avatar/1.png" alt=""></a>
-                                                    </div>
-                                                </td>
-                                                <td>Lew Shawon</td>
-                                                <td><span>Asus-565</span></td>
-                                                <td><span>456 pcs</span></td>
-                                                <td><span class="badge badge-warning">Pending</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="round-img">
-                                                        <a href=""><img width="35" src="./images/avatar/1.png" alt=""></a>
-                                                    </div>
-                                                </td>
-                                                <td>lew Shawon</td>
-                                                <td><span>Dell-985</span></td>
-                                                <td><span>456 pcs</span></td>
-                                                <td><span class="badge badge-success">Done</span></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
 
-                    <!-- code for displaying the certificate start here  -->
+                                <div class="form-group">
+                                    <label for="dropdown">Select Source:</label>
+                                    <select id="dropdown" class="form-control">
+                                        <option value="">Select</option>
+                                        <option value="amazon">Amazon</option>
+                                        <option value="electronic">Electronic.com</option>
+                                        <option value="dgk">dgk</option>
+                                        <option value="credence">Credence</option>
+                                        <option value="bl">Balmer Lawrie</option>
+                                        <option value="dmart">D-Mart</option>
+                                        <option value="ola">OLA</option>
+                                    </select>
+                                </div><br>
+
+                                <div class="form-group">
+                                    <label for="pdfInput">Select Invoice:</label>
+                                    <input type="file" class="form-control" id="pdfInput" accept=".pdf">
+                                </div><br>
+                                <button id="submitBtn" class="btn btn-success">Submit</button>
+
+
+
+
+
+
+                                <!--         <div class="col-md-6 offset-md-3">-->
+                                <!--    <h2 style="text-align:center;">PDF</h2>-->
+                                <!--    <br>-->
+                                <!--    <div class="form-group">-->
+                                <!--        <label for="dropdown">Select Source:</label>-->
+                                <!--        <select id="dropdown" class="form-control">-->
+                                <!--            <option value="">Select</option>-->
+                                <!--            <option value="amazon">Amazon</option>-->
+                                <!--            <option value="electronic">Electronic.com</option>-->
+                                <!--            <option value="dgk">dgk</option>-->
+                                <!--            <option value="credence">Credence</option>-->
+                                <!--            <option value="bl">Balmer Lawrie</option>-->
+                                <!--            <option value="dmart">D-Mart</option>-->
+                                <!--            <option value="ola">OLA</option>-->
+                                <!--        </select>-->
+                                <!--    </div><br>-->
+
+                                <!--    <div class="form-group">-->
+                                <!--        <label for="pdfInput">Select Invoice:</label>-->
+                                <!--        <input type="file" class="form-control" id="pdfInput" accept=".pdf">-->
+                                <!--    </div><br>-->
+                                <!--    <button id="submitBtn" class="btn btn-success">Submit</button>-->
+                                <!--    <div id="pdfText" style="display:none;"></div>-->
+                                <!--</div>-->
+
+                                <!--<form method="post" action="formsubmit.php/leaveapply">-->
+                                <!--        <input type="hidden" name="sid" value="<?php echo $results[0]['sid']; ?>">-->
+                                <!--        <div class="mb-3 mt-3">-->
+                                <!--             <label for="dropdown">Select Source:</label>-->
+                                <!--            <select id="dropdown" class="form-control">-->
+                                <!--                <option value="">Select</option>-->
+                                <!--                <option value="amazon">Amazon</option>-->
+                                <!--                <option value="electronic">Electronic.com</option>-->
+                                <!--                <option value="dgk">dgk</option>-->
+                                <!--                <option value="credence">Credence</option>-->
+                                <!--                <option value="bl">Balmer Lawrie</option>-->
+                                <!--                <option value="dmart">D-Mart</option>-->
+                                <!--                <option value="ola">OLA</option>-->
+                                <!--            </select>-->
+                                <!--        </div>-->
+                                <!--         <div class="form-group">-->
+                                <!--            <label for="pdfInput">Select Invoice:</label>-->
+                                <!--            <input type="file" class="form-control" id="pdfInput" accept=".pdf">-->
+                                <!--        </div><br>-->
+                                <!--        <button id="submitBtn" class="btn btn-success">Submit</button>-->
+                                <!--        <div id="pdfText" style="display:none;"></div>-->
+                                <!--</form>-->
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <!----code for displaying the invoice details start here  ---->
                     <div class="col-lg-6">
                         <div class="card">
                             <div class="card-header">
-                                <h4 class="card-title">All Certificate list</h4>
+                                <h4 class="card-title">Invoice Details</h4>
                             </div>
                             <div class="card-body">
-                                <div id="certificate"></div>
                             </div>
                         </div>
-                    </div>
-                    <!-- code for dispalying the new certificate list start as notification -->
-                    <!-- <div class="col-lg-4">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">New Certificate Request</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Name</th>
-                                                <th>Product</th>
-                                                <th>quantity</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <div class="round-img">
-                                                        <a href=""><img width="35" src="./images/avatar/1.png" alt=""></a>
-                                                    </div>
-                                                </td>
-                                                <td>Lew Shawon</td>
-                                                <td><span>Dell-985</span></td>
-                                                <td><span>456 pcs</span></td>
-                                                <td><span class="badge badge-success">Done</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="round-img">
-                                                        <a href=""><img width="35" src="./images/avatar/1.png" alt=""></a>
-                                                    </div>
-                                                </td>
-                                                <td>Lew Shawon</td>
-                                                <td><span>Asus-565</span></td>
-                                                <td><span>456 pcs</span></td>
-                                                <td><span class="badge badge-warning">Pending</span></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
 
-                    <!-- code for dispalying the resignation list start here  -->
+                    </div>
+                    <!---code for displaying the invoice list start here  --->
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-header">
-                                <h4 class="card-title">Resignation List</h4>
-                                <!-- <button id="openPopupBtn">Send Gate Pass</button> -->
+                                <h4 class="card-title">All Invoice</h4>
                             </div>
                             <div class="card-body">
-                                <!-- <div id="vmap13" class="vmap"></div> -->
-                                <div id="resign"></div>
+                                <div id="allinvoice"></div>
                             </div>
                         </div>
+
                     </div>
-
-
                 </div>
 
-
-
-                <div class="row">
-                    <div class="col-lg-6 col-xl-4 col-xxl-6 col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">Timeline</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="widget-timeline">
-                                    <ul class="timeline">
-                                        <li>
-                                            <div class="timeline-badge primary"></div>
-                                            <a class="timeline-panel text-muted" href="#">
-                                                <span>10 minutes ago</span>
-                                                <h6 class="m-t-5">Youtube, a video-sharing website, goes live.</h6>
-                                            </a>
-                                        </li>
-
-                                        <li>
-                                            <div class="timeline-badge warning">
-                                            </div>
-                                            <a class="timeline-panel text-muted" href="#">
-                                                <span>20 minutes ago</span>
-                                                <h6 class="m-t-5">Mashable, a news website and blog, goes live.</h6>
-                                            </a>
-                                        </li>
-
-                                        <li>
-                                            <div class="timeline-badge danger">
-                                            </div>
-                                            <a class="timeline-panel text-muted" href="#">
-                                                <span>30 minutes ago</span>
-                                                <h6 class="m-t-5">Google acquires Youtube.</h6>
-                                            </a>
-                                        </li>
-
-                                        <li>
-                                            <div class="timeline-badge success">
-                                            </div>
-                                            <a class="timeline-panel text-muted" href="#">
-                                                <span>15 minutes ago</span>
-                                                <h6 class="m-t-5">StumbleUpon is acquired by eBay. </h6>
-                                            </a>
-                                        </li>
-
-                                        <li>
-                                            <div class="timeline-badge warning">
-                                            </div>
-                                            <a class="timeline-panel text-muted" href="#">
-                                                <span>20 minutes ago</span>
-                                                <h6 class="m-t-5">Mashable, a news website and blog, goes live.</h6>
-                                            </a>
-                                        </li>
-
-                                        <li>
-                                            <div class="timeline-badge dark">
-                                            </div>
-                                            <a class="timeline-panel text-muted" href="#">
-                                                <span>20 minutes ago</span>
-                                                <h6 class="m-t-5">Mashable, a news website and blog, goes live.</h6>
-                                            </a>
-                                        </li>
-
-                                        <li>
-                                            <div class="timeline-badge info">
-                                            </div>
-                                            <a class="timeline-panel text-muted" href="#">
-                                                <span>30 minutes ago</span>
-                                                <h6 class="m-t-5">Google acquires Youtube.</h6>
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-4 col-xxl-6 col-lg-6 col-md-6 col-sm-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">Todo</h4>
-                            </div>
-                            <div class="card-body px-0">
-                                <div class="todo-list">
-                                    <div class="tdl-holder">
-                                        <div class="tdl-content widget-todo mr-4">
-                                            <ul id="todo_list">
-                                                <li><label><input type="checkbox"><i></i><span>Get up</span><a href='#' class="ti-trash"></a></label></li>
-                                                <li><label><input type="checkbox" checked><i></i><span>Stand up</span><a href='#' class="ti-trash"></a></label></li>
-                                                <li><label><input type="checkbox"><i></i><span>Don't give up the
-                                                            fight.</span><a href='#' class="ti-trash"></a></label></li>
-                                                <li><label><input type="checkbox" checked><i></i><span>Do something
-                                                            else</span><a href='#' class="ti-trash"></a></label></li>
-                                                <li><label><input type="checkbox" checked><i></i><span>Stand up</span><a href='#' class="ti-trash"></a></label></li>
-                                                <li><label><input type="checkbox"><i></i><span>Don't give up the
-                                                            fight.</span><a href='#' class="ti-trash"></a></label></li>
-                                            </ul>
-                                        </div>
-                                        <div class="px-4">
-                                            <input type="text" class="tdl-new form-control" placeholder="Write new item and hit 'Enter'...">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-12 col-md-12 col-xxl-6 col-xl-4 col-lg-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">Product Sold</h4>
-                                <div class="card-action">
-                                    <div class="dropdown custom-dropdown">
-                                        <div data-toggle="dropdown">
-                                            <i class="ti-more-alt"></i>
-                                        </div>
-                                        <div class="dropdown-menu dropdown-menu-right">
-                                            <a class="dropdown-item" href="#">Option 1</a>
-                                            <a class="dropdown-item" href="#">Option 2</a>
-                                            <a class="dropdown-item" href="#">Option 3</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="chart py-4">
-                                    <canvas id="sold-product"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                </div>
-
-            </div>
-        </div>
-        <!-- code for main body ends here  -->
-
-        <!-- code for footer start here  -->
-        <div class="footer">
-            <div class="copyright">
-                <!-- <p>Copyright MIP <a href="#" target="_blank"></a>2024</p> -->
-                <?php
-                $product = array(
-                    array(
-                        'text' => 'Web Development',
-                        // 'link' => '../../web.php',
-                    ),
-                    array(
-                        'text' => 'Internet of Things',
-                        // 'link' => '../../iot.php',
-                    ),
-                    array(
-                        'text' => 'Machine Learning',
-                        // 'link' => '../../ml.php',
-                    )
-                );
-
-                $usefullinks = array(
-                    array(
-                        'text' => 'Home',
-                        // 'link' => '../../index.php',
-                    ),
-                    array(
-                        'text' => 'About Us',
-                        // 'link' => '../../about.php',
-                    ),
-                    array(
-                        'text' => 'contact us',
-                        // 'link' => '../../contact.php',
-                    )
-                );
-
-                $addrerss = array(
-                    array(
-                        'text' => 'admin@miphub.in',
-                        'link' => '',
-                    ),
-
-                )
+                <!---- code for footer section start here---->
+                <?php  //include 'footer.php'; 
                 ?>
-                <!-- Footer -->
-                <footer class="text-center text-lg-start text-white" style="background-color: #1c2331">
-                    <!-- Section: Social media -->
-                    <section class="d-flex justify-content-between p-4" style="background-color: #6351ce">
-                        <!-- Left -->
-                        <div class="me-5">
-                            <!-- <span>Get connected with us on social networks:</span> -->
-                        </div>
-                        <!-- Left -->
+                <!----- code for footer section ends here-->
 
-                        <!-- Right -->
-                        <div>
-                            <!-- <a href="" class="text-white me-4 social_icon">
-                <i class="fab fa-facebook-f"></i>
-            </a> -->
-                            <!-- <a href="" class="text-white me-4 social_icon">
-                <i class="fab fa-twitter"></i>
-            </a>
-            <a href="" class="text-white me-4 social_icon">
-                <i class="fab fa-linkedin"></i>
-            </a> -->
-                            <!-- <a href="" class="text-white me-4 social_icon">
-                <i class="fab fa-google"></i>
-            </a>
-            <a href="" class="text-white me-4 social_icon">
-                <i class="fab fa-instagram"></i>
-            </a>
-            
-            <a href="" class="text-white me-4 social_icon">
-                <i class="fab fa-github"></i>
-            </a> -->
-                        </div>
-                        <!-- Right -->
-                    </section>
-                    <!-- Section: Social media -->
+                <!--<div class="footer">-->
+                <!--    <div class="copyright">-->
+                <!--        <p>Copyright MIP <a href="#" target="_blank"></a>2024</p>-->
+                <!--    </div>-->
+                <!--</div>-->
 
-                    <!-- Section: Links  -->
-                    <section class="">
-                        <div class="container text-center text-md-start mt-5">
-                            <!-- Grid row -->
-                            <div class="row mt-3">
-                                <!-- Grid column -->
-                                <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
 
-                                    <h6 class="text-uppercase fw-bold">MIP</h6>
-                                    <hr class="mb-4 mt-0 d-inline-block mx-auto" style="width: 60px; background-color: #7c4dff; height: 2px" />
-                                    <p>
-                                        Machine Intelligence Program
-                                    </p>
-                                    <address>
-                                        NCAIR office, 2nd Floor, Pre-Engineered Building,<br>
-                                        Opp. Hillside Power house, <br>
-                                        IIT-Bombay, Powai, Mumbai- 400076<br>
-                                        Ph. +91.22.25764946
-                                    </address>
-                                </div>
-                                <!-- Grid column -->
-                                <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
-                                    <!-- Links -->
-                                    <h6 class="text-uppercase fw-bold">Contact</h6>
-                                    <hr class="mb-4 mt-0 d-inline-block mx-auto" style="width: 60px; background-color: #7c4dff; height: 2px" />
-                                    <?php foreach ($addrerss as $item) : ?>
-                                        <p>
-                                            <i class="fas fa-email mr-3"></i><a href="<?php echo $item['link']; ?>" class="text-white"><?php echo $item['text']; ?></a>
-                                        </p>
-                                    <?php endforeach; ?>
-                                </div>
-                                <!-- Grid column -->
-                            </div>
-                            <!-- Grid row -->
-                        </div>
-                    </section>
-                    <!-- Section: Links  -->
-
-                </footer>
-                <!-- Footer -->
             </div>
-        </div>
+            <script>
+                //code for getting text data from the pdf file    
+                function extractTextFromPDF(file) {
+                    return new Promise((resolve, reject) => {
+                        var reader = new FileReader();
+                        reader.onload = function(event) {
+                            var arrayBuffer = event.target.result;
+
+                            pdfjsLib.getDocument(arrayBuffer).promise.then(function(pdf) {
+                                var pagesPromises = [];
+                                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                                    pagesPromises.push(pdf.getPage(pageNum));
+                                }
+                                return Promise.all(pagesPromises);
+                            }).then(function(pages) {
+                                var pageTextPromises = pages.map(function(page) {
+                                    return page.getTextContent().then(function(textContent) {
+                                        return textContent.items.map(function(item) {
+                                            return item.str;
+                                        }).join(' ');
+                                    });
+                                });
+                                return Promise.all(pageTextPromises);
+                            }).then(function(pageTexts) {
+                                var extractedText = pageTexts.join(' ');
+                                resolve(extractedText);
+                            }).catch(function(reason) {
+                                reject(reason);
+                            });
+                        };
+                        reader.readAsArrayBuffer(file);
+                    });
+                }
+                document.getElementById('submitBtn').addEventListener('click', function() {
+                    var selectedOption = document.getElementById('dropdown').value;
+                    var file = document.getElementById('pdfInput').files[0];
+                    var sid = "<?php echo $sid; ?>";
+
+                    if (!selectedOption) {
+                        alert('Please select a source.');
+                        return;
+                    }
+                    if (!file) {
+                        alert('Please select a PDF file.');
+                        return;
+                    }
+
+                    extractTextFromPDF(file).then(function(extractedText) {
+                        var reader = new FileReader();
+                        reader.onload = function(event) {
+                            var fileBase64 = event.target.result.split(',')[1]; // Get Base64 part
+
+                            var body = 'extractedTextURL=' + encodeURIComponent(extractedText) +
+                                '&dropdown=' + encodeURIComponent(selectedOption) +
+                                '&pdffile=' + encodeURIComponent(fileBase64) +
+                                '&filename=' + encodeURIComponent(file.name) +
+                                '&siddata=' + encodeURIComponent(sid);
+
+                            fetch('formsubmit.php/storebilldeatils', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded'
+                                    },
+                                    body: body
+                                })
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error('Network response was not ok');
+                                    }
+                                    return response.text();
+                                })
+                                .then(data => {
+                                    if (data == 'success') {
+                                        alert("Invoice Uploaded Successfully")
+                                        window.location.href = "account.php";
+                                    }
+                                    console.log('Success:', data);
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                });
+                        };
+                        reader.readAsDataURL(file);
+                    }).catch(function(error) {
+                        console.error('Error extracting text:', error);
+                    });
+                });
+            </script>
+            <!--- code for getting text data form the pdf file ends here ---->
+
+            <!----code for displying all the invoice start here ---->
+            <script>
+                if (typeof Tabulator !== 'undefined') {
+                    var results = <?php echo json_encode($invoices); ?>;
+                    var columns = [{
+                            title: "User Name",
+                            field: "name",
+                            headerFilter: true
+                        },
+                        {
+                            title: "Company Name",
+                            field: "companyname",
+                            headerFilter: true
+                        },
+                        {
+                            title: "Invoice Number",
+                            field: "invoicenumber",
+                            headerFilter: true
+                        },
+                        {
+                            title: "Invoice Date",
+                            field: "invoicedate",
+                            headerFilter: true,
+                        },
+                        {
+                            title: "Amount",
+                            field: "amount",
+                            headerFilter: true
+                        },
+                        {
+                            title: "Type of Invoice",
+                            field: "invoiceactivity",
+                            headerFilter: true
+                        },
+                        {
+                            title: "Type of Serivce",
+                            field: "service",
+                            headerFilter: true
+                        },
+                        {
+                            title: "File",
+                            field: "filename",
+                            headerFilter: true
+                        },
+                    ];
 
 
+                    var pageSize = 10;
+                    var currentPage = 1;
+                    var table = new Tabulator("#allinvoice", {
+                        data: results,
+                        layout: "fitColumns",
+                        columns: columns,
+                        pagination: "local", // Enable local pagination
+                        paginationSize: pageSize, // Number of rows per page
+                        paginationSizeSelector: [10, 15, 30],
+                        paginationInitialPage: currentPage, // Initial page
+                    });
+                    // Add the following code to initialize pagination buttons
+                    var prevPageBtn = document.querySelector('.pagination-btn:first-of-type');
+                    var nextPageBtn = document.querySelector('.pagination-btn:last-of-type');
+
+                    if (prevPageBtn && nextPageBtn) {
+                        prevPageBtn.addEventListener('click', function() {
+                            table.previousPage();
+                        });
+
+                        nextPageBtn.addEventListener('click', function() {
+                            table.nextPage();
+                        });
+                    }
+
+                } else {
+                    console.error('Tabulator library not defined or not loaded.');
+                }
+            </script>
+            <!--- code for all teh invoice ends here --->
+
+            <!-- Required vendors -->
+            <script src="./vendor/global/global.min.js"></script>
+            <script src="./js/quixnav-init.js"></script>
+            <script src="./js/custom.min.js"></script>
 
 
-        <!-- </div> -->
-        <!-- End of .container -->
-        <!-- code for footer ends here  -->
+            <!-- Vectormap -->
+            <script src="./vendor/raphael/raphael.min.js"></script>
+            <script src="./vendor/morris/morris.min.js"></script>
 
-    </div>
+            <script src="./vendor/circle-progress/circle-progress.min.js"></script>
+            <script src="./vendor/chart.js/Chart.bundle.min.js"></script>
 
+            <script src="./vendor/gaugeJS/dist/gauge.min.js"></script>
 
+            <!--  flot-chart js -->
+            <script src="./vendor/flot/jquery.flot.js"></script>
+            <script src="./vendor/flot/jquery.flot.resize.js"></script>
 
+            <!-- Owl Carousel -->
+            <script src="./vendor/owl-carousel/js/owl.carousel.min.js"></script>
 
-    <!-- Required vendors -->
-    <script src="./vendor/global/global.min.js"></script>
-    <script src="./js/quixnav-init.js"></script>
-    <script src="./js/custom.min.js"></script>
-
-
-    <!-- Vectormap -->
-    <script src="./vendor/raphael/raphael.min.js"></script>
-    <script src="./vendor/morris/morris.min.js"></script>
-
-    <script src="./vendor/circle-progress/circle-progress.min.js"></script>
-    <script src="./vendor/chart.js/Chart.bundle.min.js"></script>
-
-    <script src="./vendor/gaugeJS/dist/gauge.min.js"></script>
-
-    <!--  flot-chart js -->
-    <script src="./vendor/flot/jquery.flot.js"></script>
-    <script src="./vendor/flot/jquery.flot.resize.js"></script>
-
-    <!-- Owl Carousel -->
-    <script src="./vendor/owl-carousel/js/owl.carousel.min.js"></script>
-
-    <!-- Counter Up -->
-    <script src="./vendor/jqvmap/js/jquery.vmap.min.js"></script>
-    <script src="./vendor/jqvmap/js/jquery.vmap.usa.js"></script>
-    <script src="./vendor/jquery.counterup/jquery.counterup.min.js"></script>
+            <!-- Counter Up -->
+            <script src="./vendor/jqvmap/js/jquery.vmap.min.js"></script>
+            <script src="./vendor/jqvmap/js/jquery.vmap.usa.js"></script>
+            <script src="./vendor/jquery.counterup/jquery.counterup.min.js"></script>
 
 
-    <script src="./js/dashboard/dashboard-1.js"></script>
+            <script src="./js/dashboard/dashboard-1.js"></script>
 
 
 
