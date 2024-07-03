@@ -190,6 +190,9 @@ if (isset($_POST['register'])) {
                     } else if ($result['usertype'] == 'hr') {
                         header("Location: home.php");
                         exit();
+                    } else if ($result['usertype'] == 'account') {
+                        header("Location: account.php");
+                        exit();
                     } else {
                         header("Location: staff.php");
                         exit();
