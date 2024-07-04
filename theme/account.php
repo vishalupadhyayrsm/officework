@@ -8,13 +8,7 @@ if (isset($_SESSION['user_email'])) {
     $usertype = $_SESSION['usertype'];
     $sid = $_SESSION['userid'];
     $decform = $_SESSION['decform'];
-    /* code to check taht if user has filled teh decleration form  or not */
-    // if ($decform != 'yes') {
-    //     header("Location: ./decleration.php");
-    // }
-    // if ($usertype == "system") {
-    //     header("Location: ../system");
-    // }
+
     // code for checking that if the usertype is staff or not 
     try {
         $sql = "SELECT sg.`sid`,sg.`name`, sg.`email`, sg.`usertype`,sg.`tenureenddate`, sg.`contact`, sg.`cl`, sg.`rh`,sg.`el`, sg.remainingcl, sg.remainingrh,sg.remainingel, sg.declarationform,lt.leaveid, 
@@ -33,8 +27,6 @@ if (isset($_SESSION['user_email'])) {
         $stmt = $conn->prepare($sqlquery);
         $stmt->execute(); // Execute the prepared statement first
         $invoices = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch the results after execution
-        // print_r($invoices);
-        // code for getting all teh invoice ends here 
 
         /* code for dispalying the gatepass data start here  */
         $sql = "SELECT `gid`,`sid`, `name`, `mobile`, `startdate`, `enddate`, `gender`, `purpose`,`gatepassstatus` FROM `gatepass` where sid=:sid ";
@@ -128,60 +120,6 @@ $decform = $results[0]['declarationform'];
                                     <input type="file" class="form-control" id="pdfInput" accept=".pdf">
                                 </div><br>
                                 <button id="submitBtn" class="btn btn-success">Submit</button>
-
-
-
-
-
-
-                                <!--         <div class="col-md-6 offset-md-3">-->
-                                <!--    <h2 style="text-align:center;">PDF</h2>-->
-                                <!--    <br>-->
-                                <!--    <div class="form-group">-->
-                                <!--        <label for="dropdown">Select Source:</label>-->
-                                <!--        <select id="dropdown" class="form-control">-->
-                                <!--            <option value="">Select</option>-->
-                                <!--            <option value="amazon">Amazon</option>-->
-                                <!--            <option value="electronic">Electronic.com</option>-->
-                                <!--            <option value="dgk">dgk</option>-->
-                                <!--            <option value="credence">Credence</option>-->
-                                <!--            <option value="bl">Balmer Lawrie</option>-->
-                                <!--            <option value="dmart">D-Mart</option>-->
-                                <!--            <option value="ola">OLA</option>-->
-                                <!--        </select>-->
-                                <!--    </div><br>-->
-
-                                <!--    <div class="form-group">-->
-                                <!--        <label for="pdfInput">Select Invoice:</label>-->
-                                <!--        <input type="file" class="form-control" id="pdfInput" accept=".pdf">-->
-                                <!--    </div><br>-->
-                                <!--    <button id="submitBtn" class="btn btn-success">Submit</button>-->
-                                <!--    <div id="pdfText" style="display:none;"></div>-->
-                                <!--</div>-->
-
-                                <!--<form method="post" action="formsubmit.php/leaveapply">-->
-                                <!--        <input type="hidden" name="sid" value="<?php echo $results[0]['sid']; ?>">-->
-                                <!--        <div class="mb-3 mt-3">-->
-                                <!--             <label for="dropdown">Select Source:</label>-->
-                                <!--            <select id="dropdown" class="form-control">-->
-                                <!--                <option value="">Select</option>-->
-                                <!--                <option value="amazon">Amazon</option>-->
-                                <!--                <option value="electronic">Electronic.com</option>-->
-                                <!--                <option value="dgk">dgk</option>-->
-                                <!--                <option value="credence">Credence</option>-->
-                                <!--                <option value="bl">Balmer Lawrie</option>-->
-                                <!--                <option value="dmart">D-Mart</option>-->
-                                <!--                <option value="ola">OLA</option>-->
-                                <!--            </select>-->
-                                <!--        </div>-->
-                                <!--         <div class="form-group">-->
-                                <!--            <label for="pdfInput">Select Invoice:</label>-->
-                                <!--            <input type="file" class="form-control" id="pdfInput" accept=".pdf">-->
-                                <!--        </div><br>-->
-                                <!--        <button id="submitBtn" class="btn btn-success">Submit</button>-->
-                                <!--        <div id="pdfText" style="display:none;"></div>-->
-                                <!--</form>-->
-
                             </div>
                         </div>
 
@@ -356,8 +294,12 @@ $decform = $results[0]['declarationform'];
                         {
                             title: "File",
                             field: "filename",
-                            headerFilter: true
-                        },
+                            headerFilter: true,
+                            formatter: function(cell, formatterParams, onRendered) {
+                                var filename = cell.getValue();
+                                return `<a href="https://miphub.in/${filename}" target="_blank" style='color:black;'>${filename}</a>`;
+                            }
+                        }
                     ];
 
 
