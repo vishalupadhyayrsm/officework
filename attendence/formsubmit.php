@@ -401,7 +401,6 @@ switch ($endpoint) {
                     $elstartdate = !empty($elstartdate) ? $elstartdate : $defaultDate;
                     $elend_date = !empty($elend_date) ? $elend_date : $defaultDate;
 
-                    // echo $clstartdate, $clend_date, $rhstartdate, $rhend_date, $elstartdate, $elend_date;
                     if ($currentyear) {
                         /* code for selecting  teh total cl and el from teh database */
                         $selectQuery = "SELECT `remainingcl`, `remainingrh`, `remainingel` FROM `sigin` WHERE sid = :sid";
