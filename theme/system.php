@@ -107,8 +107,6 @@ $cards = array(
 </head>
 
 <body>
-
-
     <div id="main-wrapper">
         <div class="nav-header">
             <a href="index.html" class="brand-logo">
@@ -116,7 +114,6 @@ $cards = array(
                 <img class="logo-compact" src="./images/logo-text.png" alt="">
                 <img class="brand-title" src="./images/logo-text.png" alt="">
             </a>
-
             <div class="nav-control">
                 <div class="hamburger">
                     <span class="line"></span><span class="line"></span><span class="line"></span>
@@ -124,7 +121,6 @@ $cards = array(
             </div>
         </div>
         <!-- code for dispalying the logo and name ends here   -->
-
         <!-- code for header start here  -->
         <div class="header">
             <div class="header-content">
@@ -237,7 +233,6 @@ $cards = array(
 
         <!-- code for sidebar start here  -->
         <?php include 'sidebar.php' ?>
-
         <!-- code for sidebar ends here   -->
 
         <!-- code for main body start here  -->
