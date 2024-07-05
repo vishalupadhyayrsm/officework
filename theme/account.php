@@ -332,8 +332,6 @@ $decform = $results[0]['declarationform'];
                     console.error('Tabulator library not defined or not loaded.');
                 }
             </script>
-            <!--- code for all teh invoice ends here --->
-
             <!-- Required vendors -->
             <script src="./vendor/global/global.min.js"></script>
             <script src="./js/quixnav-init.js"></script>
