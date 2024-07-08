@@ -271,8 +271,6 @@ $cards = array(
                     }
                     ?>
                 </div>
-
-
                 <!-- code for dispalying the user details, certificate  and resign list start here  -->
                 <div class="row">
 
