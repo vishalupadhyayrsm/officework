@@ -8,7 +8,6 @@ if (isset($_SESSION['user_email'])) {
     $usertype = $_SESSION['usertype'];
     $sid = $_SESSION['userid'];
     $decform = $_SESSION['decform'];
-
     // code for checking that if the usertype is staff or not 
     try {
         $sql = "SELECT sg.`sid`,sg.`name`, sg.`email`, sg.`usertype`,sg.`tenureenddate`, sg.`contact`, sg.`cl`, sg.`rh`,sg.`el`, sg.remainingcl, sg.remainingrh,sg.remainingel, sg.declarationform,lt.leaveid, 
@@ -97,7 +96,7 @@ $decform = $results[0]['declarationform'];
                     <div class="col-lg-6">
                         <div class="card">
                             <div class="card-header">
-                                <h4 class="card-title">Upload Invoice </h4>
+                                <h4 class="card-title">Upload Invoice</h4>
                             </div>
                             <div class="card-body">
 
@@ -332,6 +331,8 @@ $decform = $results[0]['declarationform'];
                     console.error('Tabulator library not defined or not loaded.');
                 }
             </script>
+            <!--- code for all teh invoice ends here --->
+
             <!-- Required vendors -->
             <script src="./vendor/global/global.min.js"></script>
             <script src="./js/quixnav-init.js"></script>
