@@ -107,10 +107,10 @@ $usertype = $_SESSION['usertype'];
                             <i class="mdi mdi-account"></i>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
-                            <a href="./profile.php" class="dropdown-item">
-                                <i class="icon-user"></i>
-                                <span class="ml-2">Profile </span>
-                            </a>
+                            <!--<a href="./profile.php" class="dropdown-item">-->
+                            <!--    <i class="icon-user"></i>-->
+                            <!--    <span class="ml-2">Profile </span>-->
+                            <!--</a>-->
                             <!--<a href="./email-inbox.html" class="dropdown-item">-->
                             <!--    <i class="icon-envelope-open"></i>-->
                             <!--    <span class="ml-2">Inbox </span>-->
@@ -137,28 +137,35 @@ $usertype = $_SESSION['usertype'];
                     <?php if ($usertype == 'hr' || $usertype == 'admin') {
                     ?>
                         <li><a href="./home.php">HR</a></li>
+                        <li><a href="./user.php">Dashboard</a></li>
                     <?php }
                     if ($usertype == 'af' || $usertype == 'admin') {
                     ?>
-                        <li><a href="./accountfinance.php">Account and Finanance</a></li>
+                        <!--<li><a href="./accountfinance.php">Account and Finanance</a></li>-->
                     <?php }
-                    if ($usertype == 'staff' || $usertype == 'intern') { ?>
+                    if ($usertype == 'staff' || $usertype == 'intern' || $usertype == 'student') { ?>
                         <li><a href="./user.php">Dashboard</a></li>
-                        <li><a href="./applyleave.php">All Application</a></li>
-                        <li><a href="./resign.php">Resign </a></li>
                     <?php }
-                    if ($usertype == 'amazon' || $usertype == 'admin') { ?>
-                        <li><a href="./amazon.php">Amazon</a></li>
+                    if ($usertype == 'purchase' || $usertype == 'admin') { ?>
+                        <li><a href="./inventory.php">Amazon</a></li>
+                    <?php }
+                    if ($usertype == 'purchase') { ?>
+                        <li><a href="./user.php">Dashboard</a></li>
                     <?php }
                     if ($usertype == 'system' || $usertype == 'admin') { ?>
-                        <li><a href="./system.php">System</a></li>
+                        <!--<li><a href="./system.php">System</a></li>-->
                         <li><a href="./systemregister.php">System Registration</a></li>
                     <?php }
-                    if ($usertype == 'account' || $usertype == 'admin') { ?>
+                    if ($usertype == 'account') { ?>
                         <li><a href="./account.php">Account</a></li>
                         <li><a href="./home.php">HR</a></li>
+                        <li><a href="./user.php">Dashboard</a></li>
                     <?php } ?>
-
+                    <?php if ($usertype == 'admin') { ?>
+                        <li><a href="./account.php">Account</a></li>
+                    <?php } ?>
+                    <li><a href="./applyleave.php">All Application</a></li>
+                    <li><a href="./resign.php">Exit Formalities</a></li>
                 </ul>
             </li>
             <li class="nav-label">User Details</li>
@@ -172,7 +179,7 @@ $usertype = $_SESSION['usertype'];
                             <li><a href="./email-read.html">Read</a></li>
                         </ul>
                     </li> -->
-                    <li><a href="./app-calender.html">Calendar</a></li>
+                    <!--<li><a href="./app-calender.html">Calendar</a></li>-->
                 </ul>
             </li>
             <!-- <li><a class="has-arrow" href="javascript:void()" aria-expanded="false"><i class="icon icon-chart-bar-33"></i><span class="nav-text">Charts</span></a>
