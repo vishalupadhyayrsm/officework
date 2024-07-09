@@ -8,11 +8,7 @@ if (isset($_SESSION['user_email'])) {
     $usertype = $_SESSION['usertype'];
     $sid = $_SESSION['userid'];
     $decform = $_SESSION['decform'];
-    // echo $usertype;
-    if ($usertype == "system") {
-        header("Location: ../system");
-    }
-    // code for checking that if the usertype is staff or not 
+
     try {
         $sql = "SELECT sg.`sid`, sg.`declarationform`, sg.`name`, sg.`email`, sg.`usertype`, sg.`contact`, sg.`cl`, sg.`rh`, sg.`el`, sg.remainingcl, sg.remainingrh, sg.remainingel, sg.declarationform, lt.leaveid, lt.`reason`, lt.`clstartdate`, lt.`clenddate`, lt.`rhstartdate`, lt.`rhenddate`, lt.`elstartdate`, lt.`elenddate`, lt.`leave_status`, counts.total_records, counts.student_count, counts.staff_count, counts.intern_count
             FROM sigin AS sg LEFT JOIN leavetable AS lt ON lt.sid = sg.sid CROSS JOIN ( SELECT COUNT(sg.sid) AS total_records, SUM(CASE WHEN sg.usertype = 'student' THEN 1 ELSE 0 END) AS student_count, SUM(CASE WHEN sg.usertype = 'staff' THEN 1 ELSE 0 END) AS staff_count, SUM(CASE WHEN sg.usertype = 'intern' THEN 1 ELSE 0 END) AS intern_count FROM sigin AS sg ) AS counts";
@@ -28,14 +24,14 @@ if (isset($_SESSION['user_email'])) {
 
 
         /* code for fecthing the certificate details start here */
-        $sql = "SELECT `cid`, `sid`, `piname`, `username`,`start_date`,`end_date`,`certificatestatus`, `collegename`, `workdone` FROM `certificate`";
+        $sql = "SELECT `cid`, `sid`, `piname`, `username`,`start_date`,`end_date`,`certificatestatus`, `collegename`, `workdone`,`userresponse` FROM `certificate`";
         // $sql = 'SELECT sg.`certificatestatus`, ce.`cid`, ce.`sid`, ce.`piname`, ce.`username`, ce.`start_date`, ce.`end_date`, ce.`certificatestatus` AS `ce_certificatestatus`, ce.`collegename`, ce.`workdone` FROM `sigin` AS sg LEFT JOIN `certificate` AS ce ON ce.`sid` = sg.`sid`';
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $certificate = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         /* code for fecthing the gate pass data start here */
-        $sql = "SELECT `rid`, `sid`, `pi_name`, `start_date`, `terminationdate`, `startingposition`, `endingpostion`, `reason_leaving`, `planafterleaving`, `imporove_suggestion`, `what_mostlike`, `what_leastlike`, `taking_anotherjob`, `new_place_job`, `improvement`, `Drawer_yesno`, `CupboardKeys_yesno`, `labbookyesno`, `hardwareno`,`otherremarks`, `anyothersno` FROM `resigndata`";
+        $sql = "SELECT `rid`, `sid`, `pi_name`, `start_date`, `terminationdate`, `startingposition`, `endingpostion`, `reason_leaving`, `planafterleaving`, `imporove_suggestion`, `what_mostlike`, `what_leastlike`, `taking_anotherjob`, `new_place_job`, `improvement`, `Drawer_yesno`, `CupboardKeys_yesno`, `labbookyesno`, `hardwareno`,`otherremarks`, `anyothersno`,`resignstatus` FROM `resigndata`";
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $resign = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -53,17 +49,11 @@ if (isset($_SESSION['user_email'])) {
     exit();
 }
 
-// if ($usertype == 'hr') {
-// } else {
-//     $sql = "SELECT `gid`,`sid`, `name`, `mobile`, `startdate`, `enddate`, `gender`, `purpose`,`gatepassstatus` FROM `gatepass` where sid=:sid ";
-//     $stmt = $conn->prepare($sql);
-//     $stmt->bindParam(':sid', $sid);
-//     $stmt->execute();
-//     $gatepass = $stmt->fetchAll(PDO::FETCH_ASSOC);
-// }
 $decform = $results[0]['declarationform'];
-// echo $decform;
-// $decform = "yes";
+if ($decform !== 'yes') {
+    header("Location: ./decform.php");
+}
+
 
 ?>
 <!DOCTYPE html>
@@ -83,6 +73,12 @@ $decform = $results[0]['declarationform'];
     <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
     <link href="./vendor/jqvmap/css/jqvmap.min.css" rel="stylesheet">
     <link href="./css/style.css" rel="stylesheet">
+    <style>
+        th,
+        td {
+            color: black;
+        }
+    </style>
 </head>
 
 <body>
@@ -100,246 +96,6 @@ $decform = $results[0]['declarationform'];
     ***********************************-->
     <div id="main-wrapper">
         <?php include 'sidebar.php' ?>
-
-
-        <!-- code for displaying the logo and name start here  -->
-        <!-- <div class="nav-header">
-            <a href="home.php" class="brand-logo">
-                <img class="logo-abbr" src="./images/logo.png" alt="">
-                <img class="logo-compact" src="./images/mip.png" alt="">
-                <img class="brand-title" src="./images/mip.png" alt="">
-            </a>
-
-            <div class="nav-control">
-                <div class="hamburger">
-                    <span class="line"></span><span class="line"></span><span class="line"></span>
-                </div>
-            </div>
-        </div> -->
-        <!-- code for dispalying the logo and name ends here   -->
-
-        <!-- code for header start here  -->
-        <!-- <div class="header">
-            <div class="header-content">
-                <nav class="navbar navbar-expand">
-                    <div class="collapse navbar-collapse justify-content-between"> -->
-        <!-- <div class="header-left">
-                            <div class="search_bar dropdown">
-                                <span class="search_icon p-3 c-pointer" data-toggle="dropdown">
-                                    <i class="mdi mdi-magnify"></i>
-                                </span>
-                                <div class="dropdown-menu p-0 m-0">
-                                    <form>
-                                        <input class="form-control" type="search" placeholder="Search" aria-label="Search">
-                                    </form>
-                                </div>
-                            </div>
-                        </div> -->
-
-        <!-- <ul class="navbar-nav header-right">
-                            <li class="nav-item dropdown notification_dropdown"> -->
-        <!-- <a class="nav-link" href="#" role="button" data-toggle="dropdown">
-                                    <i class="mdi mdi-bell"></i>
-                                    <div class="pulse-css"></div>
-                                </a> -->
-        <!-- code for dispaying the notification start here  -->
-        <!-- <div class="dropdown-menu dropdown-menu-right"> -->
-        <!-- <ul class="list-unstyled">
-                                        <li class="media dropdown-item">
-                                            <span class="success"><i class="ti-user"></i></span>
-                                            <div class="media-body">
-                                                <a href="#">
-                                                    <p><strong>Martin</strong> has added a <strong>customer</strong> Successfully
-                                                    </p>
-                                                </a>
-                                            </div>
-                                            <span class="notify-time">3:20 am</span>
-                                        </li>
-                                        <li class="media dropdown-item">
-                                            <span class="primary"><i class="ti-shopping-cart"></i></span>
-                                            <div class="media-body">
-                                                <a href="#">
-                                                    <p><strong>Jennifer</strong> purchased Light Dashboard 2.0.</p>
-                                                </a>
-                                            </div>
-                                            <span class="notify-time">3:20 am</span>
-                                        </li>
-                                        <li class="media dropdown-item">
-                                            <span class="danger"><i class="ti-bookmark"></i></span>
-                                            <div class="media-body">
-                                                <a href="#">
-                                                    <p><strong>Robin</strong> marked a <strong>ticket</strong> as unsolved.
-                                                    </p>
-                                                </a>
-                                            </div>
-                                            <span class="notify-time">3:20 am</span>
-                                        </li>
-                                        <li class="media dropdown-item">
-                                            <span class="primary"><i class="ti-heart"></i></span>
-                                            <div class="media-body">
-                                                <a href="#">
-                                                    <p><strong>David</strong> purchased Light Dashboard 1.0.</p>
-                                                </a>
-                                            </div>
-                                            <span class="notify-time">3:20 am</span>
-                                        </li>
-                                        <li class="media dropdown-item">
-                                            <span class="success"><i class="ti-image"></i></span>
-                                            <div class="media-body">
-                                                <a href="#">
-                                                    <p><strong> James.</strong> has added a<strong>customer</strong> Successfully
-                                                    </p>
-                                                </a>
-                                            </div>
-                                            <span class="notify-time">3:20 am</span>
-                                        </li>
-                                    </ul> -->
-        <!-- code for notification ends here  -->
-        <!-- code for see all the notification start here nad i have to add the link -->
-        <!-- <a class="all-notification" href="#">See all notifications <i class="ti-arrow-right"></i></a> -->
-        <!-- </div>
-                            </li> -->
-        <!-- code for getting dropdown list start here  -->
-        <!-- <li class="nav-item dropdown header-profile">
-                                <a class="nav-link" href="#" role="button" data-toggle="dropdown">
-                                    <i class="mdi mdi-account"></i>
-                                </a>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <a href="./profile.php" class="dropdown-item">
-                                        <i class="icon-user"></i>
-                                        <span class="ml-2">Profile </span>
-                                    </a>
-                                    <a href="./email-inbox.html" class="dropdown-item">
-                                        <i class="icon-envelope-open"></i>
-                                        <span class="ml-2">Inbox </span>
-                                    </a>
-                                    <a href="./logout.php" class="dropdown-item">
-                                        <i class="icon-key"></i>
-                                        <span class="ml-2">Logout </span>
-                                    </a>
-                                </div>
-                            </li> -->
-        <!-- code ends for dispaying the dropdown when user click on the profile  -->
-        <!-- </ul>
-                    </div>
-                </nav>
-            </div>
-        </div> -->
-
-
-        <!-- code for header ends here  -->
-
-        <!-- code for side bar start here to display all the list start here  -->
-        <!-- <div class="quixnav">
-            <div class="quixnav-scroll">
-                <ul class="metismenu" id="menu">
-                    <li class="nav-label first">Main Menu</li>
-                    <li><a class="has-arrow" href="javascript:void()" aria-expanded="false"><i class="icon icon-single-04"></i><span class="nav-text">Dashboard</span></a>
-                        <ul aria-expanded="false">
-                            <li><a href="./home.php">HR</a></li>
-                            <li><a href="./accountfinance.php">Accoutn and Finanance</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-label">Apps</li>
-                    <li><a class="has-arrow" href="javascript:void()" aria-expanded="false"><i class="icon icon-app-store"></i><span class="nav-text">Apps</span></a>
-                        <ul aria-expanded="false">
-                            <li><a href="./app-profile.html">Profile</a></li>
-                            <li><a class="has-arrow" href="javascript:void()" aria-expanded="false">Email</a>
-                                <ul aria-expanded="false">
-                                    <li><a href="./email-compose.html">Compose</a></li>
-                                    <li><a href="./email-inbox.html">Inbox</a></li>
-                                    <li><a href="./email-read.html">Read</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="./app-calender.html">Calendar</a></li>
-                        </ul>
-                    </li>
-                    <li><a class="has-arrow" href="javascript:void()" aria-expanded="false"><i class="icon icon-chart-bar-33"></i><span class="nav-text">Charts</span></a>
-                        <ul aria-expanded="false">
-                            <li><a href="./chart-flot.html">Flot</a></li>
-                            <li><a href="./chart-morris.html">Morris</a></li>
-                            <li><a href="./chart-chartjs.html">Chartjs</a></li>
-                            <li><a href="./chart-chartist.html">Chartist</a></li>
-                            <li><a href="./chart-sparkline.html">Sparkline</a></li>
-                            <li><a href="./chart-peity.html">Peity</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-label">Components</li>
-                    <li><a class="has-arrow" href="javascript:void()" aria-expanded="false"><i class="icon icon-world-2"></i><span class="nav-text">Bootstrap</span></a>
-                        <ul aria-expanded="false">
-                            <li><a href="./ui-accordion.html">Accordion</a></li>
-                            <li><a href="./ui-alert.html">Alert</a></li>
-                            <li><a href="./ui-badge.html">Badge</a></li>
-                            <li><a href="./ui-button.html">Button</a></li>
-                            <li><a href="./ui-modal.html">Modal</a></li>
-                            <li><a href="./ui-button-group.html">Button Group</a></li>
-                            <li><a href="./ui-list-group.html">List Group</a></li>
-                            <li><a href="./ui-media-object.html">Media Object</a></li>
-                            <li><a href="./ui-card.html">Cards</a></li>
-                            <li><a href="./ui-carousel.html">Carousel</a></li>
-                            <li><a href="./ui-dropdown.html">Dropdown</a></li>
-                            <li><a href="./ui-popover.html">Popover</a></li>
-                            <li><a href="./ui-progressbar.html">Progressbar</a></li>
-                            <li><a href="./ui-tab.html">Tab</a></li>
-                            <li><a href="./ui-typography.html">Typography</a></li>
-                            <li><a href="./ui-pagination.html">Pagination</a></li>
-                            <li><a href="./ui-grid.html">Grid</a></li>
-
-                        </ul>
-                    </li>
-
-                    <li><a class="has-arrow" href="javascript:void()" aria-expanded="false"><i class="icon icon-plug"></i><span class="nav-text">Plugins</span></a>
-                        <ul aria-expanded="false">
-                            <li><a href="./uc-select2.html">Select 2</a></li>
-                            <li><a href="./uc-nestable.html">Nestedable</a></li>
-                            <li><a href="./uc-noui-slider.html">Noui Slider</a></li>
-                            <li><a href="./uc-sweetalert.html">Sweet Alert</a></li>
-                            <li><a href="./uc-toastr.html">Toastr</a></li>
-                            <li><a href="./map-jqvmap.html">Jqv Map</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="widget-basic.html" aria-expanded="false"><i class="icon icon-globe-2"></i><span class="nav-text">Widget</span></a></li>
-                    <li class="nav-label">Forms</li>
-                    <li><a class="has-arrow" href="javascript:void()" aria-expanded="false"><i class="icon icon-form"></i><span class="nav-text">Forms</span></a>
-                        <ul aria-expanded="false">
-                            <li><a href="./form-element.html">Form Elements</a></li>
-                            <li><a href="./form-wizard.html">Wizard</a></li>
-                            <li><a href="./form-editor-summernote.html">Summernote</a></li>
-                            <li><a href="form-pickers.html">Pickers</a></li>
-                            <li><a href="form-validation-jquery.html">Jquery Validate</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-label">Table</li>
-                    <li><a class="has-arrow" href="javascript:void()" aria-expanded="false"><i class="icon icon-layout-25"></i><span class="nav-text">Table</span></a>
-                        <ul aria-expanded="false">
-                            <li><a href="table-bootstrap-basic.html">Bootstrap</a></li>
-                            <li><a href="table-datatable-basic.html">Datatable</a></li>
-                        </ul>
-                    </li>
-
-                    <li class="nav-label">Extra</li>
-                    <li><a class="has-arrow" href="javascript:void()" aria-expanded="false"><i class="icon icon-single-copy-06"></i><span class="nav-text">Pages</span></a>
-                        <ul aria-expanded="false">
-                            <li><a href="./page-register.html">Register</a></li>
-                            <li><a href="./page-login.html">Login</a></li>
-                            <li><a class="has-arrow" href="javascript:void()" aria-expanded="false">Error</a>
-                                <ul aria-expanded="false">
-                                    <li><a href="./page-error-400.html">Error 400</a></li>
-                                    <li><a href="./page-error-403.html">Error 403</a></li>
-                                    <li><a href="./page-error-404.html">Error 404</a></li>
-                                    <li><a href="./page-error-500.html">Error 500</a></li>
-                                    <li><a href="./page-error-503.html">Error 503</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="./page-lock-screen.html">Lock Screen</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-
-
-        </div> -->
-
 
         <!-- code for main body start here  -->
         <div class="content-body">
@@ -409,147 +165,141 @@ $decform = $results[0]['declarationform'];
                 </div>
 
                 <div class="row">
-
-
-
                     <!-- code for user dispalying user details start here  -->
-                    <div class="col-xl-12 col-lg-12 col-md-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">User Details</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-xl-12 col-lg-8">
-                                        <div id="userdetails"></div>
+                    <?php if ($usertype == 'hr' || $usertype == 'admin' || $usertype == 'account') { ?>
+                        <div class="col-xl-12 col-lg-12 col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">User Details</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-xl-12 col-lg-8">
+                                            <div id="userdetails"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    <?php } ?>
 
-                    <!-- code for dispalying the leave status start here  -->
-                    <div class="col-xl-12 col-lg-12 col-md-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">Leave Status</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-xl-12 col-lg-8">
-                                        <div id="leave"></div>
+                    <?php if ($usertype == 'hr' || $usertype == 'account') { ?>
+                        <!-- code for dispalying the leave status start here  -->
+                        <div class="col-xl-12 col-lg-12 col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">Leave Status</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-xl-12 col-lg-8">
+                                            <div id="leave"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-
+                    <?php } ?>
                 </div>
 
                 <!-- code for dispalying the user details, certificate  and resign list start here  -->
                 <div class="row">
-                    <!-- code for displaying the certificate start here  -->
-                    <div class="col-lg-8">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">All Certificate list</h4>
-                                <!-- <button id="openPopupBtn" class='badge badge-success'>Send Certificate</button> -->
-                                <a href="javascript:void()" data-toggle="modal" data-target="#sendcertificate" class="btn btn-primary btn-event w-20">
-                                    <span class="align-middle"></span>Send Certificate
-                                </a>
-                            </div>
-                            <div class="card-body">
-                                <div id="certificate"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- code for sedning certifciate start  here  -->
-                    <div class="modal fade none-border" id="sendcertificate">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h4 class="modal-title"><strong>Send Certificate</strong></h4>
+                    <?php if ($usertype == 'hr' || $usertype == 'admin') { ?>
+                        <!-- code for displaying the certificate start here  -->
+                        <div class="col-lg-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">All Certificate list</h4>
+                                    <a href="javascript:void()" data-toggle="modal" data-target="#sendcertificate" class="btn btn-primary btn-event w-20">
+                                        <span class="align-middle"></span>Send Certificate
+                                    </a>
                                 </div>
-                                <div class="modal-body">
-                                    <form method="post" action="formsubmit.php/sendcertificate" enctype="multipart/form-data">
-                                        <input type="hidden" name="sid" value="<?php echo htmlspecialchars($results[0]['sid']); ?>">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <label class="control-label">Name</label>
-                                                <input class="form-control form-white" placeholder="Enter name" type="text" id="name" name="name" required>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="control-label">Email</label>
-                                                <input class="form-control form-white" placeholder="Enter Email" type="email" id="email" name="email" required>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label for="pdf">Select PDF:</label>
-                                                <input class="form-control form-white" type="file" id="pdf" name="pdf" accept="application/pdf" required>
-                                            </div>
-                                        </div>
-
-
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Close</button>
-                                            <button type="submit" class="btn btn-danger waves-effect waves-light save-category" data-dismiss="modal">Send</button>
-                                        </div>
-                                    </form>
+                                <div class="card-body">
+                                    <div id="certificate"></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- code for sending certificate ends here  -->
-                    <!-- code for dispalying  certificate ends here  -->
+                        <!-- code for sedning certifciate start  here  -->
+                        <div class="modal fade none-border" id="sendcertificate">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title"><strong>Send Certificate</strong></h4>
+                                        <!--<button id="openPopupBtncertficiate">Send Certificate</button>-->
+                                    </div>
+                                    <div class="modal-body">
+                                        <form method="post" action="formsubmit.php/sendcertificate" enctype="multipart/form-data">
+                                            <input type="hidden" name="sid" value="<?php echo htmlspecialchars($results[0]['sid']); ?>">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <label class="control-label">Name</label>
+                                                    <input class="form-control form-white" placeholder="Enter name" type="text" id="name" name="name" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="control-label">Email</label>
+                                                    <input class="form-control form-white" placeholder="Enter Email" type="email" id="email" name="email" required>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label for="pdf">Select PDF:</label>
+                                                    <input class="form-control form-white" type="file" id="pdf" name="pdf" accept="application/pdf" required>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Close</button>
+                                                <button type="submit" name="submit" class="btn btn-danger waves-effect waves-light save-category">Send</button>
+                                            </div>
+                                        </form>
+                                    </div>
 
-                    <!-- code for dispalying the new certificate list start as notification -->
-                    <div class="col-lg-4">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">New Certificate Request</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Name</th>
-                                                <th>Product</th>
-                                                <th>quantity</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="data-table-body">
-                                            <!-- <tbody>
-                                            <tr>
-                                                <td>
-                                                    <div class="round-img">
-                                                        <a href=""><img width="35" src="./images/avatar/1.png" alt=""></a>
-                                                    </div>
-                                                </td>
-                                                <td>Lew Shawon</td>
-                                                <td><span>Dell-985</span></td>
-                                                <td><span>456 pcs</span></td>
-                                                <td><span class="badge badge-success">Done</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="round-img">
-                                                        <a href=""><img width="35" src="./images/avatar/1.png" alt=""></a>
-                                                    </div>
-                                                </td>
-                                                <td>Lew Shawon</td>
-                                                <td><span>Asus-565</span></td>
-                                                <td><span>456 pcs</span></td>
-                                                <td><span class="badge badge-warning">Pending</span></td>
-                                            </tr>
-                                        </tbody> -->
-                                    </table>
+                                    <!---- code for  sendieng teh certificate start here --->
+                                    <!--   <div id="popupForm" class="popup">-->
+                                    <!--    <div class="popup-content">-->
+                                    <!--        <span class="close">&times;</span>-->
+                                    <!--        <form method="post" action="formsubmit.php/sendcertificate" enctype="multipart/form-data">-->
+                                    <!--            <input type="hidden" name="sid" value="<?php echo htmlspecialchars($results[0]['sid']); ?>">-->
+                                    <!--            <label for="email">Email:</label>-->
+                                    <!--            <input type="email" id="email" name="email" required>-->
+                                    <!--            <label for="name">Name:</label>-->
+                                    <!--            <input type="text" id="name" name="name" required>-->
+
+                                    <!--            <label for="pdf">Select PDF:</label>-->
+                                    <!--            <input type="file" id="pdf" name="pdf" accept="application/pdf" required>-->
+
+                                    <!--            <button type="submit" name="submit">Send</button>-->
+                                    <!--        </form>-->
+                                    <!--    </div>-->
+                                    <!--</div>-->
                                 </div>
                             </div>
                         </div>
-                    </div>
+                        <!-- code for sending certificate ends here  -->
+                        <!-- code for dispalying  certificate ends here  -->
+
+                        <!-- code for dispalying the new certificate list start as notification -->
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">New Certificate Request</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Name</th>
+                                                    <th>Start Date</th>
+                                                    <th>End Date</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="data-table-body"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php } ?>
                     <!-- code for dispalying the gate pass start here  -->
                     <div class="col-lg-8">
                         <div class="card">
@@ -574,7 +324,7 @@ $decform = $results[0]['declarationform'];
                                     <h4 class="modal-title"><strong>Send Gate Pass</strong></h4>
                                 </div>
                                 <div class="modal-body">
-                                    <form method="post" action="formsubmit.php/sendgatepass" enctype=" multipart/form-data">
+                                    <form method="post" action="formsubmit.php/sendgatepass" enctype="multipart/form-data">
                                         <input type="hidden" name="sid" value="<?php echo htmlspecialchars($results[0]['sid']); ?>">
                                         <div class="row">
                                             <div class="col-md-6">
@@ -590,11 +340,9 @@ $decform = $results[0]['declarationform'];
                                                 <input class="form-control form-white" type="file" id="pdf" name="pdf" accept="application/pdf" required>
                                             </div>
                                         </div>
-
-
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Close</button>
-                                            <button type="submit" class="btn btn-danger waves-effect waves-light save-category" data-dismiss="modal">Send</button>
+                                            <button type="submit" name="submit" class="btn btn-danger waves-effect waves-light save-category">Send</button>
                                         </div>
                                     </form>
                                 </div>
@@ -602,6 +350,7 @@ $decform = $results[0]['declarationform'];
                         </div>
                     </div>
                     <!-- code for sending gate pass ends here  -->
+
 
                     <div class="col-lg-4">
                         <div class="card">
@@ -613,48 +362,15 @@ $decform = $results[0]['declarationform'];
                                     <table class="table mb-0">
                                         <thead>
                                             <tr>
-                                                <th>#</th>
                                                 <th>Name</th>
-                                                <th>Product</th>
-                                                <th>quantity</th>
+                                                <th>Start Date</th>
+                                                <th>End Date</th>
+                                                <th>Purpose</th>
                                                 <th>Status</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <div class="round-img">
-                                                        <a href=""><img width="35" src="./images/avatar/1.png" alt=""></a>
-                                                    </div>
-                                                </td>
-                                                <td>Lew Shawon</td>
-                                                <td><span>Dell-985</span></td>
-                                                <td><span>456 pcs</span></td>
-                                                <td><span class="badge badge-success">Done</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="round-img">
-                                                        <a href=""><img width="35" src="./images/avatar/1.png" alt=""></a>
-                                                    </div>
-                                                </td>
-                                                <td>Lew Shawon</td>
-                                                <td><span>Asus-565</span></td>
-                                                <td><span>456 pcs</span></td>
-                                                <td><span class="badge badge-warning">Pending</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="round-img">
-                                                        <a href=""><img width="35" src="./images/avatar/1.png" alt=""></a>
-                                                    </div>
-                                                </td>
-                                                <td>lew Shawon</td>
-                                                <td><span>Dell-985</span></td>
-                                                <td><span>456 pcs</span></td>
-                                                <td><span class="badge badge-success">Done</span></td>
-                                            </tr>
-                                        </tbody>
+                                        <tbody id="newgatepass"></tbody>
+
                                     </table>
                                 </div>
                             </div>
@@ -662,210 +378,211 @@ $decform = $results[0]['declarationform'];
                     </div>
 
                     <!-- code for dispalying the resignation list start here  -->
-                    <div class="col-lg-8">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">Resignation List</h4>
-                                <!-- <button id="openPopupBtn">Send Gate Pass</button> -->
-                            </div>
-                            <div class="card-body">
-                                <!-- <div id="vmap13" class="vmap"></div> -->
-                                <div id="resign"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">New Resignation</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Name</th>
-                                                <th>Product</th>
-                                                <th>quantity</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <div class="round-img">
-                                                        <a href=""><img width="35" src="./images/avatar/1.png" alt=""></a>
-                                                    </div>
-                                                </td>
-                                                <td>Lew Shawon</td>
-                                                <td><span>Dell-985</span></td>
-                                                <td><span>456 pcs</span></td>
-                                                <td><span class="badge badge-success">Done</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="round-img">
-                                                        <a href=""><img width="35" src="./images/avatar/1.png" alt=""></a>
-                                                    </div>
-                                                </td>
-                                                <td>Lew Shawon</td>
-                                                <td><span>Asus-565</span></td>
-                                                <td><span>456 pcs</span></td>
-                                                <td><span class="badge badge-warning">Pending</span></td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <div class="round-img">
-                                                        <a href=""><img width="35" src="./images/avatar/1.png" alt=""></a>
-                                                    </div>
-                                                </td>
-                                                <td>lew Shawon</td>
-                                                <td><span>Dell-985</span></td>
-                                                <td><span>456 pcs</span></td>
-                                                <td><span class="badge badge-success">Done</span></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                    <?php if ($usertype == 'hr' || $usertype == 'admin') { ?>
+                        <div class="col-lg-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">Resignation List</h4>
+                                </div>
+                                <div class="card-body">
+                                    <!-- <div id="vmap13" class="vmap"></div> -->
+                                    <div id="resign"></div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                </div>
-
-
-
-                <div class="row">
-                    <div class="col-lg-6 col-xl-4 col-xxl-6 col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">Timeline</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="widget-timeline">
-                                    <ul class="timeline">
-                                        <li>
-                                            <div class="timeline-badge primary"></div>
-                                            <a class="timeline-panel text-muted" href="#">
-                                                <span>10 minutes ago</span>
-                                                <h6 class="m-t-5">Youtube, a video-sharing website, goes live.</h6>
-                                            </a>
-                                        </li>
-
-                                        <li>
-                                            <div class="timeline-badge warning">
-                                            </div>
-                                            <a class="timeline-panel text-muted" href="#">
-                                                <span>20 minutes ago</span>
-                                                <h6 class="m-t-5">Mashable, a news website and blog, goes live.</h6>
-                                            </a>
-                                        </li>
-
-                                        <li>
-                                            <div class="timeline-badge danger">
-                                            </div>
-                                            <a class="timeline-panel text-muted" href="#">
-                                                <span>30 minutes ago</span>
-                                                <h6 class="m-t-5">Google acquires Youtube.</h6>
-                                            </a>
-                                        </li>
-
-                                        <li>
-                                            <div class="timeline-badge success">
-                                            </div>
-                                            <a class="timeline-panel text-muted" href="#">
-                                                <span>15 minutes ago</span>
-                                                <h6 class="m-t-5">StumbleUpon is acquired by eBay. </h6>
-                                            </a>
-                                        </li>
-
-                                        <li>
-                                            <div class="timeline-badge warning">
-                                            </div>
-                                            <a class="timeline-panel text-muted" href="#">
-                                                <span>20 minutes ago</span>
-                                                <h6 class="m-t-5">Mashable, a news website and blog, goes live.</h6>
-                                            </a>
-                                        </li>
-
-                                        <li>
-                                            <div class="timeline-badge dark">
-                                            </div>
-                                            <a class="timeline-panel text-muted" href="#">
-                                                <span>20 minutes ago</span>
-                                                <h6 class="m-t-5">Mashable, a news website and blog, goes live.</h6>
-                                            </a>
-                                        </li>
-
-                                        <li>
-                                            <div class="timeline-badge info">
-                                            </div>
-                                            <a class="timeline-panel text-muted" href="#">
-                                                <span>30 minutes ago</span>
-                                                <h6 class="m-t-5">Google acquires Youtube.</h6>
-                                            </a>
-                                        </li>
-                                    </ul>
+                        <div class="col-lg-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">New Resignation</h4>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-xl-4 col-xxl-6 col-lg-6 col-md-6 col-sm-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">Todo</h4>
-                            </div>
-                            <div class="card-body px-0">
-                                <div class="todo-list">
-                                    <div class="tdl-holder">
-                                        <div class="tdl-content widget-todo mr-4">
-                                            <ul id="todo_list">
-                                                <li><label><input type="checkbox"><i></i><span>Get up</span><a href='#' class="ti-trash"></a></label></li>
-                                                <li><label><input type="checkbox" checked><i></i><span>Stand up</span><a href='#' class="ti-trash"></a></label></li>
-                                                <li><label><input type="checkbox"><i></i><span>Don't give up the
-                                                            fight.</span><a href='#' class="ti-trash"></a></label></li>
-                                                <li><label><input type="checkbox" checked><i></i><span>Do something
-                                                            else</span><a href='#' class="ti-trash"></a></label></li>
-                                                <li><label><input type="checkbox" checked><i></i><span>Stand up</span><a href='#' class="ti-trash"></a></label></li>
-                                                <li><label><input type="checkbox"><i></i><span>Don't give up the
-                                                            fight.</span><a href='#' class="ti-trash"></a></label></li>
-                                            </ul>
-                                        </div>
-                                        <div class="px-4">
-                                            <input type="text" class="tdl-new form-control" placeholder="Write new item and hit 'Enter'...">
-                                        </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>PI Name</th>
+                                                    <th>Product</th>
+                                                    <th>quantity</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="newresign"></tbody>
+                                            <!--<tbody>-->
+                                            <!--    <tr>-->
+                                            <!--        <td>-->
+                                            <!--            <div class="round-img">-->
+                                            <!--                <a href=""><img width="35" src="./images/avatar/1.png" alt=""></a>-->
+                                            <!--            </div>-->
+                                            <!--        </td>-->
+                                            <!--        <td>Lew Shawon</td>-->
+                                            <!--        <td><span>Dell-985</span></td>-->
+                                            <!--        <td><span>456 pcs</span></td>-->
+                                            <!--        <td><span class="badge badge-success">Done</span></td>-->
+                                            <!--    </tr>-->
+                                            <!--    <tr>-->
+                                            <!--        <td>-->
+                                            <!--            <div class="round-img">-->
+                                            <!--                <a href=""><img width="35" src="./images/avatar/1.png" alt=""></a>-->
+                                            <!--            </div>-->
+                                            <!--        </td>-->
+                                            <!--        <td>Lew Shawon</td>-->
+                                            <!--        <td><span>Asus-565</span></td>-->
+                                            <!--        <td><span>456 pcs</span></td>-->
+                                            <!--        <td><span class="badge badge-warning">Pending</span></td>-->
+                                            <!--    </tr>-->
+                                            <!--    <tr>-->
+                                            <!--        <td>-->
+                                            <!--            <div class="round-img">-->
+                                            <!--                <a href=""><img width="35" src="./images/avatar/1.png" alt=""></a>-->
+                                            <!--            </div>-->
+                                            <!--        </td>-->
+                                            <!--        <td>lew Shawon</td>-->
+                                            <!--        <td><span>Dell-985</span></td>-->
+                                            <!--        <td><span>456 pcs</span></td>-->
+                                            <!--        <td><span class="badge badge-success">Done</span></td>-->
+                                            <!--    </tr>-->
+                                            <!--</tbody>-->
+                                        </table>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-sm-12 col-md-12 col-xxl-6 col-xl-4 col-lg-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">Product Sold</h4>
-                                <div class="card-action">
-                                    <div class="dropdown custom-dropdown">
-                                        <div data-toggle="dropdown">
-                                            <i class="ti-more-alt"></i>
-                                        </div>
-                                        <div class="dropdown-menu dropdown-menu-right">
-                                            <a class="dropdown-item" href="#">Option 1</a>
-                                            <a class="dropdown-item" href="#">Option 2</a>
-                                            <a class="dropdown-item" href="#">Option 3</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="chart py-4">
-                                    <canvas id="sold-product"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+                    <?php } ?>
                 </div>
+
+
+
+                <!--<div class="row">-->
+                <!--    <div class="col-lg-6 col-xl-4 col-xxl-6 col-md-6">-->
+                <!--        <div class="card">-->
+                <!--            <div class="card-header">-->
+                <!--                <h4 class="card-title">Timeline</h4>-->
+                <!--            </div>-->
+                <!--            <div class="card-body">-->
+                <!--                <div class="widget-timeline">-->
+                <!--                    <ul class="timeline">-->
+                <!--                        <li>-->
+                <!--                            <div class="timeline-badge primary"></div>-->
+                <!--                            <a class="timeline-panel text-muted" href="#">-->
+                <!--                                <span>10 minutes ago</span>-->
+                <!--                                <h6 class="m-t-5">Youtube, a video-sharing website, goes live.</h6>-->
+                <!--                            </a>-->
+                <!--                        </li>-->
+
+                <!--                        <li>-->
+                <!--                            <div class="timeline-badge warning">-->
+                <!--                            </div>-->
+                <!--                            <a class="timeline-panel text-muted" href="#">-->
+                <!--                                <span>20 minutes ago</span>-->
+                <!--                                <h6 class="m-t-5">Mashable, a news website and blog, goes live.</h6>-->
+                <!--                            </a>-->
+                <!--                        </li>-->
+
+                <!--                        <li>-->
+                <!--                            <div class="timeline-badge danger">-->
+                <!--                            </div>-->
+                <!--                            <a class="timeline-panel text-muted" href="#">-->
+                <!--                                <span>30 minutes ago</span>-->
+                <!--                                <h6 class="m-t-5">Google acquires Youtube.</h6>-->
+                <!--                            </a>-->
+                <!--                        </li>-->
+
+                <!--                        <li>-->
+                <!--                            <div class="timeline-badge success">-->
+                <!--                            </div>-->
+                <!--                            <a class="timeline-panel text-muted" href="#">-->
+                <!--                                <span>15 minutes ago</span>-->
+                <!--                                <h6 class="m-t-5">StumbleUpon is acquired by eBay. </h6>-->
+                <!--                            </a>-->
+                <!--                        </li>-->
+
+                <!--                        <li>-->
+                <!--                            <div class="timeline-badge warning">-->
+                <!--                            </div>-->
+                <!--                            <a class="timeline-panel text-muted" href="#">-->
+                <!--                                <span>20 minutes ago</span>-->
+                <!--                                <h6 class="m-t-5">Mashable, a news website and blog, goes live.</h6>-->
+                <!--                            </a>-->
+                <!--                        </li>-->
+
+                <!--                        <li>-->
+                <!--                            <div class="timeline-badge dark">-->
+                <!--                            </div>-->
+                <!--                            <a class="timeline-panel text-muted" href="#">-->
+                <!--                                <span>20 minutes ago</span>-->
+                <!--                                <h6 class="m-t-5">Mashable, a news website and blog, goes live.</h6>-->
+                <!--                            </a>-->
+                <!--                        </li>-->
+
+                <!--                        <li>-->
+                <!--                            <div class="timeline-badge info">-->
+                <!--                            </div>-->
+                <!--                            <a class="timeline-panel text-muted" href="#">-->
+                <!--                                <span>30 minutes ago</span>-->
+                <!--                                <h6 class="m-t-5">Google acquires Youtube.</h6>-->
+                <!--                            </a>-->
+                <!--                        </li>-->
+                <!--                    </ul>-->
+                <!--                </div>-->
+                <!--            </div>-->
+                <!--        </div>-->
+                <!--    </div>-->
+                <!--    <div class="col-xl-4 col-xxl-6 col-lg-6 col-md-6 col-sm-12">-->
+                <!--        <div class="card">-->
+                <!--            <div class="card-header">-->
+                <!--                <h4 class="card-title">Todo</h4>-->
+                <!--            </div>-->
+                <!--            <div class="card-body px-0">-->
+                <!--                <div class="todo-list">-->
+                <!--                    <div class="tdl-holder">-->
+                <!--                        <div class="tdl-content widget-todo mr-4">-->
+                <!--                            <ul id="todo_list">-->
+                <!--                                <li><label><input type="checkbox"><i></i><span>Get up</span><a href='#' class="ti-trash"></a></label></li>-->
+                <!--                                <li><label><input type="checkbox" checked><i></i><span>Stand up</span><a href='#' class="ti-trash"></a></label></li>-->
+                <!--                                <li><label><input type="checkbox"><i></i><span>Don't give up the-->
+                <!--                                            fight.</span><a href='#' class="ti-trash"></a></label></li>-->
+                <!--                                <li><label><input type="checkbox" checked><i></i><span>Do something-->
+                <!--                                            else</span><a href='#' class="ti-trash"></a></label></li>-->
+                <!--                                <li><label><input type="checkbox" checked><i></i><span>Stand up</span><a href='#' class="ti-trash"></a></label></li>-->
+                <!--                                <li><label><input type="checkbox"><i></i><span>Don't give up the-->
+                <!--                                            fight.</span><a href='#' class="ti-trash"></a></label></li>-->
+                <!--                            </ul>-->
+                <!--                        </div>-->
+                <!--                        <div class="px-4">-->
+                <!--                            <input type="text" class="tdl-new form-control" placeholder="Write new item and hit 'Enter'...">-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+                <!--                </div>-->
+                <!--            </div>-->
+                <!--        </div>-->
+                <!--    </div>-->
+                <!--    <div class="col-sm-12 col-md-12 col-xxl-6 col-xl-4 col-lg-6">-->
+                <!--        <div class="card">-->
+                <!--            <div class="card-header">-->
+                <!--                <h4 class="card-title">Product Sold</h4>-->
+                <!--                <div class="card-action">-->
+                <!--                    <div class="dropdown custom-dropdown">-->
+                <!--                        <div data-toggle="dropdown">-->
+                <!--                            <i class="ti-more-alt"></i>-->
+                <!--                        </div>-->
+                <!--                        <div class="dropdown-menu dropdown-menu-right">-->
+                <!--                            <a class="dropdown-item" href="#">Option 1</a>-->
+                <!--                            <a class="dropdown-item" href="#">Option 2</a>-->
+                <!--                            <a class="dropdown-item" href="#">Option 3</a>-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+                <!--                </div>-->
+                <!--            </div>-->
+                <!--            <div class="card-body">-->
+                <!--                <div class="chart py-4">-->
+                <!--                    <canvas id="sold-product"></canvas>-->
+                <!--                </div>-->
+                <!--            </div>-->
+                <!--        </div>-->
+                <!--    </div>-->
+
+                <!--</div>-->
 
             </div>
         </div>
@@ -969,7 +686,7 @@ $decform = $results[0]['declarationform'];
                         row.getElement().classList.add('red-row');
                         return 'Denied';
                     } else {
-                        <?php if ($usertype == 'hr') : ?>
+                        <?php if ($usertype == 'hr' || $usertype == 'account') : ?>
                             var dropdown = document.createElement('select');
                             dropdown.classList.add('form-control');
                             dropdown.innerHTML = `
@@ -994,20 +711,20 @@ $decform = $results[0]['declarationform'];
                                     }
                                     var timeDifference = end - start;
                                     var dayDifference = timeDifference / (1000 * 60 * 60 * 24);
-                                    console.log(dayDifference)
+                                    // console.log(dayDifference)
                                     if (dayDifference === 0) {
                                         dayDifference = 1;
                                     }
                                     return dayDifference;
                                 }
-                                console.log()
+                                // console.log()
                                 var clDateDifference = calculateDateDifference(cellData.clstartdate, cellData.clenddate);
                                 var rhDateDifference = calculateDateDifference(cellData.rhstartdate, cellData.rhenddate);
                                 if (isNaN(rhDateDifference) || rhDateDifference === "") {
                                     rhDateDifference = 0;
                                 }
-                                console.log("CL Date Difference: " + clDateDifference + " days");
-                                console.log("RH Date Difference: " + rhDateDifference + " days");
+                                // console.log("CL Date Difference: " + clDateDifference + " days");
+                                // console.log("RH Date Difference: " + rhDateDifference + " days");
 
 
                                 updatestatus(lid, selectedValue, sid, username, clDateDifference, rhDateDifference);
@@ -1074,7 +791,7 @@ $decform = $results[0]['declarationform'];
         }
     </script>
 
-    <!-- script for dispalying the tabulator data  -->
+    <!-- script for dispalying the user details start here   -->
     <script>
         if (typeof Tabulator !== 'undefined') {
             var results = <?php echo json_encode($userdetails); ?>;
@@ -1086,8 +803,8 @@ $decform = $results[0]['declarationform'];
                         var userName = cell.getValue();
                         var userData = cell.getRow().getData();
                         var userId = userData.id;
-                        var sid = userData.sid; // Assuming sid is part of the row data
-                        var emailid = userData.emailid; // Assuming emailid is part of the row data
+                        var sid = userData.sid;
+                        var emailid = userData.emailid;
 
                         return '<a href="profile.php?sid=' + sid + '" target="_blank" style="color: black;font-weight: bold;">' + userName + '</a>';
                     }
@@ -1179,7 +896,7 @@ $decform = $results[0]['declarationform'];
             ];
 
 
-            <?php if ($usertype == 'hr') : ?>
+            <?php if ($usertype == 'hr' || $usertype == 'admin') : ?>
                 columns.push({
                     title: "Approved/Disapproved User",
                     field: "userstatus",
@@ -1196,11 +913,59 @@ $decform = $results[0]['declarationform'];
                         var newValue = currentValue === 'yes' ? 'no' : 'yes';
                         cell.setValue(newValue);
                         var userId = cell.getData().sid;
-                        console.log(newValue, userId)
+                        // console.log(newValue, userId)
                         updateApprovalStatus(userId, newValue);
                     }
                 });
             <?php endif; ?>
+
+            //code for assigning teh user 
+            <?php if ($usertype == 'admin') : ?>
+                columns.push({
+                    title: "Assign User ",
+                    field: "usertype",
+                    headerFilter: true,
+                    formatter: function(cell, formatterParams, onRendered) {
+                        var value = cell.getValue();
+                        var dropdownHTML = `
+                        <select class="form-select" style="width: 100%;" onchange="assignUserData(${cell.getData().sid}, this.value)">
+                            <option value="" ${value ? '' : 'selected'}>Select Role</option>
+                            <option value="hr" ${value === 'hr' ? 'selected' : ''}>HR</option>
+                            <option value="account" ${value === 'account' ? 'selected' : ''}>Account</option>
+                            <option value="purchase" ${value === 'purchase' ? 'selected' : ''}>Purchase</option>
+                            <option value="system" ${value === 'system' ? 'selected' : ''}>System</option>
+                        </select>`;
+                        return dropdownHTML;
+                    }
+                });
+            <?php endif; ?>
+
+
+            // code for assigning user to partiualr access
+            function assignUserData(userId, newValue) {
+                fetch('formsubmit.php/assignuser', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: 'userId=' + encodeURIComponent(userId) + '&status=' + encodeURIComponent(newValue)
+                    })
+                    .then(response => response.text())
+                    .then(data => {
+                        var datavalue = data.data;
+                        if (datavalue === 'no') {
+                            alert("User Cannot be assigned");
+                        } else {
+                            alert("User Successfully Assigned");
+                            window.location.href = '../home.php'
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error updating database:', error);
+                    });
+            }
+
+
             // function for approved or disapproved user 
             function updateApprovalStatus(userId, newValue) {
                 fetch('formsubmit.php/userapproved', {
@@ -1213,7 +978,6 @@ $decform = $results[0]['declarationform'];
                     .then(response => response.json())
                     .then(data => {
                         var datavalue = data.data;
-                        console.log(datavalue);
                         if (datavalue == 'no') {
                             alert("User Successfully Disapproved");
                             // window.location.href = "../index1.php";
@@ -1235,15 +999,15 @@ $decform = $results[0]['declarationform'];
                         },
                         body: 'userId=' + encodeURIComponent(userId) + '&status=' + encodeURIComponent(newValue)
                     })
-                    .then(response => response.json())
+                    .then(response => response.text())
                     .then(data => {
                         var datavalue = data.data;
                         console.log(datavalue);
                         if (datavalue == 'no') {
-                            alert("User Successfully Disapproved");
+                            alert("Employee Code not updated");
                             // window.location.href = "../index1.php";
                         } else {
-                            alert("User Successfully Approved");
+                            alert("Employee Code Successfully Update");
                             // window.location.href = "index1.php";
                         }
                     })
@@ -1334,6 +1098,11 @@ $decform = $results[0]['declarationform'];
                     field: "workdone",
                     headerFilter: true
                 },
+                {
+                    title: "User Response",
+                    field: "userresponse",
+                    headerFilter: true
+                },
             ];
 
             // code for updating the user leave status start here 
@@ -1373,10 +1142,10 @@ $decform = $results[0]['declarationform'];
                         var datavalue = data.data;
                         console.log(datavalue);
                         if (datavalue == 'no') {
-                            alert("User Successfully Disapproved");
+                            alert("User certificate not Sent");
                             // window.location.href = "../index1.php";
                         } else {
-                            alert("User Successfully Approved");
+                            alert("Certificate Successfully Sent");
                             // window.location.href = "index1.php";
                         }
                     })
@@ -1469,7 +1238,7 @@ $decform = $results[0]['declarationform'];
                 title: "Certificate Status",
                 field: "gatepassstatus",
                 headerFilter: true,
-                editor: <?php echo ($usertype == 'hr') ? "'input'" : "false"; ?>,
+                editor: <?php echo ($usertype == 'hr' || $usertype == 'account') ? "'input'" : "false"; ?>,
                 cellEdited: function(cell) {
                     var userId = cell.getData().sid;
                     var newValue = cell.getValue();
@@ -1623,6 +1392,11 @@ $decform = $results[0]['declarationform'];
                     field: "otherremarks",
                     headerFilter: true
                 },
+                {
+                    title: "Resign Status",
+                    field: "resignstatus",
+                    headerFilter: true
+                },
             ];
 
             /* code for upadating the resignation status start here */
@@ -1721,25 +1495,7 @@ $decform = $results[0]['declarationform'];
             console.error('Tabulator library not defined or not loaded.');
         }
     </script>
-
-
-
-
-
-    <script src='./js/index.js'></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
+    <!--<script src='./js/index.js'></script>-->
 
     <!--**********************************
         Scripts
@@ -1748,34 +1504,22 @@ $decform = $results[0]['declarationform'];
     <script src="./vendor/global/global.min.js"></script>
     <script src="./js/quixnav-init.js"></script>
     <script src="./js/custom.min.js"></script>
-
-
     <!-- Vectormap -->
     <script src="./vendor/raphael/raphael.min.js"></script>
     <script src="./vendor/morris/morris.min.js"></script>
-
     <script src="./vendor/circle-progress/circle-progress.min.js"></script>
     <script src="./vendor/chart.js/Chart.bundle.min.js"></script>
-
     <script src="./vendor/gaugeJS/dist/gauge.min.js"></script>
-
     <!--  flot-chart js -->
     <script src="./vendor/flot/jquery.flot.js"></script>
     <script src="./vendor/flot/jquery.flot.resize.js"></script>
-
     <!-- Owl Carousel -->
     <script src="./vendor/owl-carousel/js/owl.carousel.min.js"></script>
-
     <!-- Counter Up -->
     <script src="./vendor/jqvmap/js/jquery.vmap.min.js"></script>
     <script src="./vendor/jqvmap/js/jquery.vmap.usa.js"></script>
     <script src="./vendor/jquery.counterup/jquery.counterup.min.js"></script>
-
-
     <script src="./js/dashboard/dashboard-1.js"></script>
-
-
-
 
 
 </body>
