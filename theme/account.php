@@ -127,9 +127,40 @@ $decform = $results[0]['declarationform'];
                     <div class="col-lg-6">
                         <div class="card">
                             <div class="card-header">
-                                <h4 class="card-title">Invoice Details</h4>
+                                <h4 class="card-title">Download Monthly Invoice data </h4>
                             </div>
                             <div class="card-body">
+                                <form action="formsubmit.php/downloadinvoice" method="post">
+                                    <div class="form-group">
+                                        <label for="dropdown">Month:</label>
+                                        <select name="month" id="month" class="form-control">
+                                            <option value="1">January</option>
+                                            <option value="2">February</option>
+                                            <option value="3">March</option>
+                                            <option value="4">April</option>
+                                            <option value="5">May</option>
+                                            <option value="6">June</option>
+                                            <option value="7">July</option>
+                                            <option value="8">August</option>
+                                            <option value="9">September</option>
+                                            <option value="10">October</option>
+                                            <option value="11">November</option>
+                                            <option value="12">December</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="year">Year:</label>
+                                        <select name="year" id="year" class="form-control">
+                                            <?php
+                                            $currentYear = date("Y");
+                                            for ($year = $currentYear; $year >= 2000; $year--) {
+                                                echo "<option value='$year'>$year</option>";
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-success">Download</button>
+                                </form>
                             </div>
                         </div>
 
