@@ -43,7 +43,7 @@
                                                 <option value="">Select</option>
                                                 <option value="staff">Staff</option>
                                                 <option value="intern">Intern</option>
-                                                <option value="staff">Student</option>
+                                                <option value="student">Student</option>
                                             </select>
                                         </div>
                                         <div class="form-group">
