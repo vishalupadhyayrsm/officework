@@ -166,6 +166,11 @@ $usertype = $_SESSION['usertype'];
                     <?php } ?>
                     <li><a href="./applyleave.php">All Application</a></li>
                     <li><a href="./resign.php">Exit Formalities</a></li>
+                    <?php if ($usertype == 'systemadmin') { ?>
+                        <li><a href="./user.php">Dashboard</a></li>
+                        <li><a href="/system">System</a></li>
+                    <?php } ?>
+
                 </ul>
             </li>
             <li class="nav-label">User Details</li>
