@@ -6,7 +6,7 @@ $usertype = $_SESSION['usertype'];
 ?>
 
 <div class="nav-header">
-    <a href="home.php" class="brand-logo">
+    <a href="" class="brand-logo">
         <img class="logo-abbr" src="./images/logo.png" alt="">
         <img class="logo-compact" src="./images/mip.png" alt="">
         <img class="brand-title" src="./images/mip.png" alt="">
@@ -134,42 +134,32 @@ $usertype = $_SESSION['usertype'];
             <li class="nav-label first">Main Menu</li>
             <li><a class="has-arrow" href="javascript:void()" aria-expanded="false"><i class="icon icon-single-04"></i><span class="nav-text" style='color:white;'>Dashboard</span></a>
                 <ul aria-expanded="false">
+                    <li><a href="./user.php">Dashboard</a></li>
                     <?php if ($usertype == 'hr' || $usertype == 'admin') {
                     ?>
                         <li><a href="./home.php">HR</a></li>
-                        <li><a href="./user.php">Dashboard</a></li>
-                    <?php }
-                    if ($usertype == 'af' || $usertype == 'admin') {
-                    ?>
-                        <!--<li><a href="./accountfinance.php">Account and Finanance</a></li>-->
-                    <?php }
+                    <?php } ?>
+                    <?php
                     if ($usertype == 'staff' || $usertype == 'intern' || $usertype == 'student') { ?>
-                        <li><a href="./user.php">Dashboard</a></li>
                     <?php }
                     if ($usertype == 'purchase' || $usertype == 'admin') { ?>
                         <li><a href="./inventory.php">Amazon</a></li>
                     <?php }
                     if ($usertype == 'purchase') { ?>
-                        <li><a href="./user.php">Dashboard</a></li>
-                    <?php }
-                    if ($usertype == 'system' || $usertype == 'admin') { ?>
-                        <!--<li><a href="./system.php">System</a></li>-->
-                        <li><a href="./systemregister.php">System Registration</a></li>
-                    <?php }
-                    if ($usertype == 'account') { ?>
+                    <?php } ?>
+                    <?php if ($usertype == 'account') { ?>
                         <li><a href="./account.php">Account</a></li>
                         <li><a href="./home.php">HR</a></li>
-                        <li><a href="./user.php">Dashboard</a></li>
                     <?php } ?>
                     <?php if ($usertype == 'admin') { ?>
                         <li><a href="./account.php">Account</a></li>
                     <?php } ?>
                     <li><a href="./applyleave.php">All Application</a></li>
                     <li><a href="./resign.php">Exit Formalities</a></li>
-                    <?php if ($usertype == 'systemadmin') { ?>
-                        <li><a href="./user.php">Dashboard</a></li>
-                        <li><a href="/system">System</a></li>
+                    <?php if ($usertype == 'systemadmin' || $usertype == 'admin') { ?>
+                        <li><a href="./systemregister.php">System Registration</a></li>
                     <?php } ?>
+                    <li><a href="/system">System</a></li>
 
                 </ul>
             </li>
