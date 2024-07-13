@@ -351,7 +351,6 @@ $decform = $results[0]['declarationform'];
             return true;
         }
     </script>
-    <!--- code for validating teh leave appliction form ---->
     <script>
         /* code for vaildating the leave application form start here */
         function calculateDays(startDateId, endDateId, daysId) {
