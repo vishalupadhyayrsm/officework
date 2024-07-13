@@ -297,15 +297,6 @@ $decform = $results[0]['declarationform'];
             </div>
         </div>
         <!-- code for main body ends here  -->
-
-        <!-- code for footer start here  -->
-        <!--<div class="footer">-->
-        <!--    <div class="copyright">-->
-        <!--        <p>Copyright MIP <a href="#" target="_blank"></a>2024</p>-->
-        <!--    </div>-->
-        <!--</div>-->
-        <!-- code for footer ends here  -->
-
     </div>
 
     <?php include 'footer.php'; ?>
