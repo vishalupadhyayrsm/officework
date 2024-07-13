@@ -362,10 +362,10 @@ $decform = $results[0]['declarationform'];
                 const start = new Date(startDate);
                 const end = new Date(endDate);
                 const timeDiff = end - start;
-                const days = timeDiff / (1000 * 3600 * 24) + 1; // +1 to include both start and end date
+                const days = timeDiff / (1000 * 3600 * 24) + 1;
                 document.getElementById(daysId).value = days >= 0 ? days : 0;
             } else {
-                document.getElementById(daysId).value = 0; // Set to 0 if dates are not selected
+                document.getElementById(daysId).value = 0;
             }
         }
 
