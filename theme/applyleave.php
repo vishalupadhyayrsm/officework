@@ -301,9 +301,6 @@ $decform = $results[0]['declarationform'];
 
     <?php include 'footer.php'; ?>
 
-    <!--**********************************
-        Scripts
-    ***********************************-->
     <!---code for validating the product price start here  --->
     <script>
         // Function to validate product price and quantity dynamically
