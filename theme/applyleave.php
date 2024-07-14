@@ -260,9 +260,7 @@ $decform = $results[0]['declarationform'];
                                         <label for="point_internship">4-5 points about the project/work done during the Internship:</label>
                                         <input type="text" class="form-control" id="point_internship" name="point_internship" placeholder="Enter what you have learned during your internship ">
                                     </div>
-
                                     <button type="submit" name="submit" class="btn btn-primary">Submit</button>
-                                    <!-- <button type="submit" name="submit" class="btn btn-primary">Submit</button> -->
                                 </form>
                             </div>
                         </div>
