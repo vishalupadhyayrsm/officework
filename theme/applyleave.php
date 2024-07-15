@@ -1,14 +1,12 @@
 <?php
 session_start();
 include 'dbconfig.php';
-// include 'fecthdata.php';
 if (isset($_SESSION['user_email'])) {
     $email = $_SESSION['user_email'];
     $username = $_SESSION['username'];
     $usertype = $_SESSION['usertype'];
     $sid = $_SESSION['userid'];
     $decform = $_SESSION['decform'];
-    // code for checking that if the usertype is staff or not 
     try {
         $sql = "SELECT sg.`sid`,sg.`name`, sg.`email`, sg.`usertype`,sg.`tenureenddate`, sg.`contact`, sg.`cl`, sg.`rh`,sg.`el`, sg.remainingcl, sg.remainingrh,sg.remainingel, sg.declarationform,lt.leaveid, 
         lt.`clstartdate`, lt.`clenddate`,lt.`rhstartdate`, lt.`rhenddate`, lt.`elstartdate`, lt.`elenddate`,  lt.`reason`, lt.`leave_status`,de.declarationform,de.emp_roll,de.`univesity`,de.name,de.iitbemail,
