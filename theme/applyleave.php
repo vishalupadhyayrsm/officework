@@ -1,12 +1,14 @@
 <?php
 session_start();
 include 'dbconfig.php';
+// include 'fecthdata.php';
 if (isset($_SESSION['user_email'])) {
     $email = $_SESSION['user_email'];
     $username = $_SESSION['username'];
     $usertype = $_SESSION['usertype'];
     $sid = $_SESSION['userid'];
     $decform = $_SESSION['decform'];
+    // code for checking that if the usertype is staff or not 
     try {
         $sql = "SELECT sg.`sid`,sg.`name`, sg.`email`, sg.`usertype`,sg.`tenureenddate`, sg.`contact`, sg.`cl`, sg.`rh`,sg.`el`, sg.remainingcl, sg.remainingrh,sg.remainingel, sg.declarationform,lt.leaveid, 
         lt.`clstartdate`, lt.`clenddate`,lt.`rhstartdate`, lt.`rhenddate`, lt.`elstartdate`, lt.`elenddate`,  lt.`reason`, lt.`leave_status`,de.declarationform,de.emp_roll,de.`univesity`,de.name,de.iitbemail,
@@ -157,27 +159,32 @@ $decform = $results[0]['declarationform'];
 
                                     <div class="mb-3 mt-3">
                                         <label for="contact">Quantity:</label>
-                                        <input type="text" class="form-control" id="quantitytxt" name="quantity" placeholder="Contact Number" required>
+                                        <input type="text" class="form-control" id="quantitytxt" name="quantity" placeholder="Please Enter Quantity" required>
                                     </div>
 
                                     <div class="mb-3 mt-3">
                                         <label for="purpose">Urgency:</label>
                                         <input type="text" class="form-control" id="purpose" name="urgency" placeholder="Purpose" required>
                                     </div>
+                                    <!--<button type="submit" name="submit" class="btn btn-primary" onclick="return Validate()">Submit</button>-->
                                     <button type="submit" name="submit" class="btn btn-primary signupbtn" id="myBtn" onclick="return Validate()">Submit</button>
                                     <!-- <button type="submit" name="submit" class="btn btn-primary">Submit</button> -->
                                 </form>
                             </div>
                         </div>
                     </div>
+
                     <?php if ($usertype !== 'student') { ?>
                         <!-- code for applying for Gate pass start here   -->
                         <div class="col-lg-6">
                             <div class="card">
                                 <div class="card-header">
                                     <h4 class="card-title">Apply Gate Pass</h4>
+                                    <br>
+
                                 </div>
                                 <div class="card-body">
+                                    <h3 style='font-size: 17px;color: red;'>Please apply for a gate pass at least one day in advance.</h3>
                                     <form method="post" action="formsubmit.php/gatepass">
                                         <input type="hidden" name="sid" value="<?php echo $results[0]['sid']; ?>">
                                         <div class="mb-3 mt-3">
@@ -257,13 +264,15 @@ $decform = $results[0]['declarationform'];
                                         <label for="point_internship">4-5 points about the project/work done during the Internship:</label>
                                         <input type="text" class="form-control" id="point_internship" name="point_internship" placeholder="Enter what you have learned during your internship ">
                                     </div>
+
                                     <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+                                    <!-- <button type="submit" name="submit" class="btn btn-primary">Submit</button> -->
                                 </form>
                             </div>
                         </div>
                     </div>
 
-                    <?php if ($usertype == 'hr') { ?>
+                    <?php if ($usertype == 'hr' || $usertype == 'admin') { ?>
                         <!-- code for uploading certificate start here-->
                         <div class="col-lg-6">
                             <div class="card">
@@ -287,15 +296,47 @@ $decform = $results[0]['declarationform'];
                             </div>
                         </div>
                     <?php } ?>
+
+
+                    <!--- code for generic complain start here ---->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title" style="color:red;">Generic Complain</h4>
+                            </div>
+                            <div class="card-body">
+                                <form method="post" action="formsubmit.php/gencomplain" onsubmit="return validatePriceAndQuantity();">
+                                    <input type="hidden" name="sid" value="<?php echo $results[0]['sid']; ?>">
+                                    <div class="mb-3 mt-3">
+                                        <label for="purpose">Please Write What is the issue:</label>
+                                        <input type="text" class="form-control" id="issues" name="issues" placeholder="Write your Issues Here" required>
+                                    </div>
+                                    <button type="submit" name="submit" class="btn btn-primary signupbtn" id="myBtn">Submit</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </div>
         </div>
         <!-- code for main body ends here  -->
+
+        <!-- code for footer start here  -->
+        <!--<div class="footer">-->
+        <!--    <div class="copyright">-->
+        <!--        <p>Copyright MIP <a href="#" target="_blank"></a>2024</p>-->
+        <!--    </div>-->
+        <!--</div>-->
+        <!-- code for footer ends here  -->
+
     </div>
 
     <?php include 'footer.php'; ?>
 
+    <!--**********************************
+        Scripts
+    ***********************************-->
     <!---code for validating the product price start here  --->
     <script>
         // Function to validate product price and quantity dynamically
@@ -334,6 +375,7 @@ $decform = $results[0]['declarationform'];
             return true;
         }
     </script>
+    <!--- code for validating teh leave appliction form ---->
     <script>
         /* code for vaildating the leave application form start here */
         function calculateDays(startDateId, endDateId, daysId) {
@@ -344,10 +386,10 @@ $decform = $results[0]['declarationform'];
                 const start = new Date(startDate);
                 const end = new Date(endDate);
                 const timeDiff = end - start;
-                const days = timeDiff / (1000 * 3600 * 24) + 1;
+                const days = timeDiff / (1000 * 3600 * 24) + 1; // +1 to include both start and end date
                 document.getElementById(daysId).value = days >= 0 ? days : 0;
             } else {
-                document.getElementById(daysId).value = 0;
+                document.getElementById(daysId).value = 0; // Set to 0 if dates are not selected
             }
         }
 
