@@ -155,11 +155,11 @@ $usertype = $_SESSION['usertype'];
                         <li><a href="./account.php">Account</a></li>
                     <?php } ?>
                     <li><a href="./applyleave.php">All Application</a></li>
-                    <li><a href="./resign.php">Exit Formalities</a></li>
                     <?php if ($usertype == 'systemadmin' || $usertype == 'admin') { ?>
-                        <li><a href="./systemregister.php">System Registration</a></li>
+                        <!--<li><a href="./systemregister.php">System Registration</a></li>-->
                     <?php } ?>
                     <li><a href="/system">System</a></li>
+                    <li><a href="./resign.php">Exit Formalities</a></li>
 
                 </ul>
             </li>
