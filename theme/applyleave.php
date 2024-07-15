@@ -166,7 +166,6 @@ $decform = $results[0]['declarationform'];
                                         <label for="purpose">Urgency:</label>
                                         <input type="text" class="form-control" id="purpose" name="urgency" placeholder="Purpose" required>
                                     </div>
-                                    <!--<button type="submit" name="submit" class="btn btn-primary" onclick="return Validate()">Submit</button>-->
                                     <button type="submit" name="submit" class="btn btn-primary signupbtn" id="myBtn" onclick="return Validate()">Submit</button>
                                     <!-- <button type="submit" name="submit" class="btn btn-primary">Submit</button> -->
                                 </form>
