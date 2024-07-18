@@ -381,14 +381,9 @@ $decform = $results[0]['declarationform'];
                 }
             </script>
             <!--- code for all teh invoice ends here --->
-
-            <!-- Required vendors -->
             <script src="./vendor/global/global.min.js"></script>
             <script src="./js/quixnav-init.js"></script>
             <script src="./js/custom.min.js"></script>
-
-
-            <!-- Vectormap -->
             <script src="./vendor/raphael/raphael.min.js"></script>
             <script src="./vendor/morris/morris.min.js"></script>
 
