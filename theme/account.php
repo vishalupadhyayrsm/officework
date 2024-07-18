@@ -20,7 +20,7 @@ if (isset($_SESSION['user_email'])) {
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // code for getting all the invoice start  here 
-        $sqlquery = "SELECT ai.sid, ai.companyname, ai.invoicenumber, ai.invoicedate, ai.amount, ai.invoiceactivity, ai.service, ai.filename, s.name 
+        $sqlquery = "SELECT ai.sid, ai.companyname, ai.invoicenumber, ai.invoicedate, ai.amount, ai.invoiceactivity, ai.service, ai.filename,ai.month,ai.year,ai.date, s.name 
         FROM allinvoice ai 
         LEFT JOIN sigin s ON s.sid = ai.sid";
         $stmt = $conn->prepare($sqlquery);
@@ -111,6 +111,7 @@ $decform = $results[0]['declarationform'];
                                         <option value="bl">Balmer Lawrie</option>
                                         <option value="dmart">D-Mart</option>
                                         <option value="ola">OLA</option>
+                                        <option value="others">Others</option>
                                     </select>
                                 </div><br>
 
@@ -186,12 +187,13 @@ $decform = $results[0]['declarationform'];
 
                 <!--<div class="footer">-->
                 <!--    <div class="copyright">-->
-                <!--        <p>Copyright MIP <a href="#" target="_blank"></a>2024</p>-->
+                <!--        <p style='color:black;'>Copyright MIP <a href="#" target="_blank" ></a>2024</p>-->
                 <!--    </div>-->
                 <!--</div>-->
 
 
             </div>
+            <?php include 'footer.php'; ?>
             <script>
                 //code for getting text data from the pdf file    
                 function extractTextFromPDF(file) {
@@ -302,6 +304,21 @@ $decform = $results[0]['declarationform'];
                             headerFilter: true
                         },
                         {
+                            title: "Invoice Upload Date",
+                            field: "date",
+                            headerFilter: true
+                        },
+                        {
+                            title: "Invoice Upload Month",
+                            field: "month",
+                            headerFilter: true
+                        },
+                        {
+                            title: "Invoice Upload Year",
+                            field: "year",
+                            headerFilter: true
+                        },
+                        {
                             title: "Invoice Date",
                             field: "invoicedate",
                             headerFilter: true,
@@ -329,6 +346,7 @@ $decform = $results[0]['declarationform'];
                                 var filename = cell.getValue();
                                 return `<a href="https://miphub.in/${filename}" target="_blank" style='color:black;'>${filename}</a>`;
                             }
+
                         }
                     ];
 
@@ -337,7 +355,7 @@ $decform = $results[0]['declarationform'];
                     var currentPage = 1;
                     var table = new Tabulator("#allinvoice", {
                         data: results,
-                        layout: "fitColumns",
+                        layout: "fitData",
                         columns: columns,
                         pagination: "local", // Enable local pagination
                         paginationSize: pageSize, // Number of rows per page
@@ -362,21 +380,42 @@ $decform = $results[0]['declarationform'];
                     console.error('Tabulator library not defined or not loaded.');
                 }
             </script>
+            <!--- code for all teh invoice ends here --->
+
+            <!-- Required vendors -->
             <script src="./vendor/global/global.min.js"></script>
             <script src="./js/quixnav-init.js"></script>
             <script src="./js/custom.min.js"></script>
+
+
+            <!-- Vectormap -->
             <script src="./vendor/raphael/raphael.min.js"></script>
             <script src="./vendor/morris/morris.min.js"></script>
+
             <script src="./vendor/circle-progress/circle-progress.min.js"></script>
             <script src="./vendor/chart.js/Chart.bundle.min.js"></script>
+
             <script src="./vendor/gaugeJS/dist/gauge.min.js"></script>
+
+            <!--  flot-chart js -->
             <script src="./vendor/flot/jquery.flot.js"></script>
             <script src="./vendor/flot/jquery.flot.resize.js"></script>
+
+            <!-- Owl Carousel -->
             <script src="./vendor/owl-carousel/js/owl.carousel.min.js"></script>
+
+            <!-- Counter Up -->
             <script src="./vendor/jqvmap/js/jquery.vmap.min.js"></script>
             <script src="./vendor/jqvmap/js/jquery.vmap.usa.js"></script>
             <script src="./vendor/jquery.counterup/jquery.counterup.min.js"></script>
+
+
             <script src="./js/dashboard/dashboard-1.js"></script>
+
+
+
+
+
 </body>
 
 </html>
