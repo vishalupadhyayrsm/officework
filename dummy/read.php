@@ -27,7 +27,6 @@
         const pdfjsLib = window.pdfjsLib;
 
         function extractTextFromFirstPage(pdfUrl) {
-            // Load the PDF document
             pdfjsLib.getDocument(pdfUrl).promise.then(function(pdf) {
                 // Get the first page
                 pdf.getPage(1).then(function(page) {
