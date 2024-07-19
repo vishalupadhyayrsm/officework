@@ -39,10 +39,8 @@
 
                         for (let i = 0; i < textItems.length; i++) {
                             const item = textItems[i];
-                            finalText += item.str + "\n"; // Add newline characters for readability
+                            finalText += item.str + "\n";
                         }
-
-                        // Print the extracted text to the console
                         console.log(finalText);
                     }).catch(function(error) {
                         console.error("Error extracting text content:", error);
