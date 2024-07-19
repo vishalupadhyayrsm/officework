@@ -51,8 +51,6 @@
                 console.error("Error loading the PDF document:", error);
             });
         }
-
-        // Example usage: Replace 'path/to/your/file.pdf' with the actual path
         extractTextFromFirstPage('path/to/your/file.pdf');
     </script>
 </body>
