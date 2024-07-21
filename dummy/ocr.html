@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR with Tesseract.js</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+</head>
+<body>
+    <input type="file" id="imageInput" accept="image/*">
+    <div id="output"></div>
+
+    <script>
+        document.getElementById('imageInput').addEventListener('change', function(event) {
+            const imageFile = event.target.files[0];
+            if (imageFile && imageFile.type.match('image.*')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    Tesseract.recognize(
+                        e.target.result,
+                        'eng',
+                        {
+                            logger: info => console.log(info)
+                        }
+                    ).then(({ data: { text } }) => {
+                        document.getElementById('output').innerText = text;
+                    }).catch(err => {
+                        console.error('Error recognizing text:', err);
+                        document.getElementById('output').innerText = 'Error recognizing text. See console for details.';
+                    });
+                };
+                reader.readAsDataURL(imageFile);
+            } else {
+                console.error('No valid image file selected');
+                document.getElementById('output').innerText = 'No valid image file selected';
+            }
+        });
+    </script>
+</body>
+</html>
