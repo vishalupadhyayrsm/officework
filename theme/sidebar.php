@@ -161,7 +161,6 @@ $usertypeArray = array_map('trim', explode(',', $usertype));
                     <?php endif; ?>
                     <li><a href="./applyleave.php">All Application</a></li>
                     <?php if (in_array('systemadmin', $usertypeArray) || in_array('admin', $usertypeArray)) : ?>
-                        <!-- <li><a href="./systemregister.php">System Registration</a></li> -->
                     <?php endif; ?>
                     <li><a href="/system">System</a></li>
                     <li><a href="./resign.php">Exit Formalities</a></li>
