@@ -760,8 +760,6 @@ $decform = $results[0]['declarationform'];
         <script src="./vendor/flot/jquery.flot.resize.js"></script>
 
         <script src="./vendor/owl-carousel/js/owl.carousel.min.js"></script>
-
-        <!-- Counter Up -->
         <script src="./vendor/jqvmap/js/jquery.vmap.min.js"></script>
         <script src="./vendor/jqvmap/js/jquery.vmap.usa.js"></script>
         <script src="./vendor/jquery.counterup/jquery.counterup.min.js"></script>
