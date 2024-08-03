@@ -756,7 +756,6 @@ $decform = $results[0]['declarationform'];
 
         <script src="./vendor/gaugeJS/dist/gauge.min.js"></script>
 
-        <!--  flot-chart js -->
         <script src="./vendor/flot/jquery.flot.js"></script>
         <script src="./vendor/flot/jquery.flot.resize.js"></script>
 
