@@ -759,7 +759,6 @@ $decform = $results[0]['declarationform'];
         <script src="./vendor/flot/jquery.flot.js"></script>
         <script src="./vendor/flot/jquery.flot.resize.js"></script>
 
-        <!-- Owl Carousel -->
         <script src="./vendor/owl-carousel/js/owl.carousel.min.js"></script>
 
         <!-- Counter Up -->
