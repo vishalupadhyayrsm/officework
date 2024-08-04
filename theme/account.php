@@ -746,8 +746,6 @@ $decform = $results[0]['declarationform'];
         <script src="./js/quixnav-init.js"></script>
         <script src="./js/custom.min.js"></script>
 
-
-        <!-- Vectormap -->
         <script src="./vendor/raphael/raphael.min.js"></script>
         <script src="./vendor/morris/morris.min.js"></script>
 
