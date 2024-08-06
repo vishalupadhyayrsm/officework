@@ -147,7 +147,7 @@ $usertypeArray = array_map('trim', explode(',', $usertype));
                         <!-- Add specific items for these roles if needed -->
                     <?php endif; ?>
                     <?php if (in_array('purchase', $usertypeArray) || in_array('admin', $usertypeArray)) : ?>
-                        <li><a href="./inventory.php">Amazon</a></li>
+                        <li><a href="./inventory.php">Online Purchase</a></li>
                     <?php endif; ?>
                     <?php if (in_array('account', $usertypeArray)) : ?>
                         <li><a href="./account.php">Account</a></li>
@@ -157,10 +157,11 @@ $usertypeArray = array_map('trim', explode(',', $usertype));
                         <li><a href="./account.php">Account</a></li>
                     <?php endif; ?>
                     <?php if (in_array('admin', $usertypeArray) || in_array('cash', $usertypeArray)) : ?>
-                        <li><a href="./cash.php">Cash</a></li>
+                        <li><a href="./cash.php">Cash Advaance</a></li>
                     <?php endif; ?>
                     <li><a href="./applyleave.php">All Application</a></li>
                     <?php if (in_array('systemadmin', $usertypeArray) || in_array('admin', $usertypeArray)) : ?>
+                        <!-- <li><a href="./systemregister.php">System Registration</a></li> -->
                     <?php endif; ?>
                     <li><a href="/system">System</a></li>
                     <li><a href="./resign.php">Exit Formalities</a></li>
