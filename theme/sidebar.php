@@ -151,7 +151,6 @@ $usertypeArray = array_map('trim', explode(',', $usertype));
                     <?php endif; ?>
                     <?php if (in_array('account', $usertypeArray)) : ?>
                         <li><a href="./account.php">Account</a></li>
-                        <!--<li><a href="./home.php">HR</a></li>-->
                     <?php endif; ?>
                     <?php if (in_array('admin', $usertypeArray)) : ?>
                         <li><a href="./account.php">Account</a></li>
