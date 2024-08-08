@@ -96,7 +96,6 @@ $usertype = $_SESSION['usertype'];
                     <!--                <span class="notify-time">3:20 am</span>-->
                     <!--            </li>-->
                     <!--        </ul>-->
-                    <!-- code for notification ends here  -->
                     <!-- code for see all the notification start here nad i have to add the link -->
                     <!--        <a class="all-notification" href="#">See all notifications <i class="ti-arrow-right"></i></a>-->
                     <!--    </div>-->
