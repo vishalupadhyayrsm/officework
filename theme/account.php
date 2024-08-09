@@ -597,8 +597,6 @@ $decform = $results[0]['declarationform'];
             });
         </script>
         <!----code for uploading the indntor end here  --->
-
-
         <!---code for dispalying all the indentor strat here --->
         <script>
             if (typeof Tabulator !== 'undefined') {
